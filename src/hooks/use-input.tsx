@@ -1,7 +1,6 @@
 import { SetStateAction, useReducer, useState } from 'react'
 
 import React from 'react'
-// import { InputProps } from '../pages/BookVisitForm'
 
 const useInput = (validateValue: (value: string | number) => boolean) => {
   const [enteredValue, setEnteredValue] = useState('')

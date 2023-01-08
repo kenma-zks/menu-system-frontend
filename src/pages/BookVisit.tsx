@@ -1,4 +1,4 @@
-import { Box, useToast } from '@chakra-ui/react'
+import { useToast } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import BookVisitForm from './BookVisitForm'
 

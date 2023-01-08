@@ -9,16 +9,13 @@ import {
   Link as ChakraLink,
   Drawer,
   DrawerContent,
-  Text,
   useDisclosure,
   BoxProps,
   FlexProps,
   Button,
   Menu,
   MenuButton,
-  DrawerFooter,
   VStack,
-  color,
 } from '@chakra-ui/react'
 import {
   FiBell,

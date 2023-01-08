@@ -1,32 +1,17 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import {
-  background,
-  Badge,
   Box,
-  Button,
-  Card,
-  CardBody,
-  chakra,
-  Circle,
-  Flex,
   Icon,
-  Image,
   Input,
   InputGroup,
   InputRightElement,
   Link,
   Stack,
   Text,
-  Tooltip,
-  useColorModeValue,
-  VStack,
 } from '@chakra-ui/react'
 import art from '../assets/drawkit.png'
 import { SearchIcon } from '@chakra-ui/icons'
 import ButtonComponent from '../components/FormElements/ButtonComponent'
-import art2 from '../assets/drawkit2.png'
-import { BsStar, BsStarFill, BsStarHalf } from 'react-icons/bs'
-import { FiShoppingCart } from 'react-icons/fi'
 import MenuItems from '../components/Card/MenuItems'
 
 const Home = () => {
@@ -35,6 +20,10 @@ const Home = () => {
   const [categories, setCategories] = useState<{ id: number; name: string }[]>(
     [],
   )
+
+  const [foodDetails, setFoodDetails] = useState<
+    { id: number; name: string; price: number; imageURL: any }[]
+  >([])
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -60,6 +49,33 @@ const Home = () => {
   useEffect(() => {
     fetchCategories()
   }, [fetchCategories])
+
+  const fetchFoodDetails = useCallback(async () => {
+    try {
+      const response = await fetch(
+        'http://127.0.0.1:8000/api/menu/fooddetails/',
+      )
+      if (!response.ok) {
+        throw new Error('Something went wrong')
+      }
+      const data = await response.json()
+      const transformedData = data.map((item: any) => {
+        return {
+          id: item.id,
+          name: item.food_name,
+          price: item.food_price,
+          imageURL: item.food_image,
+        }
+      })
+      setFoodDetails(transformedData)
+    } catch (error) {
+      console.log(error)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchFoodDetails()
+  }, [fetchFoodDetails])
 
   return (
     <Box margin="-1rem" h="100vh">
@@ -141,7 +157,24 @@ const Home = () => {
               See all
             </Link>
           </Box>
-          <MenuItems />
+          <Stack
+            overflowX={{ base: 'scroll', md: 'hidden' }}
+            direction="row"
+            spacing={2}
+            align="center"
+            height="100%"
+          >
+            {foodDetails.map((food) => {
+              return (
+                <MenuItems
+                  key={food.id}
+                  name={food.name}
+                  price={food.price}
+                  imageURL={food.imageURL}
+                />
+              )
+            })}
+          </Stack>
         </Box>
       </Box>
     </Box>
