@@ -14,10 +14,11 @@ import { FiShoppingCart } from 'react-icons/fi'
 interface MenuItemsProps {
   name: string
   price: number
-  imageURL: any
+  imageURL: string
 }
 
 const MenuItems: React.FC<MenuItemsProps> = ({ name, price, imageURL }) => {
+  console.log(imageURL)
   return (
     <Flex w="full" alignItems="center" justifyContent="flex-start">
       <Box

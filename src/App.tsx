@@ -13,6 +13,8 @@ import MyCart from './pages/MyCart'
 import MyOrders from './pages/MyOrders'
 import Info from './pages/Info'
 import Home from './pages/Home'
+import Login from './pages/admin/Login'
+import SignUp from './pages/admin/SignUp'
 
 const router = createBrowserRouter([
   {
@@ -42,6 +44,23 @@ const router = createBrowserRouter([
       {
         path: 'info',
         element: <Info />,
+      },
+    ],
+  },
+  {
+    path: '/admin',
+    children: [
+      {
+        path: 'login',
+        element: <Login />,
+      },
+      {
+        path: 'signup',
+        element: <SignUp />,
+      },
+      {
+        path: 'home',
+        element: <Home />,
       },
     ],
   },

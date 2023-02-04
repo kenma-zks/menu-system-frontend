@@ -118,7 +118,6 @@ const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
         booking_duration: enteredBookingDuration,
         note: enteredNote,
       }
-      console.log(booking.note)
       resetFirstNameInput()
       resetLastNameInput()
       resetEmailInput()

@@ -1,30 +1,31 @@
 import { useToast } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
-import BookVisitForm from './BookVisitForm'
+import { useEffect, useState } from 'react'
+import SignUpForm from '../../components/Form/SignUpForm'
+import { IRegisterData } from '../../types/types'
 
 let errorText = ''
 
-const BookVisit = () => {
+const SignUp = () => {
   const [isError, setIsError] = useState<boolean | null>(null)
   const toast = useToast()
 
-  async function addBookingHandler(booking: any) {
+  async function formReceiveHandler(data: IRegisterData) {
     try {
       const response = await fetch(
-        'http://localhost:8000/api/booking/register/',
+        'http://localhost:8000/api/accounts/register/',
         {
           method: 'POST',
-          body: JSON.stringify(booking),
+          body: JSON.stringify(data),
           headers: {
             'Content-Type': 'application/json',
           },
         },
       )
-      const data = await response.json()
-      console.log(data)
+      const responseData = await response.json()
+      console.log(responseData)
       if (response.status === 400) {
         setIsError(true)
-        errorText = Object.values<string>(data as {})[0][0]
+        errorText = Object.values<string>(responseData as {})[0][0]
         console.log(errorText)
       }
 
@@ -48,7 +49,7 @@ const BookVisit = () => {
         })
       } else {
         toast({
-          title: `Booking successfull`,
+          title: `Successfully registered`,
           status: 'success',
           isClosable: true,
           variant: 'left-accent',
@@ -63,9 +64,9 @@ const BookVisit = () => {
 
   return (
     <>
-      <BookVisitForm onAddBooking={addBookingHandler} />
+      <SignUpForm onReceiveFormData={formReceiveHandler} />
     </>
   )
 }
 
-export default BookVisit
+export default SignUp

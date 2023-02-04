@@ -13,69 +13,62 @@ import art from '../assets/drawkit.png'
 import { SearchIcon } from '@chakra-ui/icons'
 import ButtonComponent from '../components/FormElements/ButtonComponent'
 import MenuItems from '../components/Card/MenuItems'
+import { fetchCategories, fetchFoodDetails } from '../api/api'
+
+interface ICategory {
+  id: number
+  category_name: string
+}
+
+interface IFoodDetails {
+  id: number
+  food_name: string
+  food_price: number
+  food_image: string
+}
 
 const Home = () => {
   const [activeTag, setActiveTag] = useState('Pizza')
 
-  const [categories, setCategories] = useState<{ id: number; name: string }[]>(
-    [],
-  )
+  const [categories, setCategories] = useState<ICategory[]>([])
 
-  const [foodDetails, setFoodDetails] = useState<
-    { id: number; name: string; price: number; imageURL: any }[]
-  >([])
+  const [foodDetails, setFoodDetails] = useState<IFoodDetails[]>([])
 
-  const fetchCategories = useCallback(async () => {
-    try {
-      const response = await fetch(
-        'http://127.0.0.1:8000/api/menu/foodcategory/',
-      )
-      if (!response.ok) {
-        throw new Error('Something went wrong')
-      }
-      const data = await response.json()
-      const transformedData = data.map((item: any) => {
+  const fetchCategoriesCallback = useCallback(() => {
+    console.log('fetchCategoriesCallback')
+    fetchCategories<ICategory[]>().then((data) => {
+      const transformedData = data.map((item) => {
         return {
           id: item.id,
-          name: item.category_name,
+          category_name: item.category_name,
         }
       })
       setCategories(transformedData)
-    } catch (error) {
-      console.log(error)
-    }
+    })
   }, [])
 
   useEffect(() => {
-    fetchCategories()
-  }, [fetchCategories])
+    fetchCategoriesCallback()
+  }, [fetchCategoriesCallback])
 
-  const fetchFoodDetails = useCallback(async () => {
-    try {
-      const response = await fetch(
-        'http://127.0.0.1:8000/api/menu/fooddetails/',
-      )
-      if (!response.ok) {
-        throw new Error('Something went wrong')
-      }
-      const data = await response.json()
-      const transformedData = data.map((item: any) => {
+  const fetchFoodDetailsCallback = useCallback(() => {
+    console.log('fetchFoodDetailsCallback')
+    fetchFoodDetails<IFoodDetails[]>().then((data) => {
+      const transformedData = data.map((item) => {
         return {
           id: item.id,
-          name: item.food_name,
-          price: item.food_price,
-          imageURL: item.food_image,
+          food_name: item.food_name,
+          food_price: item.food_price,
+          food_image: item.food_image,
         }
       })
       setFoodDetails(transformedData)
-    } catch (error) {
-      console.log(error)
-    }
+    })
   }, [])
 
   useEffect(() => {
-    fetchFoodDetails()
-  }, [fetchFoodDetails])
+    fetchFoodDetailsCallback()
+  }, [fetchFoodDetailsCallback])
 
   return (
     <Box margin="-1rem" h="100vh">
@@ -139,9 +132,9 @@ const Home = () => {
               return (
                 <ButtonComponent
                   key={category.id}
-                  name={category.name}
+                  name={category.category_name}
                   setActiveTag={setActiveTag}
-                  isActive={activeTag === category.name}
+                  isActive={activeTag === category.category_name}
                 />
               )
             })}
@@ -168,9 +161,9 @@ const Home = () => {
               return (
                 <MenuItems
                   key={food.id}
-                  name={food.name}
-                  price={food.price}
-                  imageURL={food.imageURL}
+                  name={food.food_name}
+                  price={food.food_price}
+                  imageURL={food.food_image}
                 />
               )
             })}
