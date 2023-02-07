@@ -23,35 +23,50 @@ const SignUp = () => {
   const toast = useToast()
   const navigate = useNavigate()
 
-  const [verifyRegister] = useRegisterUserMutation
+  const [verifyRegister] = useRegisterUserMutation()
 
   async function formReceiveHandler(data: IRegisterData) {
-    try {
-      const response = await fetch(
-        'http://localhost:8000/api/accounts/register/',
-        {
-          method: 'POST',
-          body: JSON.stringify(data),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      )
-      const responseData = await response.json()
-      console.log(responseData)
-      if (!response.ok || response.status === 400) {
-        if (response.status === 400) {
-          errorText = Object.values<string>(responseData as {})[0][0]
-        } else {
-          errorText = 'Something went wrong'
-        }
-        throw new Error(errorText)
-      }
-      navigate('/admin/login', { state: { isRegistered: true } })
-    } catch (error) {
-      setIsError(true)
-    }
+    verifyRegister({
+      first_name: data.first_name,
+      last_name: data.last_name,
+      email: data.email,
+      phone_number: data.phone_number,
+      password: data.password,
+      confirm_password: data.confirm_password,
+    })
+      .unwrap()
+      .then(() => navigate('/admin/login', { state: { isRegistered: true } }))
+      .catch((err: any) => {
+        setIsError(true)
+      })
   }
+
+  //   try {
+  //     const response = await fetch(
+  //       'http://localhost:8000/api/accounts/register/',
+  //       {
+  //         method: 'POST',
+  //         body: JSON.stringify(data),
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //         },
+  //       },
+  //     )
+  //     const responseData = await response.json()
+  //     console.log(responseData)
+  //     if (!response.ok || response.status === 400) {
+  //       if (response.status === 400) {
+  //         errorText = Object.values<string>(responseData as {})[0][0]
+  //       } else {
+  //         errorText = 'Something went wrong'
+  //       }
+  //       throw new Error(errorText)
+  //     }
+  //     navigate('/admin/login', { state: { isRegistered: true } })
+  //   } catch (error) {
+  //     setIsError(true)
+  //   }
+  // }
 
   useEffect(() => {
     if (isError !== null) {
