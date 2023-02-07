@@ -11,27 +11,56 @@ import {
   Flex,
   Image,
   Heading,
+  useToast,
 } from '@chakra-ui/react'
 import React, { Fragment, useState } from 'react'
 import { ILoginData } from '../../types/types'
 import login2 from '../../assets/login2.webp'
 import logo from '../../assets/logo.png'
 import { Link as RouterLink } from 'react-router-dom'
+import useInput from '../../hooks/use-input'
 
 interface ILoginFormProps {
   onReceiveFormData: (data: ILoginData) => void
 }
 
 const LoginForm = ({ onReceiveFormData }: ILoginFormProps) => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const toast = useToast()
+
+  const {
+    value: enteredEmail,
+    isValid: enteredEmailIsValid,
+    hasError: enteredEmailHasError,
+    valueChangeHandler: emailChangeHandler,
+    inputBlurHandler: emailBlurHandler,
+  } = useInput((value) => (value as string).includes('@'))
+
+  const {
+    value: enteredPassword,
+    isValid: enteredPasswordIsValid,
+    hasError: enteredPasswordHasError,
+    valueChangeHandler: passwordChangeHandler,
+    inputBlurHandler: passwordBlurHandler,
+  } = useInput((value) => (value as string).trim().length >= 8)
+
+  const validate = enteredEmailIsValid && enteredPasswordIsValid
 
   const submitHandler = (
     e: React.FormEvent<HTMLDivElement | HTMLFormElement>,
   ) => {
-    console.log('balls')
     e.preventDefault()
-    onReceiveFormData({ email, password })
+    if (validate) {
+      onReceiveFormData({ email: enteredEmail, password: enteredPassword })
+    } else {
+      toast({
+        title: 'Login failed.',
+        description: 'Please check your credentials.',
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+        position: 'top',
+      })
+    }
   }
 
   return (
@@ -63,27 +92,37 @@ const LoginForm = ({ onReceiveFormData }: ILoginFormProps) => {
                 Login to your account
               </Text>
 
-              <FormControl id="email" isRequired>
+              <FormControl
+                id="email"
+                isRequired
+                isInvalid={enteredEmailHasError}
+              >
                 <FormLabel fontSize={'small'} color="#633c7e">
                   Email address
                 </FormLabel>
                 <Input
                   type="email"
                   placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={enteredEmail}
+                  onChange={emailChangeHandler}
+                  onBlur={emailBlurHandler}
                   autoComplete="off"
                 />
               </FormControl>
-              <FormControl id="passowrd" isRequired>
+              <FormControl
+                id="password"
+                isRequired
+                isInvalid={enteredPasswordHasError}
+              >
                 <FormLabel fontSize={'small'} color="#633c7e">
                   Password
                 </FormLabel>
                 <Input
                   type="password"
                   placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={enteredPassword}
+                  onChange={passwordChangeHandler}
+                  onBlur={passwordBlurHandler}
                   autoComplete="off"
                 />
               </FormControl>

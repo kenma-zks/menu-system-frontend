@@ -1,13 +1,29 @@
 import { useToast } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router'
 import SignUpForm from '../../components/Form/SignUpForm'
 import { IRegisterData } from '../../types/types'
+import React from 'react'
+import { useRegisterUserMutation } from '../../store/authApiSlice'
+
+type HttpError = {
+  statusCode: 400
+}
+
+type FetchError = {
+  message: string
+}
+
+type IError = HttpError | FetchError
 
 let errorText = ''
 
 const SignUp = () => {
   const [isError, setIsError] = useState<boolean | null>(null)
   const toast = useToast()
+  const navigate = useNavigate()
+
+  const [verifyRegister] = useRegisterUserMutation
 
   async function formReceiveHandler(data: IRegisterData) {
     try {
@@ -23,21 +39,21 @@ const SignUp = () => {
       )
       const responseData = await response.json()
       console.log(responseData)
-      if (response.status === 400) {
-        setIsError(true)
-        errorText = Object.values<string>(responseData as {})[0][0]
-        console.log(errorText)
+      if (!response.ok || response.status === 400) {
+        if (response.status === 400) {
+          errorText = Object.values<string>(responseData as {})[0][0]
+        } else {
+          errorText = 'Something went wrong'
+        }
+        throw new Error(errorText)
       }
-
-      setIsError(!response.ok)
+      navigate('/admin/login', { state: { isRegistered: true } })
     } catch (error) {
       setIsError(true)
-      errorText = 'Something went wrong'
     }
   }
 
   useEffect(() => {
-    console.log(isError)
     if (isError !== null) {
       if (isError) {
         toast({

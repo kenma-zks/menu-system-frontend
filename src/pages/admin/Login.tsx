@@ -1,47 +1,65 @@
-import {
-  Button,
-  Checkbox,
-  Flex,
-  FormControl,
-  FormLabel,
-  Heading,
-  Image,
-  Input,
-  Link,
-  Stack,
-  Text,
-} from '@chakra-ui/react'
-import React from 'react'
-import login2 from '../../assets/login2.webp'
-import logo from '../../assets/logo.png'
-
-import { Link as RouterLink } from 'react-router-dom'
+import { Link as RouterLink, NavLink, useLocation } from 'react-router-dom'
 import LoginForm from '../../components/Form/LoginForm'
-import { ILoginData } from '../../types/types'
+import { useNavigate } from 'react-router-dom'
+import { useToast } from '@chakra-ui/toast'
+import { Fragment, useState } from 'react'
+import React from 'react'
+import { ILoginData, tokenState } from '../../types/types'
+import { useVerifyLoginMutation } from '../../store/authApiSlice'
+import { authActions } from '../../store/authSlice'
+import { useAppDispatch } from '../../store/hooks'
 
 const Login = () => {
-  // const toast = useToast()
+  const { state } = useLocation()
+
+  const [openToast, setOpenToast] = useState<boolean>(
+    state?.isRegistered ? true : false,
+  )
+
+  const toast = useToast()
+  const navigate = useNavigate()
+  const dispatch = useAppDispatch()
+
+  const [verifyLogin] = useVerifyLoginMutation()
 
   const formReceiveHandler = (data: ILoginData) => {
-    fetch('http://127.0.0.1:8000/api/accounts/token/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data)
-        // handle the response from the API
-      })
-      .catch((error) => {
-        console.error(error)
-        // handle the error
+    verifyLogin({ email: data.email, password: data.password })
+      .unwrap()
+      .then((tokens: tokenState) =>
+        dispatch(authActions.setCredentials({ authTokens: tokens })),
+      )
+      .then(() => navigate('/admin/home'))
+      .catch((err) => {
+        toast({
+          title: 'Login failed.',
+          description: 'Please check your credentials.',
+          status: 'error',
+          duration: 9000,
+          isClosable: true,
+          position: 'top',
+        })
       })
   }
 
-  return <LoginForm onReceiveFormData={formReceiveHandler} />
+  return (
+    <Fragment>
+      {openToast && (
+        <>
+          {setOpenToast(false)}
+          {toast({
+            title: 'Account created.',
+            description: 'You can now log in.',
+            status: 'success',
+            duration: 9000,
+            isClosable: true,
+            position: 'top',
+          })}
+        </>
+      )}
+
+      <LoginForm onReceiveFormData={formReceiveHandler} />
+    </Fragment>
+  )
 }
 
 export default Login

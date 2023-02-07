@@ -69,7 +69,7 @@ const SignUpForm = ({ onReceiveFormData }: IRegisterFormProps) => {
     valueChangeHandler: passwordChangeHandler,
     inputBlurHandler: passwordBlurHandler,
     reset: resetPasswordInput,
-  } = useInput((value) => (value as string).trim().length > 8)
+  } = useInput((value) => (value as string).trim().length >= 8)
 
   const {
     value: enteredConfirmPassword,
@@ -81,7 +81,7 @@ const SignUpForm = ({ onReceiveFormData }: IRegisterFormProps) => {
   } = useInput(
     (value) =>
       (value as string).trim() === enteredPassword &&
-      enteredPassword.trim().length > 8,
+      enteredPassword.trim().length >= 8,
   )
 
   const validate =
@@ -168,11 +168,11 @@ const SignUpForm = ({ onReceiveFormData }: IRegisterFormProps) => {
                   onBlur={firstNameBlurHandler}
                   value={enteredFirstName}
                 />
-                {enteredFirstNameHasError && (
+                {/* {enteredFirstNameHasError && (
                   <FormErrorMessage>
                     Please enter a valid first name.
                   </FormErrorMessage>
-                )}
+                )} */}
               </FormControl>
               <FormControl
                 id="lastName"
@@ -189,11 +189,11 @@ const SignUpForm = ({ onReceiveFormData }: IRegisterFormProps) => {
                   onBlur={lastNameBlurHandler}
                   value={enteredLastName}
                 />
-                {enteredLastNameHasError && (
+                {/* {enteredLastNameHasError && (
                   <FormErrorMessage>
                     Please enter a valid last name.
                   </FormErrorMessage>
-                )}
+                )} */}
               </FormControl>
             </HStack>
             <HStack>
@@ -212,11 +212,11 @@ const SignUpForm = ({ onReceiveFormData }: IRegisterFormProps) => {
                   onBlur={phoneNumberBlurHandler}
                   value={enteredPhoneNumber}
                 />
-                {enteredPhoneNumberHasError && (
+                {/* {enteredPhoneNumberHasError && (
                   <FormErrorMessage>
                     Please enter a valid phone number.
                   </FormErrorMessage>
-                )}
+                )} */}
               </FormControl>
               <FormControl
                 id="email"
@@ -233,11 +233,11 @@ const SignUpForm = ({ onReceiveFormData }: IRegisterFormProps) => {
                   onBlur={emailBlurHandler}
                   value={enteredEmail}
                 />
-                {enteredEmailHasError && (
+                {/* {enteredEmailHasError && (
                   <FormErrorMessage>
                     Please enter a valid email address.
                   </FormErrorMessage>
-                )}
+                )} */}
               </FormControl>
             </HStack>
             <HStack>
@@ -256,11 +256,11 @@ const SignUpForm = ({ onReceiveFormData }: IRegisterFormProps) => {
                   onBlur={passwordBlurHandler}
                   value={enteredPassword}
                 />
-                {enteredPasswordHasError && (
+                {/* {enteredPasswordHasError && (
                   <FormErrorMessage>
                     Password must be at least 8 characters.
                   </FormErrorMessage>
-                )}
+                )} */}
               </FormControl>
               <FormControl
                 id="confirmPassword"
@@ -277,9 +277,9 @@ const SignUpForm = ({ onReceiveFormData }: IRegisterFormProps) => {
                   onBlur={confirmPasswordBlurHandler}
                   value={enteredConfirmPassword}
                 />
-                {enteredConfirmPasswordHasError && (
+                {/* {enteredConfirmPasswordHasError && (
                   <FormErrorMessage>Password does not match.</FormErrorMessage>
-                )}
+                )} */}
               </FormControl>
             </HStack>
             <Box pt={4}>
