@@ -17,6 +17,7 @@ import {
   MenuButton,
   VStack,
   Image,
+  Center,
 } from '@chakra-ui/react'
 import {
   FiBell,
@@ -26,6 +27,9 @@ import {
   FiMenu,
   FiShoppingCart,
   FiHome,
+  FiLogOut,
+  FiArchive,
+  FiFileText,
 } from 'react-icons/fi'
 import { IconType } from 'react-icons'
 import { ReactText } from 'react'
@@ -38,14 +42,14 @@ interface LinkItemProps {
   link: string
 }
 const LinkItems: Array<LinkItemProps> = [
-  { name: 'Home', icon: FiHome, link: '/home' },
-  { name: 'Call Waiter', icon: FiBell, link: '/call-waiter' },
-  { name: 'Book Visit', icon: FiCalendar, link: '/book-visit' },
-  { name: 'My Orders', icon: FiBookOpen, link: '/my-orders' },
-  { name: 'My Cart', icon: FiShoppingCart, link: '/my-cart' },
+  { name: 'Home', icon: FiHome, link: '/admin/home' },
+  { name: 'Products', icon: FiArchive, link: '/admin/products' },
+  { name: 'Orders', icon: FiShoppingCart, link: '/admin/orders' },
+  { name: 'Bookings', icon: FiCalendar, link: '/admin/bookings' },
+  { name: 'Order History', icon: FiFileText, link: '/admin/order-history' },
 ]
 
-export default function SimpleSidebar({ children }: { children?: ReactNode }) {
+export default function AdminSidebar({ children }: { children?: ReactNode }) {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   return (
@@ -97,12 +101,13 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
           h="20"
           alignItems="center"
           mx="8"
-          my="15px"
+          my="30px"
           justifyContent="space-between"
         >
           <Box>
             <Image src={logo} alt="logo" boxSize="75px" />
           </Box>
+
           <CloseButton
             display={{ base: 'flex', md: 'none' }}
             onClick={onClose}
@@ -115,8 +120,8 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
         ))}
       </Box>
       <Box width={'100%'} paddingBottom="4">
-        <NavItem href={'/info'} icon={FiInfo}>
-          Restaurants name
+        <NavItem href={''} icon={FiLogOut}>
+          Logout
         </NavItem>
       </Box>
     </VStack>
@@ -193,13 +198,6 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
         {/* <img src={logo} alt="logo" height="120px" width="120px" /> */}
       </Box>
       <Flex>
-        <IconButton
-          background="inherit"
-          aria-label="open menu"
-          icon={<FiShoppingCart />}
-          as={Link}
-          to="/my-cart"
-        />
         <Menu>
           <MenuButton
             as={Button}

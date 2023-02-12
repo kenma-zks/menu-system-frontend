@@ -1,13 +1,10 @@
 import React, { useRef, useState } from 'react'
 
 import {
-  Box,
-  Select,
   Button,
   Flex,
   FormControl,
   FormErrorMessage,
-  FormHelperText,
   FormLabel,
   Input,
   InputGroup,
@@ -143,7 +140,7 @@ const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
   const currentDateString = currentDate.toISOString().substring(0, 16)
 
   return (
-    <VStack alignItems="flex-start">
+    <VStack padding={4} alignItems="flex-start">
       <form onSubmit={submitHandler}>
         <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold" mb="2%">
           Book Visit
