@@ -41,33 +41,6 @@ const SignUp = () => {
       })
   }
 
-  //   try {
-  //     const response = await fetch(
-  //       'http://localhost:8000/api/accounts/register/',
-  //       {
-  //         method: 'POST',
-  //         body: JSON.stringify(data),
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //         },
-  //       },
-  //     )
-  //     const responseData = await response.json()
-  //     console.log(responseData)
-  //     if (!response.ok || response.status === 400) {
-  //       if (response.status === 400) {
-  //         errorText = Object.values<string>(responseData as {})[0][0]
-  //       } else {
-  //         errorText = 'Something went wrong'
-  //       }
-  //       throw new Error(errorText)
-  //     }
-  //     navigate('/admin/login', { state: { isRegistered: true } })
-  //   } catch (error) {
-  //     setIsError(true)
-  //   }
-  // }
-
   useEffect(() => {
     if (isError !== null) {
       if (isError) {

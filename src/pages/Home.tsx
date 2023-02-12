@@ -71,7 +71,7 @@ const Home = () => {
   }, [fetchFoodDetailsCallback])
 
   return (
-    <Box margin="-1rem" h="100vh">
+    <Box h="100vh">
       <Box
         backgroundImage={`url(${art})`}
         h="40vh"
