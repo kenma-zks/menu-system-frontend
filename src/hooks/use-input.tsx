@@ -13,7 +13,6 @@ const useInput = (validateValue: (value: string | number) => boolean) => {
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | any>,
   ) => {
     setEnteredValue(event.target.value)
-    console.log(event.target.value)
   }
 
   const inputBlurHandler = () => {

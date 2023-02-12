@@ -1,34 +1,39 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { authState, tokenState } from '../types/types'
+import jwt_decode from 'jwt-decode'
+import { PayloadAction } from '@reduxjs/toolkit/dist/createAction'
 
-interface State {
-  auth: {
-    user: string
-    token: string
-  }
+const initialState: authState = {
+  authTokens: localStorage.getItem('authTokens')
+    ? JSON.parse(localStorage.getItem('authTokens')!)
+    : null,
+  user: localStorage.getItem('authTokens')
+    ? jwt_decode(JSON.parse(localStorage.getItem('authTokens')!)?.access)
+    : null,
 }
 
 const authSlice = createSlice({
   name: 'auth',
-  initialState: {
-    user: null,
-    token: null,
-  },
+  initialState: initialState,
   reducers: {
-    setCredentials: (state, action) => {
-      const { user, accessToken } = action.payload
-      state.user = user
-      state.token = accessToken
+    setCredentials(state, action: PayloadAction<{ authTokens: tokenState }>) {
+      const { authTokens } = action.payload
+
+      state.authTokens = action.payload.authTokens
+
+      if (authTokens) {
+        state.user = jwt_decode(authTokens.access)
+      }
+      localStorage.setItem('authTokens', JSON.stringify(authTokens))
     },
-    logOut: (state, action) => {
+    logOut(state) {
+      state.authTokens = null
       state.user = null
-      state.token = null
+      localStorage.removeItem('authTokens')
     },
   },
 })
 
-export const { setCredentials, logOut } = authSlice.actions
+export const authActions = authSlice.actions
 
 export default authSlice.reducer
-
-export const selectCurrentUser = (state: State) => state.auth.user
-export const selectCurrentToken = (state: State) => state.auth.token

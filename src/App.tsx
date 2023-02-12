@@ -15,6 +15,8 @@ import Info from './pages/Info'
 import Home from './pages/Home'
 import Login from './pages/admin/Login'
 import SignUp from './pages/admin/SignUp'
+import AdminHome from './pages/admin/Home'
+import React from 'react'
 
 const router = createBrowserRouter([
   {
@@ -60,7 +62,7 @@ const router = createBrowserRouter([
       },
       {
         path: 'home',
-        element: <Home />,
+        element: <AdminHome />,
       },
     ],
   },

@@ -1,43 +1,74 @@
 import { useToast } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router'
 import SignUpForm from '../../components/Form/SignUpForm'
 import { IRegisterData } from '../../types/types'
+import React from 'react'
+import { useRegisterUserMutation } from '../../store/authApiSlice'
+
+type HttpError = {
+  statusCode: 400
+}
+
+type FetchError = {
+  message: string
+}
+
+type IError = HttpError | FetchError
 
 let errorText = ''
 
 const SignUp = () => {
   const [isError, setIsError] = useState<boolean | null>(null)
   const toast = useToast()
+  const navigate = useNavigate()
+
+  const [verifyRegister] = useRegisterUserMutation()
 
   async function formReceiveHandler(data: IRegisterData) {
-    try {
-      const response = await fetch(
-        'http://localhost:8000/api/accounts/register/',
-        {
-          method: 'POST',
-          body: JSON.stringify(data),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      )
-      const responseData = await response.json()
-      console.log(responseData)
-      if (response.status === 400) {
+    verifyRegister({
+      first_name: data.first_name,
+      last_name: data.last_name,
+      email: data.email,
+      phone_number: data.phone_number,
+      password: data.password,
+      confirm_password: data.confirm_password,
+    })
+      .unwrap()
+      .then(() => navigate('/admin/login', { state: { isRegistered: true } }))
+      .catch((err: any) => {
         setIsError(true)
-        errorText = Object.values<string>(responseData as {})[0][0]
-        console.log(errorText)
-      }
-
-      setIsError(!response.ok)
-    } catch (error) {
-      setIsError(true)
-      errorText = 'Something went wrong'
-    }
+      })
   }
 
+  //   try {
+  //     const response = await fetch(
+  //       'http://localhost:8000/api/accounts/register/',
+  //       {
+  //         method: 'POST',
+  //         body: JSON.stringify(data),
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //         },
+  //       },
+  //     )
+  //     const responseData = await response.json()
+  //     console.log(responseData)
+  //     if (!response.ok || response.status === 400) {
+  //       if (response.status === 400) {
+  //         errorText = Object.values<string>(responseData as {})[0][0]
+  //       } else {
+  //         errorText = 'Something went wrong'
+  //       }
+  //       throw new Error(errorText)
+  //     }
+  //     navigate('/admin/login', { state: { isRegistered: true } })
+  //   } catch (error) {
+  //     setIsError(true)
+  //   }
+  // }
+
   useEffect(() => {
-    console.log(isError)
     if (isError !== null) {
       if (isError) {
         toast({
