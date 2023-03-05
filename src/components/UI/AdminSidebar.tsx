@@ -104,9 +104,9 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
           my="30px"
           justifyContent="space-between"
         >
-          <Box>
+          <Flex justifyContent={'center'} w="full">
             <Image src={logo} alt="logo" boxSize="75px" />
-          </Box>
+          </Flex>
 
           <CloseButton
             display={{ base: 'flex', md: 'none' }}

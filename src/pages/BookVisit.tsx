@@ -1,5 +1,6 @@
 import { useToast } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
+import { Booking } from '../types/types'
 import BookVisitForm from './BookVisitForm'
 
 let errorText = ''
@@ -8,7 +9,7 @@ const BookVisit = () => {
   const [isError, setIsError] = useState<boolean | null>(null)
   const toast = useToast()
 
-  async function addBookingHandler(booking: any) {
+  async function addBookingHandler(booking: Booking) {
     try {
       const response = await fetch(
         'http://localhost:8000/api/booking/register/',

@@ -233,7 +233,7 @@ const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
           </FormLabel>
           <Input
             placeholder="Booking Start"
-            type="datetime-local"
+            type="date"
             min={currentDateString}
             onChange={bookingStartChangeHandler}
             onBlur={bookingStartBlurHandler}

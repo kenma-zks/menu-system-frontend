@@ -39,8 +39,6 @@ const NavLink = ({ children }: { children: ReactNode }) => (
 )
 
 export default function AdminNavbar() {
-  const { colorMode, toggleColorMode } = useColorMode()
-  const { isOpen, onOpen, onClose } = useDisclosure()
   return (
     <>
       <Box px={4}>

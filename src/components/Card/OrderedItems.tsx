@@ -221,7 +221,6 @@ const OrderedItems = () => {
   }>({})
 
   const [displayOrder, setDisplayOrder] = useState(DUMMY_ORDER)
-  const [previousDisplayOrder, setPreviousDisplayOrder] = useState(displayOrder)
 
   const handleAcceptOrder = (orderId: number) => {
     setOrderState({
@@ -238,12 +237,11 @@ const OrderedItems = () => {
   }
 
   const handleDelete = (orderId: number) => {
-    setPreviousDisplayOrder(displayOrder)
-
     const updatedOrders = displayOrder.filter(
       (order) => order.order_id !== orderId,
     )
     setDisplayOrder(updatedOrders)
+    console.log(updatedOrders.length)
     toast({
       title: 'Order Deleted',
       status: 'success',
@@ -257,7 +255,7 @@ const OrderedItems = () => {
               Order #{orderId} Deleted
             </Text>
             <IconButton
-              onClick={handleUndo}
+              // onClick={handleUndo}
               aria-label="Undo"
               icon={<FiCornerUpLeft />}
               variant="solid"
@@ -270,9 +268,6 @@ const OrderedItems = () => {
     })
   }
 
-  const handleUndo = () => {
-    setDisplayOrder(previousDisplayOrder)
-  }
   const toast = useToast()
 
   return (

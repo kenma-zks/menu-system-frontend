@@ -23,6 +23,14 @@ export interface IRegisterData {
   confirm_password: string
 }
 
+export interface IProductData {
+  food_name: string
+  food_price: number | string
+  category_id: number | string
+  food_description: string
+  food_image: File | null
+}
+
 export interface tokenState {
   access: string
   refresh: string

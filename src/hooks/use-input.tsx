@@ -2,7 +2,9 @@ import { SetStateAction, useReducer, useState } from 'react'
 
 import React from 'react'
 
-const useInput = (validateValue: (value: string | number) => boolean) => {
+const useInput = (
+  validateValue: (value: string | number | File) => boolean,
+) => {
   const [enteredValue, setEnteredValue] = useState('')
   const [isTouched, setIsTouched] = useState(false)
 
