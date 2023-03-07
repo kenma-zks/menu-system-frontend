@@ -1,35 +1,24 @@
-import { ChevronDownIcon, Search2Icon } from '@chakra-ui/icons'
 import {
   Box,
-  Button,
-  HStack,
-  Input,
-  InputGroup,
-  InputLeftAddon,
-  InputLeftElement,
-  InputRightAddon,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Select,
   Tab,
   TabList,
   TabPanel,
   TabPanels,
   Tabs,
-  Text,
   useToast,
   VStack,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
-import ProductCard from '../../components/Card/ProductCard'
 import CreateProductForm from '../../components/Form/CreateProductForm'
 import AdminNavBar from '../../components/UI/AdminNavbar'
-import { IProductData } from '../../types/types'
+import AllCategories from '../../components/UI/AllCategories'
+import AllProducts from '../../components/UI/AllProducts'
+import { ICategoryData, IProductData } from '../../types/types'
 
 const Products = () => {
-  const [isError, setIsError] = useState<boolean | null>(null)
+  const [isProductError, setIsProductError] = useState<boolean | null>(null)
+  const [isCategoryError, setIsCategoryError] = useState<boolean | null>(null)
+
   const toast = useToast()
 
   async function createProductHandler(productData: IProductData) {
@@ -49,20 +38,39 @@ const Products = () => {
           body: formData,
         },
       )
-      const data = await response.json()
-      console.log(data)
       if (response.status === 400) {
-        setIsError(true)
+        setIsProductError(true)
       }
-      setIsError(!response.ok)
+      setIsProductError(!response.ok)
     } catch (error) {
-      setIsError(true)
+      setIsProductError(true)
+    }
+  }
+
+  async function createCategoryHandler(categoryData: ICategoryData) {
+    try {
+      const response = await fetch(
+        'http://127.0.0.1:8000/api/menu/foodcategory/',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(categoryData),
+        },
+      )
+      if (response.status === 400) {
+        setIsCategoryError(true)
+      }
+      setIsCategoryError(!response.ok)
+    } catch (error) {
+      setIsCategoryError(true)
     }
   }
 
   useEffect(() => {
-    if (isError !== null) {
-      if (isError) {
+    if (isProductError !== null) {
+      if (isProductError) {
         toast({
           title: 'Something went wrong',
           status: 'error',
@@ -81,9 +89,15 @@ const Products = () => {
       }
     }
     setTimeout(() => {
-      setIsError(null)
+      setIsProductError(null)
     }, 3000)
-  }, [isError, toast])
+  }, [isProductError, toast])
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsCategoryError(null)
+    }, 3000)
+  }, [isCategoryError])
 
   return (
     <>
@@ -98,54 +112,21 @@ const Products = () => {
                 <TabList px="8">
                   <Tab>All products</Tab>
                   <Tab>Create products</Tab>
+                  <Tab>All categories</Tab>
                 </TabList>
                 <Box>
                   <TabPanels>
                     <TabPanel bgColor={'white'} p="8">
-                      <VStack alignItems={'flex-start'}>
-                        <HStack pb="6" spacing={0} width={'600px'}>
-                          <Menu>
-                            <MenuButton
-                              as={Button}
-                              rightIcon={<ChevronDownIcon />}
-                              width="25%"
-                              backgroundColor="white"
-                              border="1px"
-                              borderColor="gray.400"
-                              borderRadius="md"
-                              _hover={{ bg: 'white' }}
-                              _expanded={{ bg: 'white' }}
-                              _focus={{ bg: 'white' }}
-                              borderRightRadius="0"
-                              iconSpacing="20"
-                              fontSize={'sm'}
-                              color="gray.600"
-                            >
-                              Filter
-                            </MenuButton>
-                            <MenuList>
-                              <MenuItem>Category 1</MenuItem>
-                              <MenuItem>Category 2</MenuItem>
-                            </MenuList>
-                          </Menu>
-                          <InputGroup width="75%">
-                            <InputLeftElement
-                              pointerEvents="none"
-                              children={<Search2Icon color="gray" />}
-                            />
-                            <Input
-                              borderLeftRadius="0"
-                              borderColor="gray.400"
-                              placeholder="Search products ..."
-                            />
-                          </InputGroup>
-                        </HStack>
-                        <ProductCard />
-                      </VStack>
+                      <AllProducts />
                     </TabPanel>
                     <TabPanel bgColor="white">
                       <CreateProductForm
                         onReceiveFormData={createProductHandler}
+                      />
+                    </TabPanel>
+                    <TabPanel bgColor={'white'}>
+                      <AllCategories
+                        onReceiveCategoryData={createCategoryHandler}
                       />
                     </TabPanel>
                   </TabPanels>

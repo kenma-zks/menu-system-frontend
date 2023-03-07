@@ -31,6 +31,11 @@ export interface IProductData {
   food_image: File | null
 }
 
+export interface ICategoryData {
+  id: number
+  category_name: string
+}
+
 export interface tokenState {
   access: string
   refresh: string
