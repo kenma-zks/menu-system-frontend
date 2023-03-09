@@ -24,11 +24,13 @@ export interface IRegisterData {
 }
 
 export interface IProductData {
+  id?: number
+  category_id: number | string
   food_name: string
   food_price: number | string
-  category_id: number | string
   food_description: string
   food_image: File | null
+  food_available: boolean
 }
 
 export interface ICategoryData {

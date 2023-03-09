@@ -14,11 +14,13 @@ import {
   VStack,
 } from '@chakra-ui/react'
 import ProductCard from '../../components/Card/ProductCard'
+import { useAppSelector } from '../../store/hooks'
 
 const AllProducts = () => {
+  const categories = useAppSelector((state) => state.categories.categories)
   return (
     <VStack alignItems={'flex-start'}>
-      <HStack pb="6" spacing={0} width={'600px'}>
+      <HStack pb="6" spacing={0} width={'40%'}>
         <Menu>
           <MenuButton
             as={Button}
@@ -39,8 +41,9 @@ const AllProducts = () => {
             Filter
           </MenuButton>
           <MenuList>
-            <MenuItem>Category 1</MenuItem>
-            <MenuItem>Category 2</MenuItem>
+            {categories.map((category) => (
+              <MenuItem key={category.id}>{category.category_name}</MenuItem>
+            ))}
           </MenuList>
         </Menu>
         <InputGroup width="75%">

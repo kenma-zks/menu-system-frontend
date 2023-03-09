@@ -13,12 +13,15 @@ import CreateProductForm from '../../components/Form/CreateProductForm'
 import AdminNavBar from '../../components/UI/AdminNavbar'
 import AllCategories from '../../components/UI/AllCategories'
 import AllProducts from '../../components/UI/AllProducts'
+import { useAppDispatch } from '../../store/hooks'
+import { addProduct } from '../../store/productsSlice'
 import { ICategoryData, IProductData } from '../../types/types'
 
 const Products = () => {
   const [isProductError, setIsProductError] = useState<boolean | null>(null)
   const [isCategoryError, setIsCategoryError] = useState<boolean | null>(null)
 
+  const dispatch = useAppDispatch()
   const toast = useToast()
 
   async function createProductHandler(productData: IProductData) {
@@ -26,8 +29,8 @@ const Products = () => {
       const formData = new FormData()
       formData.append('food_name', productData.food_name)
       formData.append('food_price', productData.food_price.toString())
-      formData.append('category_id', productData.category_id.toString())
       formData.append('food_description', productData.food_description)
+      formData.append('category_id', productData.category_id.toString())
       if (productData.food_image) {
         formData.append('food_image', productData.food_image)
       }
@@ -42,6 +45,7 @@ const Products = () => {
         setIsProductError(true)
       }
       setIsProductError(!response.ok)
+      dispatch(addProduct(productData))
     } catch (error) {
       setIsProductError(true)
     }

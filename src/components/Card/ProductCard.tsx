@@ -1,71 +1,56 @@
-import { Box, Flex, HStack, Image, VStack, Wrap } from '@chakra-ui/react'
+import { Box, Flex, HStack, Image, Text, VStack, Wrap } from '@chakra-ui/react'
 import item from '../../assets/login3.webp'
 import item2 from '../../assets/login2.webp'
-import React from 'react'
-
-const DUMMY_PRODUCT = [
-  {
-    id: '1',
-    name: 'Fried Rice ',
-    price: '10',
-    available: 'Available',
-    image: item,
-  },
-  {
-    id: '2',
-    name: 'Shrimp',
-    price: '10',
-    available: 'Available',
-    image: item2,
-  },
-  {
-    id: '3',
-    name: 'Nasi Lemak',
-    price: '20',
-    available: 'Not available',
-    image: item,
-  },
-  {
-    id: '4',
-    name: 'Nasi Goreng',
-    price: '40',
-    available: 'Available',
-    image: item2,
-  },
-  {
-    id: '5',
-    name: 'Fried Rice',
-    price: '10',
-    available: 'Available',
-    image: item,
-  },
-  {
-    id: '6',
-    name: 'Shrimp',
-    price: '10',
-    available: 'Not available',
-    image: item2,
-  },
-  {
-    id: '7',
-    name: 'Nasi Lemak',
-    price: '20',
-    available: 'Available',
-    image: item,
-  },
-  {
-    id: '8',
-    name: 'Nasi Goreng',
-    price: '40',
-    available: 'Not available',
-    image: item2,
-  },
-]
+import React, { useCallback, useEffect, useState } from 'react'
+import { fetchFoodDetails } from '../../api/api'
+import { IProductData } from '../../types/types'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
+import { setProducts } from '../../store/productsSlice'
 
 const ProductCard = () => {
+  const products = useAppSelector((state) => state.products.products)
+  const dispatch = useAppDispatch()
+
+  const fetchFoodDetailsCallback = useCallback(() => {
+    fetchFoodDetails<IProductData[]>().then((data) => {
+      const transformedData = data.map((item) => {
+        return {
+          id: item.id,
+          food_name: item.food_name,
+          food_price: item.food_price,
+          category_id: item.category_id,
+          food_image: item.food_image,
+          food_available: item.food_available,
+          food_description: item.food_description,
+        }
+      })
+      dispatch(setProducts(transformedData))
+    })
+  }, [])
+
+  useEffect(() => {
+    fetchFoodDetailsCallback()
+  }, [fetchFoodDetailsCallback])
+
+  useEffect(() => {
+    const urls = products.map((product) => {
+      if (product.food_image instanceof File) {
+        return URL.createObjectURL(product.food_image)
+      }
+      return ''
+    })
+    return () => {
+      urls.forEach((url) => {
+        if (url) {
+          URL.revokeObjectURL(url)
+        }
+      })
+    }
+  }, [products])
+
   return (
     <Flex flexWrap={'wrap'}>
-      {DUMMY_PRODUCT.map((product) => (
+      {products.map((product) => (
         <Box
           maxW={'270px'}
           maxH={'110px'}
@@ -81,55 +66,53 @@ const ProductCard = () => {
           _hover={{ boxShadow: 'md', cursor: 'pointer' }}
         >
           <HStack alignItems={'center'} spacing="2">
-            <>
-              <Box p="2" key={product.id}>
-                <Image
-                  src={product.image}
-                  alt="item"
-                  minW={'100px'}
-                  minH={'90px'}
-                  maxW={'100px'}
-                  maxH={'90px'}
-                  borderRadius="4"
-                  objectFit={'cover'}
-                />
+            <Box p="2">
+              <Image
+                src={
+                  product.food_image instanceof File
+                    ? URL.createObjectURL(product.food_image)
+                    : product.food_image ?? undefined
+                }
+                alt="item"
+                minW={'100px'}
+                minH={'90px'}
+                maxW={'100px'}
+                maxH={'90px'}
+                borderRadius="4"
+                objectFit={'cover'}
+              />
+            </Box>
+            <VStack alignItems={'flex-start'} pl="1">
+              <Box>
+                <Box
+                  fontWeight="bold"
+                  overflow="hidden"
+                  textOverflow="ellipsis"
+                  whiteSpace="nowrap"
+                  maxW={'120px'}
+                >
+                  {product.food_name}
+                </Box>
               </Box>
-              <VStack alignItems={'flex-start'} pl="1">
-                <Box>
-                  <Box
-                    fontWeight="bold"
-                    overflow="hidden"
-                    textOverflow="ellipsis"
-                    whiteSpace="nowrap"
-                    maxW={'120px'}
-                  >
-                    {product.name}
-                  </Box>
+              <Box>
+                <Box color="gray" fontSize="sm" fontWeight={'medium'}>
+                  $ {product.food_price}
                 </Box>
+              </Box>
+              <Box>
                 <Box>
-                  <Box color="gray" fontSize="sm" fontWeight={'medium'}>
-                    $ {product.price}
-                  </Box>
+                  {product.food_available ? (
+                    <Box color="green.500" fontSize="sm" fontWeight={'medium'}>
+                      <Text>Available</Text>
+                    </Box>
+                  ) : (
+                    <Box color="red.500" fontSize="sm" fontWeight={'medium'}>
+                      <Text>Not Available</Text>
+                    </Box>
+                  )}
                 </Box>
-                <Box>
-                  <Box>
-                    {product.available === 'Available' ? (
-                      <Box
-                        color="green.500"
-                        fontSize="sm"
-                        fontWeight={'medium'}
-                      >
-                        {product.available}
-                      </Box>
-                    ) : (
-                      <Box color="red.500" fontSize="sm" fontWeight={'medium'}>
-                        {product.available}
-                      </Box>
-                    )}
-                  </Box>
-                </Box>
-              </VStack>
-            </>
+              </Box>
+            </VStack>
           </HStack>
         </Box>
       ))}

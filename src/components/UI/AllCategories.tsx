@@ -5,18 +5,15 @@ import {
   DeleteIcon,
   EditIcon,
 } from '@chakra-ui/icons'
-import {
-  Box,
-  Flex,
-  HStack,
-  IconButton,
-  Input,
-  Text,
-  useToast,
-} from '@chakra-ui/react'
-import React, { useCallback, useEffect, useState } from 'react'
-import { fetchCategories } from '../../api/api'
+import { Box, HStack, Input, Text, useToast } from '@chakra-ui/react'
+import React, { useState } from 'react'
 import useInput from '../../hooks/use-input'
+import {
+  addCategory,
+  deleteCategory,
+  updateCategory,
+} from '../../store/categoriesSlice'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { ICategoryData } from '../../types/types'
 
 interface IAllCategoriesProps {
@@ -25,26 +22,12 @@ interface IAllCategoriesProps {
 
 const AllCategories = ({ onReceiveCategoryData }: IAllCategoriesProps) => {
   const [showCreateCategory, setShowCreateCategory] = useState(false)
-  const [categories, setCategories] = useState<ICategoryData[]>([])
+
   const [editing, setEditing] = useState(false)
   const [editedCategoryId, setEditedCategoryId] = useState<number | null>(null)
   const [editedCategoryName, setEditedCategoryName] = useState('')
-
-  const fetchCategoriesCallback = useCallback(() => {
-    fetchCategories<ICategoryData[]>().then((data) => {
-      const transformedData = data.map((item) => {
-        return {
-          id: item.id,
-          category_name: item.category_name,
-        }
-      })
-      setCategories(transformedData)
-    })
-  }, [])
-
-  useEffect(() => {
-    fetchCategoriesCallback()
-  }, [fetchCategoriesCallback])
+  const dispatch = useAppDispatch()
+  const categories = useAppSelector((state) => state.categories.categories)
 
   const createCategoryHandler = () => {
     setShowCreateCategory(true)
@@ -52,28 +35,6 @@ const AllCategories = ({ onReceiveCategoryData }: IAllCategoriesProps) => {
 
   const closeCategoryHandler = () => {
     setShowCreateCategory(false)
-  }
-
-  const deleteCategoryHandler = (id: number) => {
-    fetch(`http://127.0.0.1:8000/api/menu/foodcategory/${id}`, {
-      method: 'DELETE',
-    })
-      .then(() => {
-        const updatedCategories = categories.filter(
-          (category) => category.id !== id,
-        )
-        setCategories(updatedCategories)
-      })
-      .catch((error) => {
-        console.error('Error deleting category:', error)
-      })
-    toast({
-      title: 'Category Deleted',
-      status: 'success',
-      duration: 3000,
-      isClosable: true,
-      position: 'top',
-    })
   }
 
   const editCategoryNameHandler = (id: number, name: string) => {
@@ -85,13 +46,7 @@ const AllCategories = ({ onReceiveCategoryData }: IAllCategoriesProps) => {
       body: JSON.stringify({ category_name: name }),
     })
       .then(() => {
-        const updatedCategories = categories.map((category) => {
-          if (category.id === id) {
-            category.category_name = name
-          }
-          return category
-        })
-        setCategories(updatedCategories)
+        dispatch(updateCategory({ id, category_name: name }))
       })
       .catch((error) => {
         console.error('Error editing category name:', error)
@@ -118,6 +73,26 @@ const AllCategories = ({ onReceiveCategoryData }: IAllCategoriesProps) => {
     setEditedCategoryName('')
   }
 
+  const deleteCategoryHandler = (id: number) => {
+    fetch(`http://127.0.0.1:8000/api/menu/foodcategory/${id}`, {
+      method: 'DELETE',
+    })
+      .then(() => {
+        dispatch(deleteCategory(id))
+        toast({
+          title: 'Category Deleted',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+          position: 'top',
+        })
+      })
+      .catch((error) => {
+        console.error('Error deleting category:', error)
+      })
+    console.log('Delete category with id:', id)
+  }
+
   const {
     value: enteredCategoryName,
     isValid: enteredCategoryNameIsValid,
@@ -126,23 +101,14 @@ const AllCategories = ({ onReceiveCategoryData }: IAllCategoriesProps) => {
     reset: resetCategoryInput,
   } = useInput((value) => (value as string).trim() !== '')
 
-  const maxId = categories.reduce((max, item) => {
-    if (item.id > max) {
-      max = item.id
-    }
-    return max
-  }, 0)
-
   const submitHandler = (event: React.FormEvent) => {
     event.preventDefault()
 
     if (enteredCategoryNameIsValid) {
       const categoryData = {
-        id: maxId + 1,
         category_name: enteredCategoryName,
       }
 
-      // Send a POST request to the server to add the new category
       fetch('http://127.0.0.1:8000/api/menu/foodcategory/', {
         method: 'POST',
         headers: {
@@ -154,9 +120,15 @@ const AllCategories = ({ onReceiveCategoryData }: IAllCategoriesProps) => {
           if (!response.ok) {
             throw new Error('Failed to add category')
           }
-          // Add the new category to the categories state
-          setCategories((prevCategories) => [...prevCategories, categoryData])
-          // Show a success toast notification
+          return response.json()
+        })
+        .then((data) => {
+          const categoryWithId = {
+            ...categoryData,
+            id: data.id,
+          }
+          console.log('categoryWithId:', categoryWithId)
+          dispatch(addCategory(categoryWithId))
           toast({
             title: 'Category added',
             status: 'success',
@@ -168,7 +140,6 @@ const AllCategories = ({ onReceiveCategoryData }: IAllCategoriesProps) => {
         })
         .catch((error) => {
           console.error('Error adding category:', error)
-          // Show an error toast notification
           toast({
             title: 'Failed to add category',
             status: 'error',

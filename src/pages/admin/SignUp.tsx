@@ -36,7 +36,7 @@ const SignUp = () => {
     })
       .unwrap()
       .then(() => navigate('/admin/login', { state: { isRegistered: true } }))
-      .catch((err: any) => {
+      .catch((err: Error) => {
         setIsError(true)
       })
   }

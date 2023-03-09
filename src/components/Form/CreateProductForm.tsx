@@ -10,7 +10,6 @@ import {
   Select,
   Text,
   Textarea,
-  Toast,
   useToast,
   VStack,
 } from '@chakra-ui/react'
@@ -18,31 +17,29 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { FiImage, FiX } from 'react-icons/fi'
 import { fetchCategories } from '../../api/api'
 import useInput from '../../hooks/use-input'
-import { IProductData } from '../../types/types'
+import { setCategories } from '../../store/categoriesSlice'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
+import { ICategoryData, IProductData } from '../../types/types'
 
 interface ICreateProductFormProps {
   onReceiveFormData: (data: IProductData) => void
 }
 
-interface ICategory {
-  id: number
-  category_name: string
-}
-
 const CreateProductForm = ({ onReceiveFormData }: ICreateProductFormProps) => {
   const [imagePreview, setImagePreview] = useState<File | null>(null)
   const [dragActive, setDragActive] = useState(false)
-  const [categories, setCategories] = useState<ICategory[]>([])
+  const dispatch = useAppDispatch()
+  const categories = useAppSelector((state) => state.categories.categories)
 
   const fetchCategoriesCallback = useCallback(() => {
-    fetchCategories<ICategory[]>().then((data) => {
+    fetchCategories<ICategoryData[]>().then((data) => {
       const transformedData = data.map((item) => {
         return {
           id: item.id,
           category_name: item.category_name,
         }
       })
-      setCategories(transformedData)
+      dispatch(setCategories(transformedData))
     })
   }, [])
 
@@ -142,6 +139,7 @@ const CreateProductForm = ({ onReceiveFormData }: ICreateProductFormProps) => {
         category_id: enteredCategory,
         food_description: enteredDescription,
         food_image: imagePreview,
+        food_available: true,
       }
       resetProductNameInput()
       resetPriceInput()
@@ -149,6 +147,7 @@ const CreateProductForm = ({ onReceiveFormData }: ICreateProductFormProps) => {
       resetDescriptionInput()
       setImagePreview(null)
       onReceiveFormData(productData)
+      console.log(productData)
     } else {
       let errorMessage = 'Please enter '
       if (!enteredProductName.trim()) {
@@ -214,7 +213,7 @@ const CreateProductForm = ({ onReceiveFormData }: ICreateProductFormProps) => {
           <FormControl isInvalid={enteredCategoryHasError}>
             <Text pb="2">Category</Text>
             <Select
-              placeholder="Categories"
+              placeholder="Select category"
               onChange={categoryChangeHandler}
               onBlur={categoryBlurHandler}
               value={enteredCategory}
@@ -227,6 +226,7 @@ const CreateProductForm = ({ onReceiveFormData }: ICreateProductFormProps) => {
             </Select>
           </FormControl>
         </HStack>
+
         <FormControl isInvalid={enteredDescriptionHasError}>
           <Text pb="2">Description</Text>
           <Textarea
