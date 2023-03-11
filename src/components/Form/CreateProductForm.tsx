@@ -132,7 +132,6 @@ const CreateProductForm = ({ onReceiveFormData }: ICreateProductFormProps) => {
     event.preventDefault()
 
     if (formIsValid) {
-      console.log('form is valid')
       const productData = {
         food_name: enteredProductName,
         food_price: enteredPrice,

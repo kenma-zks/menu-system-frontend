@@ -31,6 +31,7 @@ const Products = () => {
       formData.append('food_price', productData.food_price.toString())
       formData.append('food_description', productData.food_description)
       formData.append('category_id', productData.category_id.toString())
+      formData.append('food_available', productData.food_available.toString())
       if (productData.food_image) {
         formData.append('food_image', productData.food_image)
       }
