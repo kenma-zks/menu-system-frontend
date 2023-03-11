@@ -13,6 +13,7 @@ const ProductCard = () => {
   const [selectedProduct, setSelectedProduct] = useState<IProductData | null>(
     null,
   )
+  console.log(selectedProduct)
 
   const fetchFoodDetailsCallback = useCallback(() => {
     fetchFoodDetails<IProductData[]>().then((data) => {
@@ -28,6 +29,7 @@ const ProductCard = () => {
         }
       })
       dispatch(setProducts(transformedData))
+      console.log(transformedData)
     })
   }, [])
 

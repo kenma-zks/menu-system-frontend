@@ -1,16 +1,13 @@
 import {
   Box,
   Button,
-  Divider,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
   DrawerFooter,
   DrawerHeader,
-  Flex,
   FormControl,
-  FormLabel,
   HStack,
   Input,
   InputGroup,
@@ -18,16 +15,16 @@ import {
   Select,
   Text,
   Textarea,
+  useToast,
   VStack,
 } from '@chakra-ui/react'
 import React, { useCallback, useEffect, useState } from 'react'
-import { FiImage, FiX } from 'react-icons/fi'
-import { Form } from 'react-router-dom'
-import { fetchCategories, fetchFoodDetails } from '../../api/api'
+import { fetchCategories } from '../../api/api'
 import { setCategories } from '../../store/categoriesSlice'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { setProducts } from '../../store/productsSlice'
+import { updateProduct } from '../../store/productsSlice'
 import { ICategoryData, IProductData } from '../../types/types'
+import UploadImage from './UploadImage'
 
 interface EditProductDrawerProps {
   isOpen: boolean
@@ -40,32 +37,10 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
   onClose,
   product,
 }) => {
-  const [imagePreview, setImagePreview] = useState<File | null>(null)
-  const [dragActive, setDragActive] = useState(false)
-
   const categories = useAppSelector((state) => state.categories.categories)
   const dispatch = useAppDispatch()
-
-  const fetchFoodDetailsCallback = useCallback(() => {
-    fetchFoodDetails<IProductData[]>().then((data) => {
-      const transformedData = data.map((item) => {
-        return {
-          id: item.id,
-          food_name: item.food_name,
-          food_price: item.food_price,
-          category_id: item.category_id,
-          food_image: item.food_image,
-          food_available: item.food_available,
-          food_description: item.food_description,
-        }
-      })
-      dispatch(setProducts(transformedData))
-    })
-  }, [])
-
-  useEffect(() => {
-    fetchFoodDetailsCallback()
-  }, [fetchFoodDetailsCallback])
+  const [imagePreview, setImagePreview] = useState<File | null>(null)
+  const toast = useToast()
 
   const fetchCategoriesCallback = useCallback(() => {
     fetchCategories<ICategoryData[]>().then((data) => {
@@ -82,49 +57,6 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
   useEffect(() => {
     fetchCategoriesCallback()
   }, [fetchCategoriesCallback])
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0]
-      setImagePreview(file)
-    }
-  }
-
-  const handleImageRemove = () => {
-    setImagePreview(null)
-  }
-
-  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDragActive(true)
-  }
-
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDragActive(false)
-  }
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDragActive(true)
-  }
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDragActive(false)
-    const file = e.dataTransfer.files[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setImagePreview(file)
-      }
-      reader.readAsDataURL(file)
-    }
-  }
 
   return (
     <>
@@ -156,6 +88,16 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                     />
                   </InputGroup>
                 </FormControl>
+                <FormControl w="40%">
+                  <Text pb="2">Available</Text>
+                  <Select
+                    placeholder="Select Availability"
+                    defaultValue={product?.food_available?.toString()}
+                  >
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                  </Select>
+                </FormControl>
                 <FormControl>
                   <Text pb="2">Category</Text>
                   <Select
@@ -170,6 +112,7 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                   </Select>
                 </FormControl>
               </HStack>
+
               <FormControl>
                 <Text pb="2">Description</Text>
                 <Textarea
@@ -179,81 +122,20 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
               </FormControl>
               <FormControl>
                 <Text pb="2">Image</Text>
-                <Box
-                  borderRadius="md"
-                  width="100%"
-                  border={dragActive ? '2px dashed blue' : '2px dashed #e2e8f0'}
-                  height="200px"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  onDragEnter={handleDragEnter}
-                  onDragLeave={handleDragLeave}
-                  onDragOver={handleDragOver}
-                  onDrop={handleDrop}
-                >
-                  {imagePreview ? (
-                    <Flex
-                      position="relative"
-                      alignItems="flex-start"
-                      height="100%"
-                      width="100%"
-                    >
-                      <Box
-                        bgImage={URL.createObjectURL(imagePreview)}
-                        bgSize="cover"
-                        bgPosition="center"
-                        height="100%"
-                        width="100%"
-                      >
-                        <Button
-                          position="absolute"
-                          right={2}
-                          top={2}
-                          size="sm"
-                          colorScheme="red"
-                          onClick={handleImageRemove}
-                        >
-                          <FiX />
-                        </Button>
-                      </Box>
-                    </Flex>
-                  ) : (
-                    <VStack alignItems="center" spacing="2">
-                      <FiImage size="40px" />
-                      <HStack>
-                        <Text fontSize="sm">Drag and Drop or</Text>
-                        <Text
-                          fontSize="sm"
-                          fontWeight={'semibold'}
-                          cursor="pointer"
-                          onClick={() =>
-                            document.getElementById('fileInput')?.click()
-                          }
-                        >
-                          Browse
-                        </Text>
-                        <input
-                          type={'file'}
-                          accept=".jpg, .jpeg, .png"
-                          id="fileInput"
-                          style={{ display: 'none' }}
-                          onChange={handleImageUpload}
-                        ></input>
-                      </HStack>
-
-                      <Text fontSize="xs" color="gray.500">
-                        Files supported : .jpg, .jpeg, .png (Max 10MB)
-                      </Text>
-                    </VStack>
-                  )}
-                </Box>
+                <UploadImage
+                  onImageUpload={setImagePreview}
+                  defaultImage={
+                    product?.food_image instanceof File
+                      ? URL.createObjectURL(product?.food_image)
+                      : product?.food_image
+                  }
+                />
               </FormControl>
             </VStack>
           </DrawerBody>
           <DrawerFooter>
             <Button type="submit" colorScheme="orange" size="md" w="full">
-              Create
+              Save
             </Button>
           </DrawerFooter>
         </DrawerContent>

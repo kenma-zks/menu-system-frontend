@@ -29,7 +29,7 @@ export interface IProductData {
   food_name: string
   food_price: number | string
   food_description: string
-  food_image: File | null
+  food_image?: File | string
   food_available: boolean
 }
 
