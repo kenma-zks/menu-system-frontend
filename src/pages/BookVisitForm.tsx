@@ -16,10 +16,10 @@ import {
 } from '@chakra-ui/react'
 import useInput from '../hooks/use-input'
 
-import { Booking } from '../types/types'
+import { IBookingData } from '../types/types'
 
 interface BookVisitProps {
-  onAddBooking: (booking: Booking) => void
+  onAddBooking: (booking: IBookingData) => void
 }
 
 const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
@@ -69,12 +69,12 @@ const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
   } = useInput((value) => (value as number) > 0 && (value as number) <= 12)
 
   const {
-    value: enteredBookingStart,
-    isValid: enteredBookingStartIsValid,
-    hasError: enteredBookingStartHasError,
-    valueChangeHandler: bookingStartChangeHandler,
-    inputBlurHandler: bookingStartBlurHandler,
-    reset: resetBookingStartInput,
+    value: enteredBookingDate,
+    isValid: enteredBookingDateIsValid,
+    hasError: enteredBookingDateHasError,
+    valueChangeHandler: bookingDateChangeHandler,
+    inputBlurHandler: bookingDateBlurHandler,
+    reset: resetBookingDateInput,
   } = useInput((value) => (value as string).trim() !== '')
 
   const {
@@ -98,7 +98,7 @@ const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
     enteredEmailIsValid &&
     enteredPhoneNumberIsValid &&
     enteredTableCapacityIsValid &&
-    enteredBookingStartIsValid &&
+    enteredBookingDateIsValid &&
     enteredBookingDurationIsValid
 
   function submitHandler(event: React.FormEvent<HTMLFormElement>) {
@@ -111,16 +111,17 @@ const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
         email: enteredEmail,
         phone_number: enteredPhoneNumber,
         table_capacity: enteredTableCapacity,
-        booking_start: enteredBookingStart,
+        booking_date: enteredBookingDate,
         booking_duration: enteredBookingDuration,
         note: enteredNote,
+        status: 'Pending',
       }
       resetFirstNameInput()
       resetLastNameInput()
       resetEmailInput()
       resetPhoneNumberInput()
       resetTableCapacityInput()
-      resetBookingStartInput()
+      resetBookingDateInput()
       resetBookingDurationInput()
       resetNoteInput()
       onAddBooking(booking)
@@ -201,7 +202,7 @@ const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
             <InputLeftAddon children="+977" />
             <Input
               type="number"
-              placeholder="phone number"
+              placeholder="Phone number"
               onChange={phoneNumberChangeHandler}
               onBlur={phoneNumberBlurHandler}
               value={enteredPhoneNumber}
@@ -227,20 +228,20 @@ const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
           )}
         </FormControl>
 
-        <FormControl mt="3%" isInvalid={enteredBookingStartHasError}>
-          <FormLabel htmlFor="booking-start" fontWeight="normal">
-            Booking Start
+        <FormControl mt="3%" isInvalid={enteredBookingDateHasError}>
+          <FormLabel htmlFor="booking-date" fontWeight="normal">
+            Booking Date
           </FormLabel>
           <Input
-            placeholder="Booking Start"
+            placeholder="Booking Date"
             type="date"
             min={currentDateString}
-            onChange={bookingStartChangeHandler}
-            onBlur={bookingStartBlurHandler}
-            value={enteredBookingStart}
+            onChange={bookingDateChangeHandler}
+            onBlur={bookingDateBlurHandler}
+            value={enteredBookingDate}
           />
-          {enteredBookingStartHasError && (
-            <FormErrorMessage>Enter a valid booking start</FormErrorMessage>
+          {enteredBookingDateHasError && (
+            <FormErrorMessage>Enter a valid booking date</FormErrorMessage>
           )}
         </FormControl>
 
@@ -249,7 +250,7 @@ const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
             Booking Duration
           </FormLabel>
           <Input
-            placeholder="Booking Duration"
+            placeholder="EG: 10AM - 12PM"
             onChange={bookingDurationChangeHandler}
             onBlur={bookingDurationBlurHandler}
             value={enteredBookingDuration}

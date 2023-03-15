@@ -1,42 +1,23 @@
-import { ReactNode } from 'react'
 import {
   Box,
   Flex,
   Avatar,
-  Link,
   Button,
   Menu,
   MenuButton,
   MenuList,
   MenuItem,
   MenuDivider,
-  useDisclosure,
-  useColorModeValue,
   Stack,
-  useColorMode,
   Center,
   InputGroup,
   InputLeftElement,
   Input,
 } from '@chakra-ui/react'
-import { MoonIcon, SunIcon } from '@chakra-ui/icons'
+import { useState } from 'react'
 import { FiBell, FiSearch } from 'react-icons/fi'
 import profile from '../../assets/profile.webp'
-
-const NavLink = ({ children }: { children: ReactNode }) => (
-  <Link
-    px={2}
-    py={1}
-    rounded={'md'}
-    _hover={{
-      textDecoration: 'none',
-      bg: useColorModeValue('gray.200', 'gray.700'),
-    }}
-    href={'#'}
-  >
-    {children}
-  </Link>
-)
+import { useAppSelector } from '../../store/hooks'
 
 export default function AdminNavbar() {
   return (

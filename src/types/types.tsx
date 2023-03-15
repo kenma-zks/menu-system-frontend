@@ -1,12 +1,14 @@
-export interface Booking {
+export interface IBookingData {
+  id?: number
   first_name: string
   last_name: string
   email: string
   phone_number: string
-  table_capacity: string
-  booking_start: string
+  table_capacity: number | string
+  booking_date: string
   booking_duration: string
   note: string
+  status?: string
 }
 
 export interface ILoginData {

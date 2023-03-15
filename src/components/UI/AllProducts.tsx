@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { ChevronDownIcon, Search2Icon } from '@chakra-ui/icons'
 import {
   Button,
@@ -10,7 +10,6 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
-  Select,
   VStack,
 } from '@chakra-ui/react'
 import ProductCard from '../../components/Card/ProductCard'
@@ -18,6 +17,8 @@ import { useAppSelector } from '../../store/hooks'
 
 const AllProducts = () => {
   const categories = useAppSelector((state) => state.categories.categories)
+  const products = useAppSelector((state) => state.products.products)
+
   return (
     <VStack alignItems={'flex-start'}>
       <HStack pb="6" spacing={0} width={'40%'}>

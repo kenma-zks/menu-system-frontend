@@ -7,6 +7,7 @@ import {
   DrawerContent,
   DrawerFooter,
   DrawerHeader,
+  DrawerOverlay,
   FormControl,
   HStack,
   Input,
@@ -20,6 +21,7 @@ import {
 } from '@chakra-ui/react'
 import React, { useCallback, useEffect, useState } from 'react'
 import { fetchCategories } from '../../api/api'
+import useInput from '../../hooks/use-input'
 import { setCategories } from '../../store/categoriesSlice'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { updateProduct } from '../../store/productsSlice'
@@ -58,9 +60,94 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
     fetchCategoriesCallback()
   }, [fetchCategoriesCallback])
 
+  const {
+    value: enteredName,
+    isValid: enteredNameIsValid,
+    hasError: enteredNameHasError,
+    valueChangeHandler: nameChangeHandler,
+  } = useInput((value) => (value as string).trim() !== '')
+
+  const {
+    value: enteredPrice,
+    isValid: enteredPriceIsValid,
+    hasError: enteredPriceHasError,
+    valueChangeHandler: priceChangeHandler,
+  } = useInput((value) => (value as number) > 0)
+
+  const {
+    value: enteredAvailable,
+    isValid: enteredAvailableIsValid,
+    hasError: enteredAvailableHasError,
+    valueChangeHandler: availableChangeHandler,
+  } = useInput((value) => (value as string).trim() !== '')
+
+  const {
+    value: enteredCategory,
+    isValid: enteredCategoryIsValid,
+    hasError: enteredCategoryHasError,
+    valueChangeHandler: categoryChangeHandler,
+  } = useInput((value) => (value as string).trim() !== '')
+
+  const {
+    value: enteredDescription,
+    isValid: enteredDescriptionIsValid,
+    hasError: enteredDescriptionHasError,
+    valueChangeHandler: descriptionChangeHandler,
+  } = useInput((value) => (value as string).trim() !== '')
+
+  const formIsValid =
+    enteredNameIsValid &&
+    enteredPriceIsValid &&
+    enteredAvailableIsValid &&
+    enteredCategoryIsValid &&
+    enteredDescriptionIsValid
+
+  const submitHandler = (event: React.FormEvent) => {
+    event.preventDefault()
+    console.log('submit')
+    if (formIsValid) {
+      const productData = {
+        id: product?.id,
+        food_name: enteredName,
+        food_price: enteredPrice,
+        category_id: enteredCategory,
+        food_description: enteredDescription,
+        food_image: imagePreview || product?.food_image,
+        food_available: true,
+      }
+      fetch('http://127.0.0.1:8000/api/menu/fooddetails/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(productData),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          dispatch(updateProduct(data))
+          toast({
+            title: 'Product Updated',
+            description: 'Product has been updated successfully',
+            status: 'success',
+            duration: 3000,
+            isClosable: true,
+          })
+        })
+    } else {
+      toast({
+        title: 'Invalid Input',
+        description: 'Please check your input',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      })
+    }
+  }
+
   return (
-    <>
+    <form>
       <Drawer isOpen={isOpen} placement="right" onClose={onClose} size="md">
+        <DrawerOverlay />
         <DrawerContent key={product?.id}>
           <Box borderBottomWidth="2px">
             <DrawerCloseButton />
@@ -73,6 +160,7 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                 <Text pb="2">Name</Text>
                 <Input
                   placeholder="Product Name"
+                  onChange={nameChangeHandler}
                   defaultValue={product?.food_name}
                 />
               </FormControl>
@@ -84,6 +172,7 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                     <Input
                       type="number"
                       placeholder="Price"
+                      onChange={priceChangeHandler}
                       defaultValue={product?.food_price}
                     />
                   </InputGroup>
@@ -91,8 +180,11 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                 <FormControl w="40%">
                   <Text pb="2">Available</Text>
                   <Select
-                    placeholder="Select Availability"
-                    defaultValue={product?.food_available?.toString()}
+                    placeholder="Available"
+                    onChange={availableChangeHandler}
+                    defaultValue={
+                      product ? String(product.food_available) : undefined
+                    }
                   >
                     <option value="true">Yes</option>
                     <option value="false">No</option>
@@ -102,6 +194,7 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                   <Text pb="2">Category</Text>
                   <Select
                     placeholder="Select Category"
+                    onChange={categoryChangeHandler}
                     defaultValue={product?.category_id}
                   >
                     {categories.map((category) => (
@@ -117,13 +210,15 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                 <Text pb="2">Description</Text>
                 <Textarea
                   placeholder="Product Description"
+                  onChange={descriptionChangeHandler}
                   defaultValue={product?.food_description}
                 />
               </FormControl>
+
               <FormControl>
                 <Text pb="2">Image</Text>
                 <UploadImage
-                  onImageUpload={setImagePreview}
+                  onImageUpload={(file) => setImagePreview(file)}
                   defaultImage={
                     product?.food_image instanceof File
                       ? URL.createObjectURL(product?.food_image)
@@ -134,13 +229,19 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
             </VStack>
           </DrawerBody>
           <DrawerFooter>
-            <Button type="submit" colorScheme="orange" size="md" w="full">
+            <Button
+              type="submit"
+              onClick={submitHandler}
+              colorScheme="orange"
+              size="md"
+              w="full"
+            >
               Save
             </Button>
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
-    </>
+    </form>
   )
 }
 

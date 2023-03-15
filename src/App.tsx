@@ -66,6 +66,10 @@ const router = createBrowserRouter([
             path: 'products',
             element: <RequireAuth route="products" />,
           },
+          {
+            path: 'bookings',
+            element: <RequireAuth route="bookings" />,
+          },
         ],
       },
     ],

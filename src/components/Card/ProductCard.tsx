@@ -5,6 +5,7 @@ import { IProductData } from '../../types/types'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { setProducts } from '../../store/productsSlice'
 import EditProductDrawer from '../UI/EditProductDrawer'
+import { RootState } from '../../store/store'
 
 const ProductCard = () => {
   const products = useAppSelector((state) => state.products.products)
@@ -13,7 +14,6 @@ const ProductCard = () => {
   const [selectedProduct, setSelectedProduct] = useState<IProductData | null>(
     null,
   )
-  console.log(selectedProduct)
 
   const fetchFoodDetailsCallback = useCallback(() => {
     fetchFoodDetails<IProductData[]>().then((data) => {
@@ -29,7 +29,6 @@ const ProductCard = () => {
         }
       })
       dispatch(setProducts(transformedData))
-      console.log(transformedData)
     })
   }, [])
 
