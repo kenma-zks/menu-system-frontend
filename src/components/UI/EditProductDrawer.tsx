@@ -1,4 +1,10 @@
 import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
   Box,
   Button,
   Drawer,
@@ -19,12 +25,12 @@ import {
   useToast,
   VStack,
 } from '@chakra-ui/react'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { fetchCategories } from '../../api/api'
 import useInput from '../../hooks/use-input'
 import { setCategories } from '../../store/categoriesSlice'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { updateProduct } from '../../store/productsSlice'
+import { deleteProduct, updateProduct } from '../../store/productsSlice'
 import { ICategoryData, IProductData } from '../../types/types'
 import UploadImage from './UploadImage'
 
@@ -144,6 +150,34 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
     }
   }
 
+  const leastDestructiveRef = useRef<HTMLButtonElement | null>(null)
+  const cancelRef = useRef<HTMLButtonElement | null>(null)
+  const [alertIsOpen, setAlertIsOpen] = useState(false)
+
+  const onDeleteClick = () => {
+    setAlertIsOpen(true)
+  }
+
+  const alertOnClose = () => {
+    setAlertIsOpen(false)
+  }
+
+  const onDeleteConfirm = async () => {
+    fetch(`http://127.0.0.1:8000/api/menu/fooddetails/${product?.id}/`, {
+      method: 'DELETE',
+    }).then(() => {
+      dispatch(deleteProduct(product?.id))
+      toast({
+        title: 'Product Deleted',
+        description: 'Product has been deleted successfully',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      })
+      onClose()
+    })
+  }
+
   return (
     <form>
       <Drawer isOpen={isOpen} placement="right" onClose={onClose} size="md">
@@ -230,11 +264,49 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
           </DrawerBody>
           <DrawerFooter>
             <Button
+              variant="outline"
+              mr={3}
+              onClick={onDeleteClick}
+              ref={leastDestructiveRef}
+              colorScheme="red"
+              size="md"
+              w="20%"
+            >
+              Delete
+            </Button>
+            <AlertDialog
+              isOpen={alertIsOpen}
+              leastDestructiveRef={leastDestructiveRef}
+              onClose={alertOnClose}
+            >
+              <AlertDialogOverlay>
+                <AlertDialogContent>
+                  <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                    Delete Product
+                  </AlertDialogHeader>
+
+                  <AlertDialogBody>
+                    Are you sure? You can't undo this action afterwards.
+                  </AlertDialogBody>
+
+                  <AlertDialogFooter>
+                    <Button ref={cancelRef} onClick={onClose}>
+                      Cancel
+                    </Button>
+                    <Button colorScheme="red" onClick={onDeleteConfirm} ml={3}>
+                      Delete
+                    </Button>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialogOverlay>
+            </AlertDialog>
+
+            <Button
               type="submit"
               onClick={submitHandler}
               colorScheme="orange"
               size="md"
-              w="full"
+              w="20%"
             >
               Save
             </Button>

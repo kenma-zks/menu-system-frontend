@@ -6,16 +6,6 @@ import { IRegisterData } from '../../types/types'
 import React from 'react'
 import { useRegisterUserMutation } from '../../store/authApiSlice'
 
-type HttpError = {
-  statusCode: 400
-}
-
-type FetchError = {
-  message: string
-}
-
-type IError = HttpError | FetchError
-
 let errorText = ''
 
 const SignUp = () => {

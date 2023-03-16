@@ -33,8 +33,10 @@ import {
 } from 'react-icons/fi'
 import { IconType } from 'react-icons'
 import { ReactText } from 'react'
-import { Link, Outlet } from 'react-router-dom'
+import { Link, Outlet, useNavigate } from 'react-router-dom'
 import logo from '../../assets/logo.png'
+import { useAppDispatch } from '../../store/hooks'
+import { authActions } from '../../store/authSlice'
 
 interface LinkItemProps {
   name: string
@@ -84,6 +86,8 @@ interface SidebarProps extends BoxProps {
 }
 
 const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   return (
     <VStack
       bg={useColorModeValue('white', 'gray.900')}
@@ -120,7 +124,13 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
         ))}
       </Box>
       <Box width={'100%'} paddingBottom="4">
-        <NavItem href={''} icon={FiLogOut}>
+        <NavItem
+          href="/admin/login"
+          icon={FiLogOut}
+          onClick={() => {
+            dispatch(authActions.logOut())
+          }}
+        >
           Logout
         </NavItem>
       </Box>
