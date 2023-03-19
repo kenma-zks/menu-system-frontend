@@ -290,7 +290,10 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                   </AlertDialogBody>
 
                   <AlertDialogFooter>
-                    <Button ref={cancelRef} onClick={onClose}>
+                    <Button
+                      ref={cancelRef}
+                      onClick={() => setAlertIsOpen(false)}
+                    >
                       Cancel
                     </Button>
                     <Button colorScheme="red" onClick={onDeleteConfirm} ml={3}>
