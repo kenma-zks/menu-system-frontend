@@ -70,13 +70,11 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
   const {
     value: enteredStatus,
     isValid: enteredStatusIsValid,
-    hasError: statusInputHasError,
     valueChangeHandler: statusChangeHandler,
   } = useInput((value) => (value as string).trim() !== '')
 
   const submitHandler = (event: React.FormEvent) => {
     event.preventDefault()
-    console.log(enteredStatus)
     if (enteredStatusIsValid) {
       const updatedBooking = {
         id: booking?.id,
@@ -118,6 +116,7 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose} size="2xl">
+        <ModalOverlay />
         <ModalContent
           key={booking?.id}
           borderRadius="3xl"
@@ -187,11 +186,21 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
                   <FormLabel fontWeight="normal">Status</FormLabel>
                   <Select
                     placeholder="Select Option"
+                    defaultValue={booking?.status}
                     onChange={statusChangeHandler}
-                    value={enteredStatus}
                   >
-                    <option value="Accepted">Accepted</option>
-                    <option value="Rejected">Rejected</option>
+                    <option
+                      value="Accepted"
+                      selected={booking?.status === 'Accepted' ? true : false}
+                    >
+                      Accepted
+                    </option>
+                    <option
+                      value="Rejected"
+                      selected={booking?.status === 'Rejected' ? true : false}
+                    >
+                      Rejected
+                    </option>
                   </Select>
                 </FormControl>
               </HStack>
