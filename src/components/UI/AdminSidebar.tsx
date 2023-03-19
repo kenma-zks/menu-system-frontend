@@ -49,6 +49,7 @@ const LinkItems: Array<LinkItemProps> = [
   { name: 'Orders', icon: FiShoppingCart, link: '/admin/orders' },
   { name: 'Bookings', icon: FiCalendar, link: '/admin/bookings' },
   { name: 'Order History', icon: FiFileText, link: '/admin/order-history' },
+  { name: 'Booking History', icon: FiFileText, link: '/admin/booking-history' },
 ]
 
 export default function AdminSidebar({ children }: { children?: ReactNode }) {
