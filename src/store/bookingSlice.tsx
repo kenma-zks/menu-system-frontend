@@ -27,9 +27,18 @@ const bookingsSlice = createSlice({
         existingBooking.status = status
       }
     },
+    deleteBookings(state, action: PayloadAction<number | undefined>) {
+      state.bookings = state.bookings.filter(
+        (booking) => booking.id !== action.payload,
+      )
+    },
   },
 })
 
-export const { setBookings, updateBookings } = bookingsSlice.actions
+export const {
+  setBookings,
+  updateBookings,
+  deleteBookings,
+} = bookingsSlice.actions
 
 export default bookingsSlice.reducer
