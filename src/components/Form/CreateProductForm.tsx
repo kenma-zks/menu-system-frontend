@@ -10,83 +10,42 @@ import {
   Select,
   Text,
   Textarea,
-  Toast,
   useToast,
   VStack,
 } from '@chakra-ui/react'
 import React, { useCallback, useEffect, useState } from 'react'
-import { FiImage, FiX } from 'react-icons/fi'
 import { fetchCategories } from '../../api/api'
 import useInput from '../../hooks/use-input'
-import { IProductData } from '../../types/types'
+import { setCategories } from '../../store/categoriesSlice'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
+import { ICategoryData, IProductData } from '../../types/types'
+import UploadImage from '../UI/UploadImage'
 
 interface ICreateProductFormProps {
   onReceiveFormData: (data: IProductData) => void
 }
 
-interface ICategory {
-  id: number
-  category_name: string
-}
-
 const CreateProductForm = ({ onReceiveFormData }: ICreateProductFormProps) => {
   const [imagePreview, setImagePreview] = useState<File | null>(null)
-  const [dragActive, setDragActive] = useState(false)
-  const [categories, setCategories] = useState<ICategory[]>([])
+
+  const dispatch = useAppDispatch()
+  const categories = useAppSelector((state) => state.categories.categories)
 
   const fetchCategoriesCallback = useCallback(() => {
-    fetchCategories<ICategory[]>().then((data) => {
+    fetchCategories<ICategoryData[]>().then((data) => {
       const transformedData = data.map((item) => {
         return {
           id: item.id,
           category_name: item.category_name,
         }
       })
-      setCategories(transformedData)
+      dispatch(setCategories(transformedData))
     })
   }, [])
 
   useEffect(() => {
     fetchCategoriesCallback()
   }, [fetchCategoriesCallback])
-
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target && event.target.files && event.target.files[0]) {
-      const file = event.target.files[0]
-      setImagePreview(file)
-    }
-  }
-
-  const handleImageRemove = () => {
-    setImagePreview(null)
-  }
-
-  const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault()
-    setDragActive(true)
-  }
-
-  const handleDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault()
-    setDragActive(false)
-  }
-
-  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault()
-  }
-
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault()
-    setDragActive(false)
-    const file = event.dataTransfer.files[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setImagePreview(file)
-      }
-      reader.readAsDataURL(file)
-    }
-  }
 
   const {
     value: enteredProductName,
@@ -135,13 +94,13 @@ const CreateProductForm = ({ onReceiveFormData }: ICreateProductFormProps) => {
     event.preventDefault()
 
     if (formIsValid) {
-      console.log('form is valid')
       const productData = {
         food_name: enteredProductName,
         food_price: enteredPrice,
         category_id: enteredCategory,
         food_description: enteredDescription,
         food_image: imagePreview,
+        food_available: true,
       }
       resetProductNameInput()
       resetPriceInput()
@@ -149,6 +108,7 @@ const CreateProductForm = ({ onReceiveFormData }: ICreateProductFormProps) => {
       resetDescriptionInput()
       setImagePreview(null)
       onReceiveFormData(productData)
+      console.log(productData)
     } else {
       let errorMessage = 'Please enter '
       if (!enteredProductName.trim()) {
@@ -214,7 +174,7 @@ const CreateProductForm = ({ onReceiveFormData }: ICreateProductFormProps) => {
           <FormControl isInvalid={enteredCategoryHasError}>
             <Text pb="2">Category</Text>
             <Select
-              placeholder="Categories"
+              placeholder="Select category"
               onChange={categoryChangeHandler}
               onBlur={categoryBlurHandler}
               value={enteredCategory}
@@ -227,6 +187,7 @@ const CreateProductForm = ({ onReceiveFormData }: ICreateProductFormProps) => {
             </Select>
           </FormControl>
         </HStack>
+
         <FormControl isInvalid={enteredDescriptionHasError}>
           <Text pb="2">Description</Text>
           <Textarea
@@ -238,75 +199,7 @@ const CreateProductForm = ({ onReceiveFormData }: ICreateProductFormProps) => {
         </FormControl>
         <FormControl>
           <Text pb="2">Image</Text>
-
-          <Box
-            border={dragActive ? '2px dashed blue' : '2px dashed gray'}
-            borderRadius="md"
-            height="300px"
-            width="100%"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            onDragEnter={handleDragEnter}
-            onDragLeave={handleDragLeave}
-            onDragOver={handleDragOver}
-            onDrop={handleDrop}
-          >
-            {imagePreview ? (
-              <Flex
-                position="relative"
-                alignItems="flex-start"
-                height="100%"
-                width="100%"
-              >
-                <Box
-                  bgImage={URL.createObjectURL(imagePreview)}
-                  bgSize="cover"
-                  bgPosition="center"
-                  height="100%"
-                  width="100%"
-                />
-                <Button
-                  position="absolute"
-                  right={2}
-                  top={2}
-                  size="sm"
-                  colorScheme="red"
-                  onClick={handleImageRemove}
-                >
-                  <FiX />
-                </Button>
-              </Flex>
-            ) : (
-              <VStack alignItems="center" spacing="2">
-                <FiImage size="40px" />
-                <HStack>
-                  <Text fontSize="sm">Drag and Drop or</Text>
-                  <Text
-                    fontSize="sm"
-                    fontWeight={'semibold'}
-                    cursor="pointer"
-                    onClick={() =>
-                      document.getElementById('fileInput')?.click()
-                    }
-                  >
-                    Browse
-                  </Text>
-                  <input
-                    type={'file'}
-                    accept=".jpg, .jpeg, .png"
-                    id="fileInput"
-                    style={{ display: 'none' }}
-                    onChange={handleImageUpload}
-                  ></input>
-                </HStack>
-
-                <Text fontSize="xs" color="gray.500">
-                  Files supported : .jpg, .jpeg, .png (Max 10MB)
-                </Text>
-              </VStack>
-            )}
-          </Box>
+          <UploadImage onImageUpload={setImagePreview} />
         </FormControl>
         <FormControl>
           <Button type="submit" colorScheme="orange" size="md" w="full">
