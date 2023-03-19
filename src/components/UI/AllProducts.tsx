@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ChevronDownIcon, Search2Icon } from '@chakra-ui/icons'
 import {
   Button,
@@ -12,12 +12,31 @@ import {
   MenuList,
   VStack,
 } from '@chakra-ui/react'
-import ProductCard from '../../components/Card/ProductCard'
+import ProductList from '../Card/ProductList'
 import { useAppSelector } from '../../store/hooks'
 
 const AllProducts = () => {
   const categories = useAppSelector((state) => state.categories.categories)
+
   const products = useAppSelector((state) => state.products.products)
+
+  const [filteredProducts, setFilteredProducts] = useState(products)
+
+  const handleCategorySelect = (id: number) => {
+    if (id === 0) {
+      setFilteredProducts(products)
+      return
+    } else {
+      const filteredProducts = products.filter(
+        (product) => product.category_id === id,
+      )
+      setFilteredProducts(filteredProducts)
+    }
+  }
+
+  useEffect(() => {
+    setFilteredProducts(products)
+  }, [products])
 
   return (
     <VStack alignItems={'flex-start'}>
@@ -42,8 +61,23 @@ const AllProducts = () => {
             Filter
           </MenuButton>
           <MenuList>
+            <MenuItem
+              key={0}
+              onClick={() => {
+                handleCategorySelect(0)
+              }}
+            >
+              All
+            </MenuItem>
             {categories.map((category) => (
-              <MenuItem key={category.id}>{category.category_name}</MenuItem>
+              <MenuItem
+                key={category.id}
+                onClick={() => {
+                  handleCategorySelect(category.id)
+                }}
+              >
+                {category.category_name}
+              </MenuItem>
             ))}
           </MenuList>
         </Menu>
@@ -59,7 +93,7 @@ const AllProducts = () => {
           />
         </InputGroup>
       </HStack>
-      <ProductCard />
+      <ProductList filteredProduct={filteredProducts} />
     </VStack>
   )
 }
