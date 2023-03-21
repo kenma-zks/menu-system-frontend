@@ -210,9 +210,6 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
         icon={<FiMenu />}
       />
 
-      <Box>
-        {/* <img src={logo} alt="logo" height="120px" width="120px" /> */}
-      </Box>
       <Flex>
         <Menu>
           <MenuButton

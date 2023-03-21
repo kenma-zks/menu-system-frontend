@@ -29,7 +29,7 @@ import {
 } from 'react-icons/fi'
 import { IconType } from 'react-icons'
 import { ReactText } from 'react'
-import { Link, Outlet } from 'react-router-dom'
+import { Link, Outlet, useLocation } from 'react-router-dom'
 import logo from '../../assets/logo.png'
 
 interface LinkItemProps {
@@ -97,12 +97,12 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
           h="20"
           alignItems="center"
           mx="8"
-          my="15px"
+          my="30px"
           justifyContent="space-between"
         >
-          <Box>
+          <Flex justifyContent={'center'} w="full">
             <Image src={logo} alt="logo" boxSize="75px" />
-          </Box>
+          </Flex>
           <CloseButton
             display={{ base: 'flex', md: 'none' }}
             onClick={onClose}
@@ -129,6 +129,9 @@ interface NavItemProps extends FlexProps {
   href: string
 }
 const NavItem = ({ icon, href, children, ...rest }: NavItemProps) => {
+  const location = useLocation()
+  const isActive = location.pathname === href
+
   return (
     <ChakraLink
       as={Link}
@@ -144,9 +147,9 @@ const NavItem = ({ icon, href, children, ...rest }: NavItemProps) => {
         role="group"
         cursor="pointer"
         _hover={{
-          bg: 'cyan.400',
-          color: 'white',
+          color: 'orange.400',
         }}
+        color={isActive ? 'orange' : 'inherit'}
         {...rest}
       >
         {icon && (
@@ -154,8 +157,9 @@ const NavItem = ({ icon, href, children, ...rest }: NavItemProps) => {
             mr="4"
             fontSize="16"
             _groupHover={{
-              color: 'white',
+              color: 'orange.400',
             }}
+            color={isActive ? 'orange' : 'inherit'}
             as={icon}
           />
         )}
