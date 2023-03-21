@@ -33,7 +33,7 @@ import {
 } from 'react-icons/fi'
 import { IconType } from 'react-icons'
 import { ReactText } from 'react'
-import { Link, Outlet, useNavigate } from 'react-router-dom'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import logo from '../../assets/logo.png'
 import { useAppDispatch } from '../../store/hooks'
 import { authActions } from '../../store/authSlice'
@@ -43,6 +43,7 @@ interface LinkItemProps {
   icon: IconType
   link: string
 }
+
 const LinkItems: Array<LinkItemProps> = [
   { name: 'Home', icon: FiHome, link: '/admin/home' },
   { name: 'Products', icon: FiArchive, link: '/admin/products' },
@@ -145,6 +146,9 @@ interface NavItemProps extends FlexProps {
   href: string
 }
 const NavItem = ({ icon, href, children, ...rest }: NavItemProps) => {
+  const location = useLocation()
+  const isActive = location.pathname === href
+
   return (
     <ChakraLink
       as={Link}
@@ -160,9 +164,9 @@ const NavItem = ({ icon, href, children, ...rest }: NavItemProps) => {
         role="group"
         cursor="pointer"
         _hover={{
-          bg: 'cyan.400',
-          color: 'white',
+          color: 'orange.400',
         }}
+        color={isActive ? 'orange' : 'inherit'}
         {...rest}
       >
         {icon && (
@@ -170,8 +174,9 @@ const NavItem = ({ icon, href, children, ...rest }: NavItemProps) => {
             mr="4"
             fontSize="16"
             _groupHover={{
-              color: 'white',
+              color: 'orange.400',
             }}
+            color={isActive ? 'orange' : 'inherit'}
             as={icon}
           />
         )}
