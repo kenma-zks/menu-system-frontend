@@ -89,6 +89,8 @@ const Booking = () => {
           >
             <option value="All">All</option>
             <option value="Pending">Pending</option>
+            <option value="Accepted">Accepted</option>
+            <option value="Rejected">Rejected</option>
           </Select>
         </Box>
 

@@ -75,6 +75,7 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
 
   const submitHandler = (event: React.FormEvent) => {
     event.preventDefault()
+    console.log(enteredStatus)
     if (enteredStatusIsValid) {
       const updatedBooking = {
         id: booking?.id,
@@ -88,7 +89,6 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
         note: booking?.note,
         status: enteredStatus,
       }
-      console.log(updatedBooking)
       fetch(`http://127.0.0.1:8000/api/booking/list/${booking?.id}/`, {
         method: 'PUT',
         headers: {
@@ -189,18 +189,8 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
                     defaultValue={booking?.status}
                     onChange={statusChangeHandler}
                   >
-                    <option
-                      value="Accepted"
-                      selected={booking?.status === 'Accepted' ? true : false}
-                    >
-                      Accepted
-                    </option>
-                    <option
-                      value="Rejected"
-                      selected={booking?.status === 'Rejected' ? true : false}
-                    >
-                      Rejected
-                    </option>
+                    <option value="Accepted">Accepted</option>
+                    <option value="Rejected">Rejected</option>
                   </Select>
                 </FormControl>
               </HStack>
