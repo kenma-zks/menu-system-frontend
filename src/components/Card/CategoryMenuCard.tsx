@@ -10,8 +10,9 @@ const CategoryMenuCard = ({
   handleCategoryClick: (id: number) => void;
   isActive: boolean;
 }) => {
-  const bgColor = isActive ? "orange.400" : "white";
-  const textColor = isActive ? "white" : "black";
+  const textColor = isActive ? "orange" : "black";
+  const borderColor = isActive ? "orange" : "gray.200";
+  const bgColor = isActive ? "orange.100" : "white";
 
   return (
     <Box
@@ -25,9 +26,10 @@ const CategoryMenuCard = ({
         maxH={"40px"}
         minW={"140px"}
         minH={"40px"}
-        bgColor={bgColor}
         color={textColor}
-        borderRadius={"lg"}
+        bgColor={bgColor}
+        borderColor={borderColor}
+        borderRadius="full"
         borderWidth={2}
         display={"flex"}
         mr="4"
