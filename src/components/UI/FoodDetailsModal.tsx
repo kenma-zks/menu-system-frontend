@@ -19,6 +19,7 @@ import { fetchFoodDetails } from "../../api/api";
 import { useAppDispatch } from "../../store/hooks";
 import { setProducts } from "../../store/productsSlice";
 import { IProductData } from "../../types/types";
+import { addItemToCart } from "../../store/cartSlice";
 
 interface FoodDetailsModalProps {
   isOpen: boolean;
@@ -33,6 +34,17 @@ const FoodDetailsModal: React.FC<FoodDetailsModalProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const toast = useToast();
+  const [quantity, setQuantity] = useState(1);
+
+  const handleIncrement = () => {
+    setQuantity((prev) => prev + 1);
+  };
+
+  const handleDecrement = () => {
+    if (quantity > 1) {
+      setQuantity((prev) => prev - 1);
+    }
+  };
 
   const fetchFoodDetailsCallback = useCallback(() => {
     fetchFoodDetails<IProductData[]>().then((data) => {
@@ -55,14 +67,15 @@ const FoodDetailsModal: React.FC<FoodDetailsModalProps> = ({
     fetchFoodDetailsCallback();
   }, [fetchFoodDetailsCallback]);
 
-  const [quantity, setQuantity] = useState(1);
-
-  const handleIncrement = () => {
-    setQuantity(quantity + 1);
-  };
-
-  const handleDecrement = () => {
-    setQuantity(quantity - 1);
+  const addtoCartHandler = () => {
+    dispatch(
+      addItemToCart({
+        id: foodItem?.id,
+        food_name: foodItem?.food_name,
+        food_price: foodItem?.food_price,
+        quantity,
+      })
+    );
   };
 
   return (
@@ -132,7 +145,9 @@ const FoodDetailsModal: React.FC<FoodDetailsModalProps> = ({
                 borderRadius="full"
                 mt={4}
                 _hover={{ bgColor: "#D67229" }}
-                //   onClick={handleOrderNow}
+                onClick={() => {
+                  addtoCartHandler();
+                }}
               >
                 Order Now
               </Button>
