@@ -1,9 +1,10 @@
-import { configureStore } from '@reduxjs/toolkit'
-import { apiSlice } from './api/apiSlice'
-import authReducer from './authSlice'
-import categoriesSlice from './categoriesSlice'
-import productsSlice from './productsSlice'
-import bookingsSlice from './bookingSlice'
+import { configureStore } from "@reduxjs/toolkit";
+import { apiSlice } from "./api/apiSlice";
+import authReducer from "./authSlice";
+import categoriesSlice from "./categoriesSlice";
+import productsSlice from "./productsSlice";
+import bookingsSlice from "./bookingSlice";
+import cartSlice from "./cartSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,12 +13,13 @@ export const store = configureStore({
     products: productsSlice,
     bookings: bookingsSlice,
     [apiSlice.reducerPath]: apiSlice.reducer,
+    cart: cartSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
     }).concat(apiSlice.middleware),
-})
+});
 
-export type RootState = ReturnType<typeof store.getState>
-export type AppDispatch = typeof store.dispatch
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
