@@ -28,6 +28,8 @@ const MenuItemCard = ({ product }: { product: IProductData }) => {
       key={product.id}
       _hover={{ boxShadow: "md", cursor: "pointer" }}
       onClick={openFoodDetailsModal}
+      pointerEvents={product.food_available ? "auto" : "none"}
+      opacity={product.food_available ? 1 : 0.5}
     >
       <HStack alignItems={"center"} spacing="2">
         <Box p="2">
