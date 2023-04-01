@@ -1,6 +1,5 @@
-import { AddIcon, DeleteIcon, MinusIcon } from "@chakra-ui/icons";
+import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 import {
-  Avatar,
   Box,
   Button,
   Divider,
@@ -11,46 +10,25 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
-  HStack,
-  Icon,
   IconButton,
   Image,
-  Select,
   Spacer,
   Stack,
   Text,
-  VStack,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { IProductData } from "../../types/types";
 import momo from "../../assets/momo.jpg";
-import { FaMoneyBillWaveAlt } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { CartItem } from "../../types/types";
+import { addItemToCart, removeItemFromCart } from "../../store/cartSlice";
 
-const DUMMY_Cart = {
-  cart_id: 6,
-  items: [
-    {
-      item_name: "Chicken Burger",
-      item_price: 5.3,
-      item_category: "burger",
-    },
-    {
-      item_name: "Mix Salad",
-      item_price: 2.3,
-      item_category: "veg",
-    },
-    {
-      item_name: "Mix Salad",
-      item_price: 2.3,
-      item_category: "veg",
-    },
-    {
-      item_name: "Mix Salad",
-      item_price: 2.3,
-      item_category: "burger",
-    },
-  ],
-};
+interface RootState {
+  cart: {
+    cartItems: CartItem[];
+    totalQuantity: number;
+    totalAmount: number;
+  };
+}
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -58,16 +36,37 @@ interface CartDrawerProps {
 }
 
 const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
-  const [quantity, setQuantity] = useState(1);
+  const cartItems = useSelector((state: RootState) => state.cart.cartItems);
+  const totalAmount = useSelector((state: RootState) => state.cart.totalAmount);
+  const totalQuantity = useSelector(
+    (state: RootState) => state.cart.totalQuantity
+  );
+
+  const dispatch = useDispatch();
   const [paymentMethod, setPaymentMethod] = useState("cash");
 
-  const handleIncrement = () => {
-    setQuantity(quantity + 1);
+  const addItemHandler = (
+    id: number,
+    food_name?: string,
+    food_price?: string | number,
+    quantity?: number
+  ) => {
+    if (food_name && food_price && quantity) {
+      dispatch(
+        addItemToCart({
+          id: id,
+          food_name: food_name,
+          food_price: food_price,
+          quantity,
+        })
+      );
+    }
   };
 
-  const handleDecrement = () => {
-    setQuantity(quantity - 1);
+  const removeItemHandler = (id: number) => {
+    dispatch(removeItemFromCart(id));
   };
+
   return (
     <Box>
       <Drawer isOpen={isOpen} placement="right" onClose={onClose} size="sm">
@@ -80,8 +79,8 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
           <DrawerBody>
             <Stack pt={6}>
               <Box height="240px" overflowY="auto">
-                {DUMMY_Cart.items.map((item, index) => (
-                  <Box key={index} pb="4">
+                {cartItems.map((item, index) => (
+                  <Box key={item.id} pb="4">
                     <Stack
                       direction={"row"}
                       spacing={4}
@@ -100,14 +99,14 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
 
                       <Stack width="100%" pr="3">
                         <Text fontWeight={"semibold"} fontSize={"md"}>
-                          {item.item_name}
+                          {item.food_name}
                         </Text>
                         <Text
                           fontSize={"sm"}
                           color="gray"
                           fontWeight={"semibold"}
                         >
-                          {item.item_category}
+                          {/* {item.ca} */}
                         </Text>
                         <Stack direction={"row"} spacing={"4"}>
                           <IconButton
@@ -117,9 +116,10 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                             bg="gray.300"
                             _hover={{ bg: "gray.400" }}
                             size="xs"
-                            onClick={handleDecrement}
+                            data-index={index}
+                            onClick={() => removeItemHandler(item.id!)}
                           />
-                          <Text fontSize={"md"}>{quantity}</Text>
+                          <Text fontSize={"md"}>{item.quantity}</Text>
                           <IconButton
                             aria-label="Add to cart"
                             icon={<AddIcon />}
@@ -127,7 +127,14 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                             bg="gray.300"
                             _hover={{ bg: "gray.400" }}
                             size="xs"
-                            onClick={handleIncrement}
+                            onClick={() => {
+                              addItemHandler(
+                                item.id!,
+                                item.food_name,
+                                item.food_price,
+                                1
+                              );
+                            }}
                           />
                           <Spacer />
                           <Text
@@ -136,13 +143,13 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                             pb="2"
                             color={"orange"}
                           >
-                            {quantity} X {item.item_price}
+                            {item.quantity} X Rs {item.food_price}
                           </Text>
                         </Stack>
                       </Stack>
                     </Stack>
 
-                    {index !== DUMMY_Cart.items.length - 1 && (
+                    {index !== cartItems.length - 1 && (
                       <Divider borderBottomWidth={"3px"} />
                     )}
                   </Box>
@@ -156,7 +163,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                   </Text>
                   <Spacer />
                   <Text fontWeight={"semibold"} fontSize={"sm"}>
-                    {quantity} (items)
+                    {totalQuantity}
                   </Text>
                 </Stack>
                 <Stack direction={"row"} spacing={"4"} pt="2">
@@ -165,18 +172,10 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                   </Text>
                   <Spacer />
                   <Text fontWeight={"semibold"} fontSize={"sm"}>
-                    Rs {quantity * 5.3}
+                    Rs {totalAmount}
                   </Text>
                 </Stack>
-                <Stack direction={"row"} spacing={"4"} pt="2">
-                  <Text fontWeight={"semibold"} fontSize={"sm"} color="gray">
-                    Discount
-                  </Text>
-                  <Spacer />
-                  <Text fontWeight={"semibold"} fontSize={"sm"} color="orange">
-                    Rs 0
-                  </Text>
-                </Stack>
+
                 <Divider pt={2} pb="2" borderBottomWidth={"3px"} />
                 <Stack direction={"row"} spacing={"4"} pt="2">
                   <Text fontWeight={"semibold"} fontSize={"md"}>
@@ -184,7 +183,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                   </Text>
                   <Spacer />
                   <Text fontWeight={"semibold"} fontSize={"md"}>
-                    Rs {quantity * 5.3}
+                    Rs {totalAmount}
                   </Text>
                 </Stack>
                 <Divider pb="2" borderBottomWidth={"3px"} />
