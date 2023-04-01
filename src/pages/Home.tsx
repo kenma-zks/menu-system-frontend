@@ -12,15 +12,28 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { FiShoppingCart } from "react-icons/fi";
+import { useSelector } from "react-redux";
 import CategoryItemList from "../components/Card/CategoryItemList";
 import MenuItemList from "../components/Card/MenuItemList";
 import CartDrawer from "../components/UI/CartDrawer";
 import { ICategoryData, IProductData } from "../types/types";
 
+interface RootState {
+  cart: CartState;
+}
+
+interface CartState {
+  totalQuantity: number;
+}
+
 const Home = () => {
   const [selectedCategoryItem, setSelectedCategoryItem] =
     useState<ICategoryData | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const cartQuantity = useSelector(
+    (state: RootState) => state.cart.totalQuantity
+  );
 
   useEffect(() => {
     setSelectedCategoryItem({ id: 0, category_name: "All" });
@@ -54,12 +67,14 @@ const Home = () => {
             aria-label="Cart"
             icon={<FiShoppingCart />}
             borderRadius="full"
-            bg="orange.300"
             _hover={{ bg: "orange.400" }}
             onClick={() => {
               openCartDrawer();
             }}
           />
+          <Text fontSize="xl" fontWeight="semibold">
+            {cartQuantity} items
+          </Text>
         </HStack>
       </Box>
       <Divider borderBottom="1px" />
