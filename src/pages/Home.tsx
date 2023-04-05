@@ -2,6 +2,7 @@ import { Search2Icon } from "@chakra-ui/icons";
 import {
   Box,
   Divider,
+  Flex,
   HStack,
   IconButton,
   Input,
@@ -30,6 +31,7 @@ const Home = () => {
   const [selectedCategoryItem, setSelectedCategoryItem] =
     useState<ICategoryData | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const cartQuantity = useSelector(
     (state: RootState) => state.cart.totalQuantity
@@ -38,6 +40,12 @@ const Home = () => {
   useEffect(() => {
     setSelectedCategoryItem({ id: 0, category_name: "All" });
   }, []);
+
+  const handleSearchInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setSearchQuery(event.target.value);
+  };
 
   const openCartDrawer = () => {
     setIsDrawerOpen(true);
@@ -57,24 +65,51 @@ const Home = () => {
               type="text"
               placeholder="Search menu"
               _placeholder={{ color: "black" }}
+              value={searchQuery}
+              onChange={handleSearchInputChange}
             />
             <InputRightElement
               pointerEvents="none"
               children={<Search2Icon />}
             />
           </InputGroup>
-          <IconButton
-            aria-label="Cart"
-            icon={<FiShoppingCart />}
-            borderRadius="full"
-            _hover={{ bg: "orange.400" }}
-            onClick={() => {
-              openCartDrawer();
-            }}
-          />
-          <Text fontSize="xl" fontWeight="semibold">
-            {cartQuantity} items
-          </Text>
+          <Flex alignItems="center" justifyContent="flex-end">
+            <Box
+              position="relative"
+              display="inline-block"
+              mr="2"
+              width="40px"
+              height="40px"
+            >
+              <IconButton
+                aria-label="Cart"
+                icon={<FiShoppingCart />}
+                borderRadius="full"
+                _hover={{ bg: "orange.400" }}
+                onClick={() => {
+                  openCartDrawer();
+                }}
+                backgroundColor={"orange.200"}
+              />
+              <Box
+                position="absolute"
+                top="-10px"
+                right="-10px"
+                bg="black"
+                borderRadius="full"
+                width="24px"
+                height="24px"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                fontSize="xs"
+                fontWeight="semibold"
+                color="white"
+              >
+                {cartQuantity}
+              </Box>
+            </Box>
+          </Flex>
         </HStack>
       </Box>
       <Divider borderBottom="1px" />
@@ -87,14 +122,17 @@ const Home = () => {
           <CategoryItemList setSelectedCategoryItem={setSelectedCategoryItem} />
 
           {selectedCategoryItem === null && (
-            <MenuItemList selectedCategoryId={0} />
+            <MenuItemList selectedCategoryId={0} searchQuery={searchQuery} />
           )}
           {selectedCategoryItem && (
             <>
               <Text fontSize="lg" fontWeight="semibold" pt="2" pb={"2"}>
                 Select Menu
               </Text>
-              <MenuItemList selectedCategoryId={selectedCategoryItem.id} />
+              <MenuItemList
+                selectedCategoryId={selectedCategoryItem.id}
+                searchQuery={searchQuery}
+              />
             </>
           )}
           <CartDrawer

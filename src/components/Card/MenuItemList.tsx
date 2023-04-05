@@ -1,4 +1,13 @@
-import { Box, Flex, HStack, Image, Text, VStack, Wrap } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  HStack,
+  Icon,
+  Image,
+  Text,
+  VStack,
+  Wrap,
+} from "@chakra-ui/react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { fetchFoodDetails } from "../../api/api";
 import { IProductData } from "../../types/types";
@@ -8,9 +17,13 @@ import MenuItemCard from "./MenuItemCard";
 
 interface MenuItemListProps {
   selectedCategoryId: number;
+  searchQuery: string;
 }
 
-const MenuItemList = ({ selectedCategoryId }: MenuItemListProps) => {
+const MenuItemList = ({
+  selectedCategoryId,
+  searchQuery,
+}: MenuItemListProps) => {
   const products = useAppSelector((state) => state.products.products);
   const dispatch = useAppDispatch();
 
@@ -53,13 +66,30 @@ const MenuItemList = ({ selectedCategoryId }: MenuItemListProps) => {
 
   const filteredProducts = useMemo(() => {
     if (selectedCategoryId === null || selectedCategoryId === 0) {
-      return products;
+      return products.filter((product) =>
+        product.food_name.toLowerCase().startsWith(searchQuery.toLowerCase())
+      );
     } else {
       return products.filter(
-        (product) => product.category_id === selectedCategoryId
+        (product) =>
+          product.category_id === selectedCategoryId &&
+          product.food_name.toLowerCase().startsWith(searchQuery.toLowerCase())
       );
     }
-  }, [products, selectedCategoryId]);
+  }, [products, selectedCategoryId, searchQuery]);
+
+  if (filteredProducts.length === 0) {
+    return (
+      <Flex width="100%" justifyContent="center" alignItems="center">
+        <Text fontSize="sm" fontWeight="semibold" color={"gray"}>
+          No items found
+        </Text>
+        <span role="img" aria-label="sad face" style={{ fontSize: "1rem" }}>
+          😞
+        </span>
+      </Flex>
+    );
+  }
 
   return (
     <>
