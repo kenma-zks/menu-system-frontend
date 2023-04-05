@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState } from "react";
 
 import {
   Button,
@@ -13,13 +13,13 @@ import {
   Textarea,
   VStack,
   useToast,
-} from '@chakra-ui/react'
-import useInput from '../hooks/use-input'
+} from "@chakra-ui/react";
+import useInput from "../hooks/use-input";
 
-import { IBookingData } from '../types/types'
+import { IBookingData } from "../types/types";
 
 interface BookVisitProps {
-  onAddBooking: (booking: IBookingData) => void
+  onAddBooking: (booking: IBookingData) => void;
 }
 
 const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
@@ -30,7 +30,7 @@ const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
     valueChangeHandler: firstNameChangeHandler,
     inputBlurHandler: firstNameBlurHandler,
     reset: resetFirstNameInput,
-  } = useInput((value) => (value as string).trim() !== '')
+  } = useInput((value) => (value as string).trim() !== "");
 
   const {
     value: enteredLastName,
@@ -39,7 +39,7 @@ const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
     valueChangeHandler: lastNameChangeHandler,
     inputBlurHandler: lastNameBlurHandler,
     reset: resetLastNameInput,
-  } = useInput((value) => (value as string).trim() !== '')
+  } = useInput((value) => (value as string).trim() !== "");
 
   const {
     value: enteredEmail,
@@ -48,7 +48,7 @@ const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
     valueChangeHandler: emailChangeHandler,
     inputBlurHandler: emailBlurHandler,
     reset: resetEmailInput,
-  } = useInput((value) => (value as string).includes('@'))
+  } = useInput((value) => (value as string).includes("@"));
 
   const {
     value: enteredPhoneNumber,
@@ -57,7 +57,7 @@ const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
     valueChangeHandler: phoneNumberChangeHandler,
     inputBlurHandler: phoneNumberBlurHandler,
     reset: resetPhoneNumberInput,
-  } = useInput((value) => (value as number).toString().length === 10)
+  } = useInput((value) => (value as number).toString().length === 10);
 
   const {
     value: enteredTableCapacity,
@@ -66,7 +66,7 @@ const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
     valueChangeHandler: tableCapacityChangeHandler,
     inputBlurHandler: tableCapacityBlurHandler,
     reset: resetTableCapacityInput,
-  } = useInput((value) => (value as number) > 0 && (value as number) <= 12)
+  } = useInput((value) => (value as string).trim() !== "");
 
   const {
     value: enteredBookingDate,
@@ -75,7 +75,7 @@ const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
     valueChangeHandler: bookingDateChangeHandler,
     inputBlurHandler: bookingDateBlurHandler,
     reset: resetBookingDateInput,
-  } = useInput((value) => (value as string).trim() !== '')
+  } = useInput((value) => (value as string).trim() !== "");
 
   const {
     value: enteredBookingDuration,
@@ -84,13 +84,13 @@ const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
     valueChangeHandler: bookingDurationChangeHandler,
     inputBlurHandler: bookingDurationBlurHandler,
     reset: resetBookingDurationInput,
-  } = useInput((value) => (value as string).trim() !== '')
+  } = useInput((value) => (value as string).trim() !== "");
 
   const {
     value: enteredNote,
     valueChangeHandler: enteredNoteChangeHandler,
     reset: resetNoteInput,
-  } = useInput(() => true)
+  } = useInput(() => true);
 
   const validate =
     enteredFirstNameIsValid &&
@@ -99,10 +99,10 @@ const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
     enteredPhoneNumberIsValid &&
     enteredTableCapacityIsValid &&
     enteredBookingDateIsValid &&
-    enteredBookingDurationIsValid
+    enteredBookingDurationIsValid;
 
   function submitHandler(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
+    event.preventDefault();
 
     if (validate) {
       const booking = {
@@ -114,31 +114,31 @@ const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
         booking_date: enteredBookingDate,
         booking_duration: enteredBookingDuration,
         note: enteredNote,
-        status: 'Pending',
-      }
-      resetFirstNameInput()
-      resetLastNameInput()
-      resetEmailInput()
-      resetPhoneNumberInput()
-      resetTableCapacityInput()
-      resetBookingDateInput()
-      resetBookingDurationInput()
-      resetNoteInput()
-      onAddBooking(booking)
+        status: "Pending",
+      };
+      resetFirstNameInput();
+      resetLastNameInput();
+      resetEmailInput();
+      resetPhoneNumberInput();
+      resetTableCapacityInput();
+      resetBookingDateInput();
+      resetBookingDurationInput();
+      resetNoteInput();
+      onAddBooking(booking);
     } else {
       toast({
-        title: 'Invalid input.',
-        description: 'Please check your input.',
-        status: 'error',
+        title: "Invalid input.",
+        description: "Please check your input.",
+        status: "error",
         duration: 9000,
         isClosable: true,
-        variant: 'left-accent',
-      })
+        variant: "left-accent",
+      });
     }
   }
-  const toast = useToast()
-  const currentDate = new Date()
-  const currentDateString = currentDate.toISOString().substring(0, 16)
+  const toast = useToast();
+  const currentDate = new Date();
+  const currentDateString = currentDate.toISOString().substring(0, 16);
 
   return (
     <VStack padding={4} alignItems="flex-start">
@@ -279,6 +279,6 @@ const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
         </FormControl>
       </form>
     </VStack>
-  )
-}
-export default BookVisitForm
+  );
+};
+export default BookVisitForm;
