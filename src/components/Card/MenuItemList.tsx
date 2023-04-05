@@ -1,13 +1,4 @@
-import {
-  Box,
-  Flex,
-  HStack,
-  Icon,
-  Image,
-  Text,
-  VStack,
-  Wrap,
-} from "@chakra-ui/react";
+import { Box, Flex, HStack, Image, Text, VStack, Wrap } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { fetchFoodDetails } from "../../api/api";
 import { IProductData } from "../../types/types";
@@ -90,7 +81,6 @@ const MenuItemList = ({
       </Flex>
     );
   }
-
   return (
     <>
       <Flex flexWrap={"wrap"}>

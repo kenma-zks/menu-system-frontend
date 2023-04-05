@@ -62,7 +62,7 @@ const MenuItemCard = ({ product }: { product: IProductData }) => {
           </Box>
           <Box>
             <Box color="gray" fontSize="sm" fontWeight={"medium"}>
-              $ {product.food_price}
+              Rs {product.food_price}
             </Box>
           </Box>
           <Box>

@@ -1,23 +1,24 @@
-import { Box, Flex, HStack, Image, Text, VStack, Wrap } from '@chakra-ui/react'
-import React, { useCallback, useEffect, useState } from 'react'
-import { fetchFoodDetails } from '../../api/api'
-import { IProductData } from '../../types/types'
-import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { setProducts } from '../../store/productsSlice'
-import EditProductDrawer from '../UI/EditProductDrawer'
-import ProductCard from './ProductCard'
+import { Box, Flex, HStack, Image, Text, VStack, Wrap } from "@chakra-ui/react";
+import React, { useCallback, useEffect, useState } from "react";
+import { fetchFoodDetails } from "../../api/api";
+import { IProductData } from "../../types/types";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { setProducts } from "../../store/productsSlice";
+import EditProductDrawer from "../UI/EditProductDrawer";
+import ProductCard from "./ProductCard";
 
 const ProductList = ({
   filteredProduct,
 }: {
-  filteredProduct: IProductData[]
+  filteredProduct: IProductData[];
 }) => {
-  const products = useAppSelector((state) => state.products.products)
-  const dispatch = useAppDispatch()
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const products = useAppSelector((state) => state.products.products);
+  const dispatch = useAppDispatch();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<IProductData | null>(
-    null,
-  )
+    null
+  );
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const fetchFoodDetailsCallback = useCallback(() => {
     fetchFoodDetails<IProductData[]>().then((data) => {
@@ -30,40 +31,57 @@ const ProductList = ({
           food_image: item.food_image,
           food_available: item.food_available,
           food_description: item.food_description,
-        }
-      })
-      dispatch(setProducts(transformedData))
-    })
-  }, [])
+        };
+      });
+      dispatch(setProducts(transformedData));
+    });
+  }, []);
 
   useEffect(() => {
-    fetchFoodDetailsCallback()
-  }, [fetchFoodDetailsCallback])
+    fetchFoodDetailsCallback();
+  }, [fetchFoodDetailsCallback]);
 
   useEffect(() => {
     const urls = products.map((product) => {
       if (product.food_image instanceof File) {
-        return URL.createObjectURL(product.food_image)
+        return URL.createObjectURL(product.food_image);
       }
-      return ''
-    })
+      return "";
+    });
     return () => {
       urls.forEach((url) => {
         if (url) {
-          URL.revokeObjectURL(url)
+          URL.revokeObjectURL(url);
         }
-      })
-    }
-  }, [products])
+      });
+    };
+  }, [products]);
 
   const handleProductClick = (product: IProductData) => {
-    setSelectedProduct(product)
-    setIsDrawerOpen(true)
+    setSelectedProduct(product);
+    setIsDrawerOpen(true);
+  };
+
+  const filteredResults = filteredProduct.filter((product) =>
+    product.food_name.toLowerCase().startsWith(searchQuery.toLowerCase())
+  );
+
+  if (filteredResults.length === 0) {
+    return (
+      <Flex width="100%" justifyContent="center" alignItems="center">
+        <Text fontSize="sm" fontWeight="semibold" color={"gray"}>
+          No items found
+        </Text>
+        <span role="img" aria-label="sad face" style={{ fontSize: "1rem" }}>
+          😞
+        </span>
+      </Flex>
+    );
   }
 
   return (
     <>
-      <Flex flexWrap={'wrap'}>
+      <Flex flexWrap={"wrap"}>
         {filteredProduct.map((product) => (
           <ProductCard
             key={product.id}
@@ -80,7 +98,7 @@ const ProductList = ({
         />
       )}
     </>
-  )
-}
+  );
+};
 
-export default ProductList
+export default ProductList;
