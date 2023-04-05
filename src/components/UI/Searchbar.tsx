@@ -16,7 +16,9 @@ const SearchBar = ({ onSearch, products }: SearchBarProps) => {
   ) => {
     setSearchValue(event.target.value);
     const filteredProducts = products.filter((product) =>
-      product.food_name.toLowerCase().includes(event.target.value.toLowerCase())
+      product.food_name
+        .toLowerCase()
+        .startsWith(event.target.value.toLowerCase())
     );
     onSearch(filteredProducts);
   };
