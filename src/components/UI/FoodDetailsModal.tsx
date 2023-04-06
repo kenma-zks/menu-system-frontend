@@ -67,13 +67,22 @@ const FoodDetailsModal: React.FC<FoodDetailsModalProps> = ({
     fetchFoodDetailsCallback();
   }, [fetchFoodDetailsCallback]);
 
-  const addtoCartHandler = () => {
+  const addtoCartHandler = (
+    id: number,
+    food_name: string,
+    food_price: number | string,
+    food_image: string | File,
+    quantity: number,
+    totalAmount: number | string
+  ) => {
     dispatch(
       addItemToCart({
-        id: foodItem?.id,
-        food_name: foodItem?.food_name,
-        food_price: foodItem?.food_price,
+        id,
+        food_name,
+        food_price,
+        food_image,
         quantity,
+        totalAmount,
       })
     );
   };
@@ -146,7 +155,21 @@ const FoodDetailsModal: React.FC<FoodDetailsModalProps> = ({
                 mt={4}
                 _hover={{ bgColor: "#D67229" }}
                 onClick={() => {
-                  addtoCartHandler();
+                  addtoCartHandler(
+                    foodItem?.id!,
+                    foodItem?.food_name!,
+                    foodItem?.food_price!,
+                    foodItem?.food_image!,
+                    quantity,
+                    quantity * (foodItem?.food_price! as number)
+                  );
+                  toast({
+                    title: "Item added to cart",
+                    status: "success",
+                    duration: 2000,
+                    isClosable: true,
+                  });
+                  onClose();
                 }}
               >
                 Order Now

@@ -16,11 +16,12 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import momo from "../../assets/momo.jpg";
 import { useDispatch, useSelector } from "react-redux";
-import { CartItem } from "../../types/types";
+import { CartItem, IOrderData, OrderedItem } from "../../types/types";
 import { addItemToCart, removeItemFromCart } from "../../store/cartSlice";
+import OrderedItems from "../Card/OrderedItems";
 
 interface RootState {
   cart: {
@@ -41,15 +42,16 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const totalQuantity = useSelector(
     (state: RootState) => state.cart.totalQuantity
   );
-
   const dispatch = useDispatch();
   const [paymentMethod, setPaymentMethod] = useState("cash");
 
   const addItemHandler = (
     id: number,
-    food_name?: string,
-    food_price?: string | number,
-    quantity?: number
+    food_name: string,
+    food_price: string | number,
+    food_image: string | File,
+    quantity: number,
+    totalAmount: number | string
   ) => {
     if (food_name && food_price && quantity) {
       dispatch(
@@ -57,7 +59,9 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
           id: id,
           food_name: food_name,
           food_price: food_price,
+          food_image: food_image,
           quantity,
+          totalAmount,
         })
       );
     }
@@ -65,6 +69,43 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
 
   const removeItemHandler = (id: number) => {
     dispatch(removeItemFromCart(id));
+  };
+
+  const submitHandler = async () => {
+    const orderedItems = await Promise.all(
+      cartItems.map(async (item) => {
+        const response = await fetch("http://127.0.0.1:8000/api/ordereditem/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            food: item.id,
+            quantity: item.quantity,
+          }),
+        });
+        const orderedItem: OrderedItem = await response.json();
+        return orderedItem;
+      })
+    );
+
+    const order: Pick<IOrderData, "items" | "total_price" | "total_items"> = {
+      items: orderedItems,
+      total_price: totalAmount,
+      total_items: totalQuantity,
+    };
+
+    const response = await fetch("http://127.0.0.1:8000/api/order/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(order),
+    });
+
+    const data = await response.json();
+    console.log(data);
+    console.log(orderedItems);
   };
 
   return (
@@ -89,12 +130,14 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                       pb="2"
                     >
                       <Image
-                        src={momo}
-                        alt={"Chicken Burger"}
-                        width={"140px"}
+                        src={item.food_image as string}
+                        alt={"Food Item"}
+                        maxW={"140px"}
+                        minW={"140px"}
                         objectFit={"cover"}
                         borderRadius={"md"}
-                        h="80px"
+                        maxH="80px"
+                        minH="80px"
                       />
 
                       <Stack width="100%" pr="3">
@@ -105,9 +148,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                           fontSize={"sm"}
                           color="gray"
                           fontWeight={"semibold"}
-                        >
-                          {/* {item.ca} */}
-                        </Text>
+                        ></Text>
                         <Stack direction={"row"} spacing={"4"}>
                           <IconButton
                             aria-label="Remove from cart"
@@ -132,7 +173,9 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                                 item.id!,
                                 item.food_name,
                                 item.food_price,
-                                1
+                                item.food_image,
+                                1,
+                                item.totalAmount
                               );
                             }}
                           />
@@ -253,6 +296,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
               width="100%"
               borderRadius="md"
               _hover={{ bg: "orange.400" }}
+              onClick={submitHandler}
             >
               Process Transaction
             </Button>

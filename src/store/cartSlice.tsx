@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { CartItem } from "../types/types";
+import { CartItem, IOrderData } from "../types/types";
 
 interface CartState {
   cartItems: CartItem[];
@@ -26,6 +26,7 @@ const cartSlice = createSlice({
           id: newItem.id,
           food_name: newItem.food_name,
           food_price: newItem.food_price,
+          food_image: newItem.food_image,
           quantity: newItem.quantity,
           totalAmount: newItem.food_price,
         });
