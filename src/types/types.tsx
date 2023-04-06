@@ -55,9 +55,27 @@ export interface authState {
 }
 
 export interface CartItem {
-  id?: number;
-  food_name?: string;
-  food_price?: string | number;
+  id: number;
+  food_name: string;
+  food_price: string | number;
   quantity: number;
-  totalAmount?: number | string;
+  totalAmount: number | string;
+}
+
+export interface OrderedItem {
+  food: number;
+  quantity: number;
+  food_name: string;
+  food_price: number | string;
+  food_image: string;
+}
+
+export interface IOrderData {
+  order_id: number;
+  items: OrderedItem[];
+  total_price: number | string;
+  total_items: number | string;
+  order_status: string;
+  ordered_date: string;
+  ordered_time: string;
 }
