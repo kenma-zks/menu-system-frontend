@@ -1,4 +1,10 @@
-import { ILoginData, IRegisterData, IResetPasswordData } from "../types/types";
+import {
+  ILoginData,
+  IRegisterData,
+  IResetCode,
+  IResetPasswordData,
+  IVerifyEmailData,
+} from "../types/types";
 import { apiSlice } from "./api/apiSlice";
 
 export const authApiSlice = apiSlice.injectEndpoints({
@@ -25,10 +31,30 @@ export const authApiSlice = apiSlice.injectEndpoints({
     }),
 
     verifyEmail: build.mutation({
-      query: (emailInfo: IResetPasswordData) => ({
+      query: (emailInfo: IVerifyEmailData) => ({
         url: "forgot-password/",
         method: "POST",
         body: { email: emailInfo.email },
+      }),
+    }),
+
+    verifyCode: build.mutation({
+      query: (codeInfo: IResetCode) => ({
+        url: "forgot-password/verify-code/",
+        method: "POST",
+        body: { code: codeInfo.code },
+      }),
+    }),
+
+    verifyPassword: build.mutation({
+      query: (passwordInfo: IResetPasswordData) => ({
+        url: "forgot-password/reset-password/",
+        method: "POST",
+        body: {
+          user_id: passwordInfo.user_id,
+          password: passwordInfo.password,
+          confirm_password: passwordInfo.confirm_password,
+        },
       }),
     }),
 
@@ -46,4 +72,6 @@ export const {
   useRegisterUserMutation,
   useVerifyEmailMutation,
   useLogoutUserMutation,
+  useVerifyPasswordMutation,
+  useVerifyCodeMutation,
 } = authApiSlice;

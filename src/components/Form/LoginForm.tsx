@@ -12,20 +12,20 @@ import {
   Image,
   Heading,
   useToast,
-} from '@chakra-ui/react'
-import React, { Fragment, useState } from 'react'
-import { ILoginData } from '../../types/types'
-import login2 from '../../assets/login2.webp'
-import logo from '../../assets/logo.png'
-import { Link as RouterLink } from 'react-router-dom'
-import useInput from '../../hooks/use-input'
+} from "@chakra-ui/react";
+import React, { Fragment, useState } from "react";
+import { ILoginData } from "../../types/types";
+import login2 from "../../assets/login2.webp";
+import logo from "../../assets/logo.png";
+import { Link as RouterLink } from "react-router-dom";
+import useInput from "../../hooks/use-input";
 
 interface ILoginFormProps {
-  onReceiveFormData: (data: ILoginData) => void
+  onReceiveFormData: (data: ILoginData) => void;
 }
 
 const LoginForm = ({ onReceiveFormData }: ILoginFormProps) => {
-  const toast = useToast()
+  const toast = useToast();
 
   const {
     value: enteredEmail,
@@ -33,7 +33,7 @@ const LoginForm = ({ onReceiveFormData }: ILoginFormProps) => {
     hasError: enteredEmailHasError,
     valueChangeHandler: emailChangeHandler,
     inputBlurHandler: emailBlurHandler,
-  } = useInput((value) => (value as string).includes('@'))
+  } = useInput((value) => (value as string).includes("@"));
 
   const {
     value: enteredPassword,
@@ -41,52 +41,52 @@ const LoginForm = ({ onReceiveFormData }: ILoginFormProps) => {
     hasError: enteredPasswordHasError,
     valueChangeHandler: passwordChangeHandler,
     inputBlurHandler: passwordBlurHandler,
-  } = useInput((value) => (value as string).trim().length >= 8)
+  } = useInput((value) => (value as string).trim().length >= 8);
 
-  const validate = enteredEmailIsValid && enteredPasswordIsValid
+  const validate = enteredEmailIsValid && enteredPasswordIsValid;
 
   const submitHandler = (
-    e: React.FormEvent<HTMLDivElement | HTMLFormElement>,
+    e: React.FormEvent<HTMLDivElement | HTMLFormElement>
   ) => {
-    e.preventDefault()
+    e.preventDefault();
     if (validate) {
-      onReceiveFormData({ email: enteredEmail, password: enteredPassword })
+      onReceiveFormData({ email: enteredEmail, password: enteredPassword });
     } else {
       toast({
-        title: 'Login failed.',
-        description: 'Please check your credentials.',
-        status: 'error',
+        title: "Login failed.",
+        description: "Please check your credentials.",
+        status: "error",
         duration: 9000,
         isClosable: true,
-        position: 'top',
-      })
+        position: "top",
+      });
     }
-  }
+  };
 
   return (
     <Fragment>
       <Box as="form" onSubmit={submitHandler}>
-        <Stack minH={'100vh'} direction={{ base: 'column', md: 'row' }}>
+        <Stack minH={"100vh"} direction={{ base: "column", md: "row" }}>
           <Flex flex={1.25}>
-            <Image alt={'Login Image'} objectFit={'cover'} src={login2} />
+            <Image alt={"Login Image"} objectFit={"cover"} src={login2} />
           </Flex>
           <Flex flex={1} w="full">
-            <Stack spacing={4} w={'full'} pl={'60px'} pt={10} pr={40}>
-              <Image alt={'logo'} src={logo} h={75} w={75} />
+            <Stack spacing={4} w={"full"} pl={"60px"} pt={10} pr={40}>
+              <Image alt={"logo"} src={logo} h={75} w={75} />
 
               <Heading
                 pt={20}
-                fontSize={'3xl'}
-                fontWeight={'semibold'}
+                fontSize={"3xl"}
+                fontWeight={"semibold"}
                 pb={4}
                 color="#633c7e"
               >
                 Login
               </Heading>
               <Text
-                fontSize={'small'}
-                fontWeight={'semibold'}
-                color={'gray'}
+                fontSize={"small"}
+                fontWeight={"semibold"}
+                color={"gray"}
                 pb={4}
               >
                 Login to your account
@@ -97,7 +97,7 @@ const LoginForm = ({ onReceiveFormData }: ILoginFormProps) => {
                 isRequired
                 isInvalid={enteredEmailHasError}
               >
-                <FormLabel fontSize={'small'} color="#633c7e">
+                <FormLabel fontSize={"small"} color="#633c7e">
                   Email address
                 </FormLabel>
                 <Input
@@ -114,7 +114,7 @@ const LoginForm = ({ onReceiveFormData }: ILoginFormProps) => {
                 isRequired
                 isInvalid={enteredPasswordHasError}
               >
-                <FormLabel fontSize={'small'} color="#633c7e">
+                <FormLabel fontSize={"small"} color="#633c7e">
                   Password
                 </FormLabel>
                 <Input
@@ -127,29 +127,34 @@ const LoginForm = ({ onReceiveFormData }: ILoginFormProps) => {
                 />
               </FormControl>
               <Stack
-                direction={{ base: 'column', sm: 'row' }}
-                align={'start'}
-                justify={'space-between'}
+                direction={{ base: "column", sm: "row" }}
+                align={"start"}
+                justify={"space-between"}
                 pb={4}
               >
                 <Checkbox>
-                  <Text fontSize={'small'} color={'gray'}>
+                  <Text fontSize={"small"} color={"gray"}>
                     Remember me
                   </Text>
                 </Checkbox>
-                <Link color={'#03a6d4'} fontSize={'small'}>
+                <Link
+                  color={"#03a6d4"}
+                  fontSize={"small"}
+                  as={RouterLink}
+                  to="/admin/forgot-password"
+                >
                   Forgot password?
                 </Link>
               </Stack>
 
               <Button
-                bg={'#144ec7'}
-                color={'white'}
+                bg={"#144ec7"}
+                color={"white"}
                 _hover={{
-                  backgroundColor: '#1B1091',
+                  backgroundColor: "#1B1091",
                 }}
                 _active={{
-                  backgroundColor: '#1B1091',
+                  backgroundColor: "#1B1091",
                 }}
                 type="submit"
               >
@@ -157,13 +162,13 @@ const LoginForm = ({ onReceiveFormData }: ILoginFormProps) => {
               </Button>
               <Stack pt={3}>
                 <Text
-                  fontSize={'small'}
-                  fontWeight={'semibold'}
-                  color={'gray'}
+                  fontSize={"small"}
+                  fontWeight={"semibold"}
+                  color={"gray"}
                   align="center"
                 >
                   Don't have an account?
-                  <Link color={'#03a6d4'} as={RouterLink} to="/admin/signup">
+                  <Link color={"#03a6d4"} as={RouterLink} to="/admin/signup">
                     Sign Up
                   </Link>
                 </Text>
@@ -173,7 +178,7 @@ const LoginForm = ({ onReceiveFormData }: ILoginFormProps) => {
         </Stack>
       </Box>
     </Fragment>
-  )
-}
+  );
+};
 
-export default LoginForm
+export default LoginForm;

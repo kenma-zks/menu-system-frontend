@@ -1,3 +1,4 @@
+import React, { Fragment, useState } from "react";
 import {
   Box,
   Button,
@@ -13,38 +14,35 @@ import {
   useToast,
   Divider,
   HStack,
-  FormErrorMessage,
 } from "@chakra-ui/react";
-import React, { Fragment, useState } from "react";
+
 import login2 from "../../assets/login2.webp";
 import logo from "../../assets/logo.png";
 import { Link as RouterLink } from "react-router-dom";
 import useInput from "../../hooks/use-input";
-import { IVerifyEmailData } from "../../types/types";
+import { useVerifyCodeMutation } from "../../store/authApiSlice";
+import { IResetCode } from "../../types/types";
 
-interface IForgotPasswordFormProps {
-  onReceiveFormData: (data: IVerifyEmailData) => void;
+interface IVerifyCodeFormProps {
+  onReceiveFormData: (data: IResetCode) => void;
 }
 
-const ForgotPasswordForm = ({
-  onReceiveFormData,
-}: IForgotPasswordFormProps) => {
+const VerifyCodeForm = ({ onReceiveFormData }: IVerifyCodeFormProps) => {
   const toast = useToast();
-
   const {
-    value: enteredEmail,
-    isValid: enteredEmailIsValid,
-    hasError: enteredEmailHasError,
-    valueChangeHandler: emailChangeHandler,
-    inputBlurHandler: emailBlurHandler,
-  } = useInput((value) => (value as string).includes("@"));
+    value: enteredCode,
+    isValid: enteredCodeIsValid,
+    hasError: enteredCodeHasError,
+    valueChangeHandler: codeChangeHandler,
+    inputBlurHandler: codeBlurHandler,
+  } = useInput((value) => (value as string).trim() !== "");
 
   const submitHandler = (
     e: React.FormEvent<HTMLDivElement | HTMLFormElement>
   ) => {
     e.preventDefault();
-    if (enteredEmailIsValid) {
-      onReceiveFormData({ email: enteredEmail });
+    if (enteredCodeIsValid) {
+      onReceiveFormData({ code: enteredCode });
     } else {
       toast({
         title: "Reset password failed.",
@@ -74,7 +72,7 @@ const ForgotPasswordForm = ({
                 pb={4}
                 color="#633c7e"
               >
-                Trouble logging in?
+                Verify Code
               </Heading>
               <Text
                 fontSize={"small"}
@@ -82,31 +80,21 @@ const ForgotPasswordForm = ({
                 color={"gray"}
                 pb={4}
               >
-                Enter your email and we'll send you a code to reset your
-                password.
+                Please enter the code sent to your email address
               </Text>
 
-              <FormControl
-                id="email"
-                isRequired
-                isInvalid={enteredEmailHasError}
-              >
+              <FormControl id="Code" isRequired isInvalid={enteredCodeHasError}>
                 <FormLabel fontSize={"small"} color="#633c7e">
-                  Email address
+                  Code
                 </FormLabel>
                 <Input
-                  type="email"
-                  placeholder="Email"
-                  value={enteredEmail}
-                  onChange={emailChangeHandler}
-                  onBlur={emailBlurHandler}
+                  type="text"
+                  placeholder="Enter code"
+                  value={enteredCode}
+                  onChange={codeChangeHandler}
+                  onBlur={codeBlurHandler}
                   autoComplete="off"
                 />
-                {enteredEmailHasError && (
-                  <FormErrorMessage>
-                    Please enter a valid email address.
-                  </FormErrorMessage>
-                )}
               </FormControl>
 
               <Button
@@ -120,7 +108,7 @@ const ForgotPasswordForm = ({
                 }}
                 type="submit"
               >
-                Send Code
+                Submit
               </Button>
               <HStack pt={3} justify="center" align="center">
                 <Divider
@@ -169,4 +157,4 @@ const ForgotPasswordForm = ({
   );
 };
 
-export default ForgotPasswordForm;
+export default VerifyCodeForm;

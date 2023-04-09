@@ -18,33 +18,52 @@ import {
 import React, { Fragment, useState } from "react";
 import login2 from "../../assets/login2.webp";
 import logo from "../../assets/logo.png";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useLocation } from "react-router-dom";
 import useInput from "../../hooks/use-input";
-import { IVerifyEmailData } from "../../types/types";
+import { IResetPasswordData } from "../../types/types";
 
-interface IForgotPasswordFormProps {
-  onReceiveFormData: (data: IVerifyEmailData) => void;
+interface IResetPasswordForm {
+  onReceiveFormData: (data: IResetPasswordData) => void;
 }
 
-const ForgotPasswordForm = ({
-  onReceiveFormData,
-}: IForgotPasswordFormProps) => {
+const ResetPasswordForm = ({ onReceiveFormData }: IResetPasswordForm) => {
   const toast = useToast();
+  const state = useLocation();
 
   const {
-    value: enteredEmail,
-    isValid: enteredEmailIsValid,
-    hasError: enteredEmailHasError,
-    valueChangeHandler: emailChangeHandler,
-    inputBlurHandler: emailBlurHandler,
-  } = useInput((value) => (value as string).includes("@"));
+    value: enteredPassword,
+    isValid: enteredPasswordIsValid,
+    hasError: enteredPasswordHasError,
+    valueChangeHandler: passwordChangeHandler,
+    inputBlurHandler: passwordBlurHandler,
+    reset: resetPasswordInput,
+  } = useInput((value) => (value as string).trim().length >= 8);
+
+  const {
+    value: enteredConfirmPassword,
+    isValid: enteredConfirmPasswordIsValid,
+    hasError: enteredConfirmPasswordHasError,
+    valueChangeHandler: confirmPasswordChangeHandler,
+    inputBlurHandler: confirmPasswordBlurHandler,
+    reset: resetConfirmPasswordInput,
+  } = useInput(
+    (value) =>
+      (value as string).trim() === enteredPassword &&
+      enteredPassword.trim().length >= 8
+  );
 
   const submitHandler = (
     e: React.FormEvent<HTMLDivElement | HTMLFormElement>
   ) => {
     e.preventDefault();
-    if (enteredEmailIsValid) {
-      onReceiveFormData({ email: enteredEmail });
+    if (enteredPasswordIsValid && enteredConfirmPasswordIsValid) {
+      resetPasswordInput();
+      resetConfirmPasswordInput();
+      onReceiveFormData({
+        user_id: state.state.userId,
+        password: enteredPassword,
+        confirm_password: enteredConfirmPassword,
+      });
     } else {
       toast({
         title: "Reset password failed.",
@@ -74,7 +93,7 @@ const ForgotPasswordForm = ({
                 pb={4}
                 color="#633c7e"
               >
-                Trouble logging in?
+                Reset Password
               </Heading>
               <Text
                 fontSize={"small"}
@@ -82,30 +101,50 @@ const ForgotPasswordForm = ({
                 color={"gray"}
                 pb={4}
               >
-                Enter your email and we'll send you a code to reset your
-                password.
+                Enter your new password and confirm it.
               </Text>
 
               <FormControl
-                id="email"
+                id="password"
                 isRequired
-                isInvalid={enteredEmailHasError}
+                isInvalid={enteredPasswordHasError}
               >
                 <FormLabel fontSize={"small"} color="#633c7e">
-                  Email address
+                  New Password
                 </FormLabel>
                 <Input
-                  type="email"
-                  placeholder="Email"
-                  value={enteredEmail}
-                  onChange={emailChangeHandler}
-                  onBlur={emailBlurHandler}
+                  type="password"
+                  placeholder="password"
+                  value={enteredPassword}
+                  onChange={passwordChangeHandler}
+                  onBlur={passwordBlurHandler}
                   autoComplete="off"
                 />
-                {enteredEmailHasError && (
+                {enteredConfirmPasswordHasError && (
                   <FormErrorMessage>
-                    Please enter a valid email address.
+                    Please enter a valid password.
                   </FormErrorMessage>
+                )}
+              </FormControl>
+
+              <FormControl
+                id="password"
+                isRequired
+                isInvalid={enteredConfirmPasswordHasError}
+              >
+                <FormLabel fontSize={"small"} color="#633c7e">
+                  Confirm Password
+                </FormLabel>
+                <Input
+                  type="password"
+                  placeholder="confirm password"
+                  value={enteredConfirmPassword}
+                  onChange={confirmPasswordChangeHandler}
+                  onBlur={confirmPasswordBlurHandler}
+                  autoComplete="off"
+                />
+                {enteredConfirmPasswordHasError && (
+                  <FormErrorMessage>Password does not match.</FormErrorMessage>
                 )}
               </FormControl>
 
@@ -120,7 +159,7 @@ const ForgotPasswordForm = ({
                 }}
                 type="submit"
               >
-                Send Code
+                Reset Password
               </Button>
               <HStack pt={3} justify="center" align="center">
                 <Divider
@@ -169,4 +208,4 @@ const ForgotPasswordForm = ({
   );
 };
 
-export default ForgotPasswordForm;
+export default ResetPasswordForm;
