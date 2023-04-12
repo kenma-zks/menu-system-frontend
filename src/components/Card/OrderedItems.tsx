@@ -10,17 +10,19 @@ import {
   Divider,
   IconButton,
   Button,
-  Icon,
   useToast,
-  CloseButton,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
 } from "@chakra-ui/react";
-import React, { useCallback, useEffect, useState } from "react";
-import { FiCornerUpLeft, FiX } from "react-icons/fi";
-import momo from "../../assets/momo.jpg";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrderDetails, fetchOrderedItemsDetails } from "../../api/api";
 import { IOrderData, OrderedItem } from "../../types/types";
-import { setOrders } from "../../store/orderSlice";
+import { deleteOrder, setOrders } from "../../store/orderSlice";
 import { RootState } from "../../store/store";
 
 const OrderedItems = () => {
@@ -31,15 +33,16 @@ const OrderedItems = () => {
   }>({});
 
   const orders = useSelector((state: RootState) => state.orders.orders);
+  const [selectedOrder, setSelectedOrder] = useState<IOrderData | null>(null);
 
   const toast = useToast();
 
   const transformOrderData = async (order: IOrderData): Promise<IOrderData> => {
     const cartItems = await Promise.all(
       order.items.map(async (item) => {
-        const foodDetails = await fetchFoodDetails(item.food);
+        const foodDetails = await fetchFoodDetails(item.food_id);
         return {
-          food: item.food,
+          food_id: item.food_id,
           quantity: item.quantity,
           food_name: foodDetails.food_name,
           food_price: foodDetails.food_price,
@@ -47,6 +50,7 @@ const OrderedItems = () => {
         };
       })
     );
+
     return {
       order_id: order.order_id,
       items: cartItems,
@@ -91,6 +95,38 @@ const OrderedItems = () => {
     fetchOrderDetailsCallback();
   }, [fetchOrderDetailsCallback]);
 
+  const leastDestructiveRef = useRef<HTMLButtonElement | null>(null);
+  const cancelRef = useRef<HTMLButtonElement | null>(null);
+  const [alertIsOpen, setAlertIsOpen] = useState(false);
+
+  const onDeleteClick = (order: IOrderData) => {
+    setSelectedOrder(order);
+    setAlertIsOpen(true);
+  };
+
+  const alertOnClose = () => {
+    setAlertIsOpen(false);
+  };
+
+  const handleDelete = () => {
+    if (selectedOrder) {
+      const { order_id } = selectedOrder;
+      fetch(`http://127.0.0.1:8000/api/order/${order_id}`, {
+        method: "DELETE",
+      }).then(() => {
+        dispatch(deleteOrder(order_id));
+        setAlertIsOpen(false);
+        toast({
+          title: "Order Deleted",
+          description: `Order #${order_id} has been deleted`,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      });
+    }
+  };
+
   return (
     <>
       <Flex flexWrap={"wrap"}>
@@ -121,8 +157,35 @@ const OrderedItems = () => {
                     aria-label="Delete"
                     icon={<DeleteIcon />}
                     colorScheme="orange"
-                    // onClick={() => handleDelete(order.order_id)}
+                    onClick={() => onDeleteClick(order)}
                   />
+                  <AlertDialog
+                    isOpen={alertIsOpen}
+                    leastDestructiveRef={leastDestructiveRef}
+                    onClose={alertOnClose}
+                  >
+                    <AlertDialogContent>
+                      <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                        Delete Product
+                      </AlertDialogHeader>
+
+                      <AlertDialogBody>
+                        Are you sure? You can't undo this action afterwards.
+                      </AlertDialogBody>
+
+                      <AlertDialogFooter>
+                        <Button
+                          ref={cancelRef}
+                          onClick={() => setAlertIsOpen(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button colorScheme="red" onClick={handleDelete} ml={3}>
+                          Delete
+                        </Button>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </Stack>
 
                 <Stack pt={6}>
