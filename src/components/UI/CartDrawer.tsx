@@ -15,13 +15,16 @@ import {
   Spacer,
   Stack,
   Text,
+  useToast,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import momo from "../../assets/momo.jpg";
 import { useDispatch, useSelector } from "react-redux";
-import { CartItem, IOrderData, OrderedItem } from "../../types/types";
+import { CartItem } from "../../types/types";
 import { addItemToCart, removeItemFromCart } from "../../store/cartSlice";
 import OrderedItems from "../Card/OrderedItems";
+import { fetchOrderDetails } from "../../api/api";
+import { addOrder, setOrders } from "../../store/orderSlice";
 
 interface RootState {
   cart: {
@@ -36,6 +39,17 @@ interface CartDrawerProps {
   onClose: () => void;
 }
 
+interface OrderedItem {
+  food_id: number;
+  quantity: number;
+}
+
+interface IOrderData {
+  items: OrderedItem[];
+  total_price: number | string;
+  total_items: number | string;
+}
+
 const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const cartItems = useSelector((state: RootState) => state.cart.cartItems);
   const totalAmount = useSelector((state: RootState) => state.cart.totalAmount);
@@ -44,6 +58,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   );
   const dispatch = useDispatch();
   const [paymentMethod, setPaymentMethod] = useState("cash");
+  const toast = useToast();
 
   const addItemHandler = (
     id: number,
@@ -71,41 +86,49 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     dispatch(removeItemFromCart(id));
   };
 
-  const submitHandler = async () => {
+  const submitHandler = async (e: React.FormEvent) => {
+    e.preventDefault();
     const orderedItems = await Promise.all(
       cartItems.map(async (item) => {
-        const response = await fetch("http://127.0.0.1:8000/api/ordereditem/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            food: item.id,
-            quantity: item.quantity,
-          }),
-        });
-        const orderedItem: OrderedItem = await response.json();
+        const response = await fetch(
+          "http://127.0.0.1:8000/api/menu/fooddetails/" + item.id
+        );
+        const food = await response.json();
+        const orderedItem: OrderedItem = {
+          food_id: food.food_id,
+          quantity: item.quantity,
+        };
         return orderedItem;
       })
     );
 
-    const order: Pick<IOrderData, "items" | "total_price" | "total_items"> = {
+    const order: IOrderData = {
       items: orderedItems,
       total_price: totalAmount,
       total_items: totalQuantity,
     };
-
-    const response = await fetch("http://127.0.0.1:8000/api/order/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(order),
-    });
-
-    const data = await response.json();
-    console.log(data);
-    console.log(orderedItems);
+    ``;
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/order/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(order),
+      });
+      const data = await response.json();
+      dispatch(addOrder(data));
+      console.log(setOrders(data));
+      toast({
+        title: "Order Placed",
+        description: `Your order #${data.order_id} has been placed successfully!`,
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
