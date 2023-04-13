@@ -20,6 +20,8 @@ import { useAppDispatch } from "../../store/hooks";
 import { setProducts } from "../../store/productsSlice";
 import { IProductData } from "../../types/types";
 import { addItemToCart } from "../../store/cartSlice";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
 
 interface FoodDetailsModalProps {
   isOpen: boolean;
@@ -35,6 +37,9 @@ const FoodDetailsModal: React.FC<FoodDetailsModalProps> = ({
   const dispatch = useAppDispatch();
   const toast = useToast();
   const [quantity, setQuantity] = useState(1);
+  const isOrderPlaced = useSelector(
+    (state: RootState) => state.orders.isOrderPlaced
+  );
 
   const handleIncrement = () => {
     setQuantity((prev) => prev + 1);
@@ -50,7 +55,7 @@ const FoodDetailsModal: React.FC<FoodDetailsModalProps> = ({
     fetchFoodDetails<IProductData[]>().then((data) => {
       const transformedData = data.map((item) => {
         return {
-          id: item.id,
+          food_id: item.food_id,
           food_name: item.food_name,
           food_price: item.food_price,
           category_id: item.category_id,
@@ -75,16 +80,32 @@ const FoodDetailsModal: React.FC<FoodDetailsModalProps> = ({
     quantity: number,
     totalAmount: number | string
   ) => {
-    dispatch(
-      addItemToCart({
-        id,
-        food_name,
-        food_price,
-        food_image,
-        quantity,
-        totalAmount,
-      })
-    );
+    if (!isOrderPlaced) {
+      dispatch(
+        addItemToCart({
+          id,
+          food_name,
+          food_price,
+          food_image,
+          quantity,
+          totalAmount,
+        })
+      );
+      toast({
+        title: "Item added to cart",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: "Order already placed",
+        description: "Please place a new order",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
   };
 
   return (
@@ -156,19 +177,13 @@ const FoodDetailsModal: React.FC<FoodDetailsModalProps> = ({
                 _hover={{ bgColor: "#D67229" }}
                 onClick={() => {
                   addtoCartHandler(
-                    foodItem?.id!,
+                    foodItem?.food_id!,
                     foodItem?.food_name!,
                     foodItem?.food_price!,
                     foodItem?.food_image!,
                     quantity,
                     quantity * (foodItem?.food_price! as number)
                   );
-                  toast({
-                    title: "Item added to cart",
-                    status: "success",
-                    duration: 2000,
-                    isClosable: true,
-                  });
                   onClose();
                 }}
               >
