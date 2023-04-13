@@ -56,6 +56,7 @@ const OrderedItems = () => {
       items: cartItems,
       total_price: order.total_price,
       total_items: order.total_items,
+      payment_method: order.payment_method,
       order_status: order.order_status,
       ordered_date: order.ordered_date,
       ordered_time: order.ordered_time,
