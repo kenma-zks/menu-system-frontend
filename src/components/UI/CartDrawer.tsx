@@ -1,5 +1,10 @@
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
   Box,
   Button,
   Divider,
@@ -17,14 +22,11 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
-import { useCallback, useEffect, useState } from "react";
-import momo from "../../assets/momo.jpg";
+import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CartItem } from "../../types/types";
 import { addItemToCart, removeItemFromCart } from "../../store/cartSlice";
-import OrderedItems from "../Card/OrderedItems";
-import { fetchOrderDetails } from "../../api/api";
-import { addOrder, setOrders } from "../../store/orderSlice";
+import { addOrder, deleteOrder, setOrders } from "../../store/orderSlice";
 
 interface RootState {
   cart: {
@@ -45,9 +47,11 @@ interface OrderedItem {
 }
 
 interface IOrderData {
+  order_id?: number;
   items: OrderedItem[];
   total_price: number | string;
   total_items: number | string;
+  payment_method: string;
 }
 
 const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
@@ -59,6 +63,8 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const toast = useToast();
+  const [isOrderPlaced, setIsOrderPlaced] = useState(false);
+  const [newOrder, setNewOrder] = useState<IOrderData | null>(null);
 
   const addItemHandler = (
     id: number,
@@ -68,7 +74,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     quantity: number,
     totalAmount: number | string
   ) => {
-    if (food_name && food_price && quantity) {
+    if (food_name && food_price && quantity && !isOrderPlaced) {
       dispatch(
         addItemToCart({
           id: id,
@@ -83,7 +89,22 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   };
 
   const removeItemHandler = (id: number) => {
-    dispatch(removeItemFromCart(id));
+    if (!isOrderPlaced) {
+      dispatch(removeItemFromCart(id));
+    }
+  };
+
+  const leastDestructiveRef = useRef<HTMLButtonElement | null>(null);
+  const cancelRef = useRef<HTMLButtonElement | null>(null);
+  const [alertIsOpen, setAlertIsOpen] = useState(false);
+  const [cancelAlertIsOpen, setCancelAlertIsOpen] = useState(false);
+
+  const alertOnClose = () => {
+    setAlertIsOpen(false);
+  };
+
+  const cancelAlertOnClose = () => {
+    setCancelAlertIsOpen(false);
   };
 
   const submitHandler = async (e: React.FormEvent) => {
@@ -106,8 +127,8 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
       items: orderedItems,
       total_price: totalAmount,
       total_items: totalQuantity,
+      payment_method: paymentMethod,
     };
-    ``;
     try {
       const response = await fetch("http://127.0.0.1:8000/api/order/", {
         method: "POST",
@@ -118,7 +139,10 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
       });
       const data = await response.json();
       dispatch(addOrder(data));
-      console.log(setOrders(data));
+      alertOnClose();
+      setNewOrder(data);
+      setIsOrderPlaced(true);
+      console.log(data);
       toast({
         title: "Order Placed",
         description: `Your order #${data.order_id} has been placed successfully!`,
@@ -126,6 +150,29 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
         duration: 3000,
         isClosable: true,
       });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const cancelHandler = async () => {
+    try {
+      if (newOrder) {
+        // Check if a new order was created
+        await fetch(`http://127.0.0.1:8000/api/order/${newOrder.order_id}`, {
+          method: "DELETE",
+        });
+        dispatch(deleteOrder(newOrder.order_id));
+        setIsOrderPlaced(false);
+        cancelAlertOnClose();
+        toast({
+          title: "Order Cancelled",
+          description: `Your order #${newOrder.order_id} has been cancelled successfully!`,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
     } catch (error) {
       console.error(error);
     }
@@ -182,6 +229,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                             size="xs"
                             data-index={index}
                             onClick={() => removeItemHandler(item.id!)}
+                            isDisabled={isOrderPlaced}
                           />
                           <Text fontSize={"md"}>{item.quantity}</Text>
                           <IconButton
@@ -201,6 +249,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                                 item.totalAmount
                               );
                             }}
+                            isDisabled={isOrderPlaced}
                           />
                           <Spacer />
                           <Text
@@ -313,16 +362,88 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
             </Stack>
           </DrawerBody>
           <DrawerFooter>
-            <Button
-              variant="solid"
-              colorScheme="orange"
-              width="100%"
-              borderRadius="md"
-              _hover={{ bg: "orange.400" }}
-              onClick={submitHandler}
-            >
-              Process Transaction
-            </Button>
+            {isOrderPlaced ? (
+              <>
+                <Button
+                  variant="solid"
+                  colorScheme="orange"
+                  width="100%"
+                  borderRadius="md"
+                  _hover={{ bg: "orange.400" }}
+                  onClick={() => setCancelAlertIsOpen(true)}
+                >
+                  Cancel Order
+                </Button>
+                <AlertDialog
+                  isOpen={cancelAlertIsOpen}
+                  leastDestructiveRef={leastDestructiveRef}
+                  onClose={() => setCancelAlertIsOpen(false)}
+                >
+                  <AlertDialogContent>
+                    <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                      Confirm Cancellation
+                    </AlertDialogHeader>
+
+                    <AlertDialogBody>
+                      Are you sure you want to cancel your order?
+                    </AlertDialogBody>
+
+                    <AlertDialogFooter>
+                      <Button
+                        ref={cancelRef}
+                        onClick={() => setCancelAlertIsOpen(false)}
+                      >
+                        No, keep my order
+                      </Button>
+                      <Button colorScheme="red" onClick={cancelHandler} ml={3}>
+                        Yes, cancel my order
+                      </Button>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="solid"
+                  colorScheme="orange"
+                  width="100%"
+                  borderRadius="md"
+                  _hover={{ bg: "orange.400" }}
+                  onClick={() => setAlertIsOpen(true)}
+                >
+                  Process Transaction
+                </Button>
+                <AlertDialog
+                  isOpen={alertIsOpen}
+                  leastDestructiveRef={leastDestructiveRef}
+                  onClose={alertOnClose}
+                >
+                  <AlertDialogContent>
+                    <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                      Confirm Order
+                    </AlertDialogHeader>
+
+                    <AlertDialogBody>
+                      Is this order correct? You cannot make changes after
+                      5mins.
+                    </AlertDialogBody>
+
+                    <AlertDialogFooter>
+                      <Button
+                        ref={cancelRef}
+                        onClick={() => setAlertIsOpen(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button colorScheme="red" onClick={submitHandler} ml={3}>
+                        Order
+                      </Button>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </>
+            )}
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
