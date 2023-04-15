@@ -22,11 +22,13 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CartItem } from "../../types/types";
 import { addItemToCart, removeItemFromCart } from "../../store/cartSlice";
 import { addOrder, deleteOrder, setOrders } from "../../store/orderSlice";
+import KhaltiConfig from "../Khalti/KhaltiConfig";
+import KhaltiCheckout from "khalti-checkout-web";
 
 interface RootState {
   cart: {
@@ -107,6 +109,22 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     setCancelAlertIsOpen(false);
   };
 
+  const handlePayment = () => {
+    const config = KhaltiConfig();
+    const checkout = new KhaltiCheckout(config);
+    const addKhaltiScript = () => {
+      const script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src = "https://khalti.com/static/khalti-checkout.js";
+      script.async = true;
+      script.onload = () => {
+        checkout.show({ amount: totalAmount * 100 });
+      };
+      document.body.appendChild(script);
+    };
+    addKhaltiScript();
+  };
+
   const submitHandler = async (e: React.FormEvent) => {
     e.preventDefault();
     const orderedItems = await Promise.all(
@@ -143,6 +161,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
       setNewOrder(data);
       setIsOrderPlaced(true);
       console.log(data);
+
       toast({
         title: "Order Placed",
         description: `Your order #${data.order_id} has been placed successfully!`,
@@ -328,33 +347,23 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                   <Box
                     borderWidth="2px"
                     borderRadius="lg"
-                    borderColor={paymentMethod === "qr" ? "orange" : "gray.200"}
-                    p={3}
-                    onClick={() => setPaymentMethod("qr")}
-                    _hover={{ borderColor: "gray.300", cursor: "pointer" }}
-                    alignItems="center"
-                    as="button" // set the element as a button
-                    bgColor={paymentMethod === "qr" ? "orange.100" : "white"}
-                  >
-                    <Text fontWeight="semibold" fontSize="sm">
-                      QR
-                    </Text>
-                  </Box>
-                  <Box
-                    borderWidth="2px"
-                    borderRadius="lg"
                     borderColor={
-                      paymentMethod === "debit" ? "orange" : "gray.200"
+                      paymentMethod === "Khalti" ? "orange" : "gray.200"
                     }
                     p={3}
-                    onClick={() => setPaymentMethod("debit")}
+                    onClick={() => {
+                      setPaymentMethod("Khalti");
+                      handlePayment();
+                    }}
                     _hover={{ borderColor: "gray.300", cursor: "pointer" }}
                     alignItems="center"
                     as="button" // set the element as a button
-                    bgColor={paymentMethod === "debit" ? "orange.100" : "white"}
+                    bgColor={
+                      paymentMethod === "Khalti" ? "orange.100" : "white"
+                    }
                   >
                     <Text fontWeight="semibold" fontSize="sm">
-                      Debit
+                      Pay with Khalti
                     </Text>
                   </Box>
                 </Stack>
