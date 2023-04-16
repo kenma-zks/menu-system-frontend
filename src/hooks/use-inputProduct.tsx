@@ -1,13 +1,12 @@
 import { useState } from "react";
 
-const useDefaultInput = (
-  validateValue: (value: string | number | File | boolean) => boolean,
-  defaultValue: string | number | File | boolean
+const useInputProduct = (
+  validateValue: (value: string | number | File, allowEmpty: boolean) => boolean
 ) => {
-  const [enteredValue, setEnteredValue] = useState(defaultValue);
+  const [enteredValue, setEnteredValue] = useState("");
   const [isTouched, setIsTouched] = useState(false);
 
-  const valueIsValid = isTouched ? validateValue(enteredValue) : true;
+  const valueIsValid = validateValue(enteredValue, !isTouched);
   const hasError = !valueIsValid && isTouched;
 
   const valueChangeHandler = (
@@ -21,7 +20,7 @@ const useDefaultInput = (
   };
 
   const reset = () => {
-    setEnteredValue(defaultValue);
+    setEnteredValue("");
     setIsTouched(false);
   };
 
@@ -35,4 +34,4 @@ const useDefaultInput = (
   };
 };
 
-export default useDefaultInput;
+export default useInputProduct;
