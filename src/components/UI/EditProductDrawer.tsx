@@ -135,6 +135,15 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
     }
   };
 
+  useEffect(() => {
+    setImagePreview(null);
+    nameInput.reset();
+    priceInput.reset();
+    availableInput.reset();
+    categoryInput.reset();
+    descriptionInput.reset();
+  }, [product]);
+
   const leastDestructiveRef = useRef<HTMLButtonElement | null>(null);
   const cancelRef = useRef<HTMLButtonElement | null>(null);
   const [alertIsOpen, setAlertIsOpen] = useState(false);
@@ -160,6 +169,7 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
         isClosable: true,
       });
       onClose();
+      alertOnClose();
     });
   };
 
