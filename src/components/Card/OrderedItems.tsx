@@ -24,6 +24,7 @@ import { fetchOrderDetails, fetchOrderedItemsDetails } from "../../api/api";
 import { IOrderData, OrderedItem } from "../../types/types";
 import { deleteOrder, setOrders } from "../../store/orderSlice";
 import { RootState } from "../../store/store";
+import OrderReceipt from "./OrderReceipt";
 
 const OrderedItems = () => {
   const dispatch = useDispatch();
@@ -34,7 +35,7 @@ const OrderedItems = () => {
 
   const orders = useSelector((state: RootState) => state.orders.orders);
   const [selectedOrder, setSelectedOrder] = useState<IOrderData | null>(null);
-
+  const [previewOrder, setPreviewOrder] = useState<IOrderData | null>(null);
   const toast = useToast();
 
   const transformOrderData = async (order: IOrderData): Promise<IOrderData> => {
@@ -141,6 +142,9 @@ const OrderedItems = () => {
             mr="4"
             mb="4"
             key={order.order_id}
+            onClick={() => {
+              setPreviewOrder(order);
+            }}
           >
             <Stack mb="6">
               <>
@@ -231,7 +235,9 @@ const OrderedItems = () => {
                       >
                         X {order.total_items} items
                       </Text>
-                      <Text fontWeight={500}>${order.total_price}</Text>
+                      <Text fontWeight={500}>
+                        Rs. {order.total_price} ({order.payment_method})
+                      </Text>
                     </Stack>
                     <Spacer />
                     <Stack direction={"row"}>
@@ -284,6 +290,12 @@ const OrderedItems = () => {
             </Stack>
           </Box>
         ))}
+        {previewOrder && (
+          <OrderReceipt
+            order={previewOrder}
+            onClose={() => setPreviewOrder(null)}
+          />
+        )}
       </Flex>
     </>
   );
