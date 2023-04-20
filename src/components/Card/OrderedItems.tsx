@@ -1,4 +1,4 @@
-import { CheckIcon, CloseIcon, DeleteIcon } from "@chakra-ui/icons";
+import { CheckIcon, CloseIcon, DeleteIcon, ViewIcon } from "@chakra-ui/icons";
 import {
   Box,
   Flex,
@@ -25,6 +25,7 @@ import { IOrderData, OrderedItem } from "../../types/types";
 import { deleteOrder, setOrders } from "../../store/orderSlice";
 import { RootState } from "../../store/store";
 import OrderReceipt from "./OrderReceipt";
+import { FiInfo } from "react-icons/fi";
 
 const OrderedItems = () => {
   const dispatch = useDispatch();
@@ -142,9 +143,6 @@ const OrderedItems = () => {
             mr="4"
             mb="4"
             key={order.order_id}
-            onClick={() => {
-              setPreviewOrder(order);
-            }}
           >
             <Stack mb="6">
               <>
@@ -158,6 +156,12 @@ const OrderedItems = () => {
                     </Text>
                   </Stack>
                   <Spacer />
+                  <IconButton
+                    aria-label="Preview"
+                    icon={<FiInfo />}
+                    onClick={() => setPreviewOrder(order)}
+                  />
+
                   <IconButton
                     aria-label="Delete"
                     icon={<DeleteIcon />}
