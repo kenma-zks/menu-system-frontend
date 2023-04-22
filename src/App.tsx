@@ -12,6 +12,7 @@ import SignUp from "./pages/admin/SignUp";
 import RequireAuth from "./routes/requireAuth";
 import AdminSidebar from "./components/UI/AdminSidebar";
 import ForgotPassword from "./pages/admin/ForgotPassword";
+import ResetPassword from "./components/Form/ResetPassword";
 
 const router = createBrowserRouter([
   {
@@ -61,6 +62,10 @@ const router = createBrowserRouter([
         element: <ForgotPassword />,
       },
       {
+        path: "forgot-password/reset-password",
+        element: <ResetPassword />,
+      },
+      {
         element: <AdminSidebar />,
         children: [
           {
@@ -78,6 +83,10 @@ const router = createBrowserRouter([
           {
             path: "bookings",
             element: <RequireAuth route="bookings" />,
+          },
+          {
+            path: "tables",
+            element: <RequireAuth route="tables" />,
           },
           {
             path: "order-history",
