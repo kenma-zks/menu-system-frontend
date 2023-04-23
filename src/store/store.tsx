@@ -5,6 +5,7 @@ import categoriesSlice from "./categoriesSlice";
 import productsSlice from "./productsSlice";
 import bookingsSlice from "./bookingSlice";
 import cartSlice from "./cartSlice";
+import orderSlice from "./orderSlice";
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     bookings: bookingsSlice,
     [apiSlice.reducerPath]: apiSlice.reducer,
     cart: cartSlice,
+    orders: orderSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

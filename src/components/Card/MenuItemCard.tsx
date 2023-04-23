@@ -25,7 +25,7 @@ const MenuItemCard = ({ product }: { product: IProductData }) => {
       flexShrink={0}
       mr="4"
       mb="4"
-      key={product.id}
+      key={product.food_id}
       _hover={{ boxShadow: "md", cursor: "pointer" }}
       onClick={openFoodDetailsModal}
       pointerEvents={product.food_available ? "auto" : "none"}

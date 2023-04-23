@@ -24,7 +24,7 @@ const ProductList = ({
     fetchFoodDetails<IProductData[]>().then((data) => {
       const transformedData = data.map((item) => {
         return {
-          id: item.id,
+          food_id: item.food_id,
           food_name: item.food_name,
           food_price: item.food_price,
           category_id: item.category_id,
@@ -84,7 +84,7 @@ const ProductList = ({
       <Flex flexWrap={"wrap"}>
         {filteredProduct.map((product) => (
           <ProductCard
-            key={product.id}
+            key={product.food_id}
             product={product}
             handleProductClick={handleProductClick}
           />

@@ -1,34 +1,42 @@
-import { WarningIcon } from '@chakra-ui/icons'
-import { Box, HStack, Select, Text, VStack } from '@chakra-ui/react'
-import React, { useCallback, useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { fetchPastBookingDetails } from '../../api/api'
-import AdminNavbar from '../../components/UI/AdminNavbar'
-import BookingHistoryModal from '../../components/UI/BookingHistoryModal'
-import EditBookingModal from '../../components/UI/EditBookingModal'
-import { setBookings } from '../../store/bookingSlice'
-import { useAppSelector } from '../../store/hooks'
-import { IBookingData } from '../../types/types'
+import { WarningIcon } from "@chakra-ui/icons";
+import { Box, HStack, Select, Text, VStack } from "@chakra-ui/react";
+import React, { useCallback, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { fetchPastBookingDetails } from "../../api/api";
+import AdminNavbar from "../../components/UI/BookingAdminNavbar";
+import BookingHistoryModal from "../../components/UI/BookingHistoryModal";
+import EditBookingModal from "../../components/UI/EditBookingModal";
+import { setBookings } from "../../store/bookingSlice";
+import { useAppSelector } from "../../store/hooks";
+import { IBookingData } from "../../types/types";
+import BookingAdminNavbar from "../../components/UI/BookingAdminNavbar";
 
 const BookingHistory = () => {
-  const bookings = useAppSelector((state) => state.bookings.bookings)
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const bookings = useAppSelector((state) => state.bookings.bookings);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<IBookingData | null>(
-    null,
-  )
-  const dispatch = useDispatch()
+    null
+  );
+  const dispatch = useDispatch();
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
-  const groupedBookings = bookings.reduce(
+  const filteredBookings = bookings.filter(
+    (booking) =>
+      booking.first_name.toLowerCase().startsWith(searchQuery.toLowerCase()) ||
+      booking.last_name.toLowerCase().startsWith(searchQuery.toLowerCase())
+  );
+
+  const groupedBookings = filteredBookings.reduce(
     (acc: Record<string, IBookingData[]>, booking) => {
-      const bookingDate = new Date(booking.booking_date).toLocaleDateString()
+      const bookingDate = new Date(booking.booking_date).toLocaleDateString();
       if (!acc[bookingDate]) {
-        acc[bookingDate] = []
+        acc[bookingDate] = [];
       }
-      acc[bookingDate].push(booking)
-      return acc
+      acc[bookingDate].push(booking);
+      return acc;
     },
-    {},
-  )
+    {}
+  );
 
   const fetchPastBookingDetailsCallback = useCallback(() => {
     fetchPastBookingDetails<IBookingData[]>().then((data) => {
@@ -44,25 +52,28 @@ const BookingHistory = () => {
           email: item.email,
           note: item.note,
           status: item.status,
-        }
-      })
-      dispatch(setBookings(transformedData))
-    })
-  }, [dispatch])
+        };
+      });
+      dispatch(setBookings(transformedData));
+    });
+  }, [dispatch]);
 
   useEffect(() => {
-    fetchPastBookingDetailsCallback()
-  }, [fetchPastBookingDetailsCallback])
+    fetchPastBookingDetailsCallback();
+  }, [fetchPastBookingDetailsCallback]);
 
   const openModalHandler = (booking: IBookingData) => {
-    setIsModalOpen(true)
-    setSelectedBooking(booking)
-  }
+    setIsModalOpen(true);
+    setSelectedBooking(booking);
+  };
 
   return (
     <Box minH="100vh" backgroundColor="#EBEEF2" p="4">
-      <AdminNavbar />
-      <VStack alignItems={'flex-start'} p="4">
+      <BookingAdminNavbar
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+      />
+      <VStack alignItems={"flex-start"} p="4">
         <Box pb={3}>
           <Text fontWeight="bold" pb="1">
             BOOKINGS
@@ -75,11 +86,11 @@ const BookingHistory = () => {
               <React.Fragment key={date}>
                 <Box pb="4">
                   <Text fontWeight="medium" fontSize="sm" pb="1" color="gray">
-                    {new Date(date).toLocaleDateString('en-US', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
+                    {new Date(date).toLocaleDateString("en-US", {
+                      weekday: "long",
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
                     })}
                   </Text>
                   {bookings.map((booking) => (
@@ -90,7 +101,7 @@ const BookingHistory = () => {
                       backgroundColor="white"
                       borderRadius="md"
                       mb="2"
-                      _hover={{ boxShadow: 'md', cursor: 'pointer' }}
+                      _hover={{ boxShadow: "md", cursor: "pointer" }}
                       onClick={() => openModalHandler(booking)}
                     >
                       <HStack
@@ -98,25 +109,25 @@ const BookingHistory = () => {
                         alignItems="center"
                         justifyContent="space-between"
                       >
-                        <Text fontWeight="medium" fontSize={'sm'} w="40%">
+                        <Text fontWeight="medium" fontSize={"sm"} w="40%">
                           {booking.first_name} {booking.last_name}
                         </Text>
-                        <Text color="gray" fontSize={'sm'} w="30%">
+                        <Text color="gray" fontSize={"sm"} w="30%">
                           {booking.booking_duration}
                         </Text>
                         <Box
                           backgroundColor={
-                            booking.status === 'Accepted'
-                              ? 'green.200'
-                              : booking.status === 'Rejected'
-                              ? 'red.200'
-                              : 'gray.300'
+                            booking.status === "Accepted"
+                              ? "green.200"
+                              : booking.status === "Rejected"
+                              ? "red.200"
+                              : "gray.300"
                           }
                           color="white"
-                          fontSize={'sm'}
+                          fontSize={"sm"}
                           w="20%"
                           py="2"
-                          borderRadius={'md'}
+                          borderRadius={"md"}
                           display="flex"
                           justifyContent="center"
                         >
@@ -125,11 +136,11 @@ const BookingHistory = () => {
                             <Text
                               fontWeight="medium"
                               color={
-                                booking.status === 'Accepted'
-                                  ? 'green.600'
-                                  : booking.status === 'Rejected'
-                                  ? 'red.600'
-                                  : 'gray.600'
+                                booking.status === "Accepted"
+                                  ? "green.600"
+                                  : booking.status === "Rejected"
+                                  ? "red.600"
+                                  : "gray.600"
                               }
                               textAlign="center"
                             >
@@ -149,12 +160,12 @@ const BookingHistory = () => {
                   )}
                 </Box>
               </React.Fragment>
-            )
+            );
           })}
         </Box>
       </VStack>
     </Box>
-  )
-}
+  );
+};
 
-export default BookingHistory
+export default BookingHistory;

@@ -22,7 +22,7 @@ const MenuItemList = ({
     fetchFoodDetails<IProductData[]>().then((data) => {
       const transformedData = data.map((item) => {
         return {
-          id: item.id,
+          food_id: item.food_id,
           food_name: item.food_name,
           food_price: item.food_price,
           category_id: item.category_id,
@@ -85,7 +85,7 @@ const MenuItemList = ({
     <>
       <Flex flexWrap={"wrap"}>
         {filteredProducts.map((product) => (
-          <MenuItemCard key={product.id} product={product} />
+          <MenuItemCard key={product.food_id} product={product} />
         ))}
       </Flex>
     </>

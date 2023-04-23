@@ -5,6 +5,7 @@ interface CartState {
   cartItems: CartItem[];
   totalQuantity: number;
   totalAmount: number;
+  paymentMethod: string;
 }
 
 const cartSlice = createSlice({
@@ -13,6 +14,7 @@ const cartSlice = createSlice({
     cartItems: [],
     totalQuantity: 0,
     totalAmount: 0,
+    paymentMethod: "",
   },
   reducers: {
     addItemToCart(state: CartState, action: PayloadAction<CartItem>) {

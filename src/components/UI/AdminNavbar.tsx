@@ -13,48 +13,46 @@ import {
   InputGroup,
   InputLeftElement,
   Input,
-} from '@chakra-ui/react'
-import { useState } from 'react'
-import { FiBell, FiSearch } from 'react-icons/fi'
-import profile from '../../assets/profile.webp'
-import { useAppSelector } from '../../store/hooks'
+} from "@chakra-ui/react";
+import { FiBell, FiSearch } from "react-icons/fi";
+import profile from "../../assets/profile.webp";
 
-export default function AdminNavbar() {
+const AdminNavbar = () => {
   return (
     <>
       <Box px={4}>
-        <Flex h={16} alignItems="center" justifyContent={'space-between'}>
+        <Flex h={16} alignItems="center" justifyContent={"space-between"}>
           <Box>
-            <InputGroup backgroundColor={'white'} borderRadius="6px">
+            <InputGroup backgroundColor={"white"} borderRadius="6px">
               <InputLeftElement pointerEvents="none" children={<FiSearch />} />
               <Input
                 type="text"
                 placeholder="Search"
-                _placeholder={{ color: 'black' }}
+                _placeholder={{ color: "black" }}
               />
             </InputGroup>
           </Box>
 
-          <Flex alignItems={'center'} pr="8">
-            <Stack direction={'row'} spacing={5}>
-              <Button backgroundColor="inherit" size={'lg'}>
+          <Flex alignItems={"center"} pr="8">
+            <Stack direction={"row"} spacing={5}>
+              <Button backgroundColor="inherit" size={"lg"}>
                 <FiBell />
               </Button>
 
               <Menu>
                 <MenuButton
                   as={Button}
-                  rounded={'full'}
-                  variant={'link'}
-                  cursor={'pointer'}
+                  rounded={"full"}
+                  variant={"link"}
+                  cursor={"pointer"}
                   minW={0}
                 >
-                  <Avatar size={'md'} src={profile} />
+                  <Avatar size={"md"} src={profile} />
                 </MenuButton>
-                <MenuList alignItems={'center'}>
+                <MenuList alignItems={"center"}>
                   <br />
                   <Center>
-                    <Avatar size={'2xl'} src={profile} />
+                    <Avatar size={"2xl"} src={profile} />
                   </Center>
                   <br />
                   <Center>
@@ -63,7 +61,6 @@ export default function AdminNavbar() {
                   <br />
                   <MenuDivider />
                   <MenuItem>Account Settings</MenuItem>
-                  <MenuItem>Logout</MenuItem>
                 </MenuList>
               </Menu>
             </Stack>
@@ -71,5 +68,7 @@ export default function AdminNavbar() {
         </Flex>
       </Box>
     </>
-  )
-}
+  );
+};
+
+export default AdminNavbar;

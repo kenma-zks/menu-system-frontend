@@ -141,6 +141,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
       })
     );
 
+    console.log(orderedItems);
     const order: IOrderData = {
       items: orderedItems,
       total_price: totalAmount,
@@ -339,6 +340,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                     alignItems="center"
                     as="button" // set the element as a button
                     bgColor={paymentMethod === "cash" ? "orange.100" : "white"}
+                    disabled={cartItems.length === 0}
                   >
                     <Text fontWeight="semibold" fontSize="sm">
                       Cash
@@ -361,6 +363,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                     bgColor={
                       paymentMethod === "Khalti" ? "orange.100" : "white"
                     }
+                    disabled={cartItems.length === 0}
                   >
                     <Text fontWeight="semibold" fontSize="sm">
                       Pay with Khalti
@@ -420,6 +423,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                   borderRadius="md"
                   _hover={{ bg: "orange.400" }}
                   onClick={() => setAlertIsOpen(true)}
+                  disabled={cartItems.length === 0}
                 >
                   Process Transaction
                 </Button>

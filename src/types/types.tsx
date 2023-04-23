@@ -16,6 +16,20 @@ export interface ILoginData {
   password: string;
 }
 
+export interface IVerifyEmailData {
+  email: string;
+}
+
+export interface IResetCode {
+  code: string;
+}
+
+export interface IResetPasswordData {
+  user_id: number;
+  password: string;
+  confirm_password: string;
+}
+
 export interface IRegisterData {
   first_name: string;
   last_name: string;
@@ -26,7 +40,7 @@ export interface IRegisterData {
 }
 
 export interface IProductData {
-  id?: number;
+  food_id?: number;
   category_id: number | string;
   food_name: string;
   food_price: number | string;
@@ -58,12 +72,13 @@ export interface CartItem {
   id: number;
   food_name: string;
   food_price: string | number;
+  food_image: string | File;
   quantity: number;
   totalAmount: number | string;
 }
 
 export interface OrderedItem {
-  food: number;
+  food_id: number;
   quantity: number;
   food_name: string;
   food_price: number | string;
@@ -75,6 +90,7 @@ export interface IOrderData {
   items: OrderedItem[];
   total_price: number | string;
   total_items: number | string;
+  payment_method: string;
   order_status: string;
   ordered_date: string;
   ordered_time: string;

@@ -1,30 +1,30 @@
-import { SetStateAction, useReducer, useState } from 'react'
+import { SetStateAction, useReducer, useState } from "react";
 
-import React from 'react'
+import React from "react";
 
 const useInput = (
-  validateValue: (value: string | number | File) => boolean,
+  validateValue: (value: string | number | File) => boolean
 ) => {
-  const [enteredValue, setEnteredValue] = useState('')
-  const [isTouched, setIsTouched] = useState(false)
+  const [enteredValue, setEnteredValue] = useState("");
+  const [isTouched, setIsTouched] = useState(false);
 
-  const valueIsValid = validateValue(enteredValue)
-  const hasError = !valueIsValid && isTouched
+  const valueIsValid = validateValue(enteredValue);
+  const hasError = !valueIsValid && isTouched;
 
   const valueChangeHandler = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | any>,
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | any>
   ) => {
-    setEnteredValue(event.target.value)
-  }
+    setEnteredValue(event.target.value);
+  };
 
   const inputBlurHandler = () => {
-    setIsTouched(true)
-  }
+    setIsTouched(true);
+  };
 
   const reset = () => {
-    setEnteredValue('')
-    setIsTouched(false)
-  }
+    setEnteredValue("");
+    setIsTouched(false);
+  };
 
   return {
     value: enteredValue,
@@ -33,7 +33,7 @@ const useInput = (
     valueChangeHandler,
     inputBlurHandler,
     reset,
-  }
-}
+  };
+};
 
-export default useInput
+export default useInput;

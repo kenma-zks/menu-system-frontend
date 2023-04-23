@@ -1,0 +1,92 @@
+[33mcommit e69165b19f290b57935d5c3e25737b5a9dfc552a[m[33m ([m[1;36mHEAD -> [m[1;32muserpage[m[33m, [m[1;31morigin/userpage[m[33m)[m
+Author: kenma-zks <pallawmgr20@gmail.com>
+Date:   Wed Apr 5 11:03:26 2023 +0545
+
+    add searchbar functionality
+
+[33mcommit bfbbb8a807e5f1327f1255f2525253a6ee6a81be[m
+Author: kenma-zks <pallawmgr20@gmail.com>
+Date:   Wed Apr 5 10:03:56 2023 +0545
+
+    fix table capacity to char field
+
+[33mcommit 6810b03bbefb1c23965bd79a5dfcad80bc6d1c4f[m
+Author: kenma-zks <pallawmgr20@gmail.com>
+Date:   Sat Apr 1 21:27:26 2023 +0545
+
+    fix total amount not being reduced with decreasing quantity
+
+[33mcommit 8249410091b725523995388d0f35132e5728d5a4[m
+Author: kenma-zks <pallawmgr20@gmail.com>
+Date:   Sat Apr 1 21:11:35 2023 +0545
+
+    add reducer for adding and removing cart items
+
+[33mcommit e81b52d8f569090500f26b586a3d28b9a3f257bb[m
+Author: kenma-zks <pallawmgr20@gmail.com>
+Date:   Sat Apr 1 21:11:08 2023 +0545
+
+    add interface CartItem[]
+
+[33mcommit b06cfaaa766733aff225c9d30adf05ee1e5d0f9e[m
+Author: kenma-zks <pallawmgr20@gmail.com>
+Date:   Sat Apr 1 21:01:44 2023 +0545
+
+    add adding item and removing item reducer
+
+[33mcommit 7273640ccde351f9b833d6d0473e94e1e9bb980d[m
+Author: kenma-zks <pallawmgr20@gmail.com>
+Date:   Sat Apr 1 21:01:15 2023 +0545
+
+    use redux to push ordered items to cart
+
+[33mcommit c6d2a2d3188cf4979865e346861b560eb8effdae[m
+Author: kenma-zks <pallawmgr20@gmail.com>
+Date:   Sat Apr 1 21:00:23 2023 +0545
+
+    display item quantity besides cart
+
+[33mcommit 78b062509009e24fee0dcc2d2bcc1dbc2b6464d3[m
+Author: kenma-zks <pallawmgr20@gmail.com>
+Date:   Sat Apr 1 20:59:02 2023 +0545
+
+    use redux for fetching item
+
+[33mcommit 8c9d51da79fb7b11f6a4804f984fb0b3bf6297d3[m
+Author: kenma-zks <pallawmgr20@gmail.com>
+Date:   Sat Apr 1 20:57:57 2023 +0545
+
+    add modal onclick
+
+[33mcommit a8b729e37715b87a31a3613320f629553113f1eb[m
+Author: kenma-zks <pallawmgr20@gmail.com>
+Date:   Tue Mar 28 22:27:07 2023 +0545
+
+    add functionality for menu items detail and cart
+
+[33mcommit eb25820446c0a53471363540638b040e210b06e6[m
+Author: kenma-zks <pallawmgr20@gmail.com>
+Date:   Tue Mar 28 22:26:17 2023 +0545
+
+    create description modal for menu items
+
+[33mcommit 623d30bd9c34f60810a463f3202e7c36512527b2[m
+Author: kenma-zks <pallawmgr20@gmail.com>
+Date:   Tue Mar 28 22:25:53 2023 +0545
+
+    create drawer for cart
+
+[33mcommit 3c81c1c90ebcab04a42997ab962c8a5c892d4735[m
+Author: kenma-zks <pallawmgr20@gmail.com>
+Date:   Tue Mar 28 22:25:04 2023 +0545
+
+    fix active status for category
+
+[33mcommit a64a488db7f1b777ef0d8f446d27d3c36b58eea6[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m)[m
+Merge: 16388c7 01717de
+Author: kenma-zks <90539189+kenma-zks@users.noreply.github.com>
+Date:   Sat Mar 25 23:15:46 2023 +0545
+
+    Merge pull request #5 from kenma-zks/adminhome
+    
+    Adminhome

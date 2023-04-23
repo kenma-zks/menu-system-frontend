@@ -1,5 +1,14 @@
 import {
+  Avatar,
   Box,
+  Button,
+  Center,
+  Flex,
+  Menu,
+  MenuButton,
+  MenuDivider,
+  MenuItem,
+  MenuList,
   Tab,
   TabList,
   TabPanel,
@@ -7,69 +16,70 @@ import {
   Tabs,
   useToast,
   VStack,
-} from '@chakra-ui/react'
-import { useEffect, useState } from 'react'
-import CreateProductForm from '../../components/Form/CreateProductForm'
-import AdminNavBar from '../../components/UI/AdminNavbar'
-import AllCategories from '../../components/UI/AllCategories'
-import AllProducts from '../../components/UI/AllProducts'
-import { useAppDispatch } from '../../store/hooks'
-import { addProduct } from '../../store/productsSlice'
-import { ICategoryData, IProductData } from '../../types/types'
+} from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import CreateProductForm from "../../components/Form/CreateProductForm";
+import AdminNavBar from "../../components/UI/BookingAdminNavbar";
+import AllCategories from "../../components/UI/AllCategories";
+import AllProducts from "../../components/UI/AllProducts";
+import { useAppDispatch } from "../../store/hooks";
+import { addProduct } from "../../store/productsSlice";
+import { ICategoryData, IProductData } from "../../types/types";
+import profile from "../../assets/profile.webp";
 
 const Products = () => {
-  const [isProductError, setIsProductError] = useState<boolean | null>(null)
-  const [isCategoryError, setIsCategoryError] = useState<boolean | null>(null)
+  const [isProductError, setIsProductError] = useState<boolean | null>(null);
+  const [isCategoryError, setIsCategoryError] = useState<boolean | null>(null);
 
-  const dispatch = useAppDispatch()
-  const toast = useToast()
+  const dispatch = useAppDispatch();
+  const toast = useToast();
 
   async function createProductHandler(productData: IProductData) {
     try {
-      const formData = new FormData()
-      formData.append('food_name', productData.food_name)
-      formData.append('food_price', productData.food_price.toString())
-      formData.append('food_description', productData.food_description)
-      formData.append('category_id', productData.category_id.toString())
-      formData.append('food_available', productData.food_available.toString())
+      const formData = new FormData();
+      formData.append("food_name", productData.food_name);
+      formData.append("food_price", productData.food_price.toString());
+      formData.append("food_description", productData.food_description);
+      formData.append("category_id", productData.category_id.toString());
+      formData.append("food_available", productData.food_available.toString());
       if (productData.food_image) {
-        formData.append('food_image', productData.food_image)
+        formData.append("food_image", productData.food_image);
       }
       const response = await fetch(
-        'http://127.0.0.1:8000/api/menu/fooddetails/',
+        "http://127.0.0.1:8000/api/menu/fooddetails/",
         {
-          method: 'POST',
+          method: "POST",
           body: formData,
-        },
-      )
+        }
+      );
       if (response.status === 400) {
-        setIsProductError(true)
+        setIsProductError(true);
       }
-      setIsProductError(!response.ok)
-      dispatch(addProduct(productData))
+      setIsProductError(!response.ok);
+      dispatch(addProduct(productData));
     } catch (error) {
-      setIsProductError(true)
+      setIsProductError(true);
     }
   }
 
   async function createCategoryHandler(categoryData: ICategoryData) {
     try {
       const response = await fetch(
-        'http://127.0.0.1:8000/api/menu/foodcategory/',
+        "http://127.0.0.1:8000/api/menu/foodcategory/",
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(categoryData),
-        },
-      )
+        }
+      );
       if (response.status === 400) {
-        setIsCategoryError(true)
+        setIsCategoryError(true);
       }
-      setIsCategoryError(!response.ok)
+      setIsCategoryError(!response.ok);
     } catch (error) {
-      setIsCategoryError(true)
+      setIsCategoryError(true);
     }
   }
 
@@ -77,51 +87,75 @@ const Products = () => {
     if (isProductError !== null) {
       if (isProductError) {
         toast({
-          title: 'Something went wrong',
-          status: 'error',
+          title: "Something went wrong",
+          status: "error",
           isClosable: true,
-          variant: 'left-accent',
+          variant: "left-accent",
           duration: 3000,
-        })
+        });
       } else {
         toast({
           title: `Product created successfully`,
-          status: 'success',
+          status: "success",
           isClosable: true,
-          variant: 'left-accent',
+          variant: "left-accent",
           duration: 3000,
-        })
+        });
       }
     }
     setTimeout(() => {
-      setIsProductError(null)
-    }, 3000)
-  }, [isProductError, toast])
+      setIsProductError(null);
+    }, 3000);
+  }, [isProductError, toast]);
 
   useEffect(() => {
     setTimeout(() => {
-      setIsCategoryError(null)
-    }, 3000)
-  }, [isCategoryError])
+      setIsCategoryError(null);
+    }, 3000);
+  }, [isCategoryError]);
 
   return (
     <>
       <Box minH="100vh">
         <Box backgroundColor="#F0F2F4">
-          <Box p="4">
-            <AdminNavBar />
-          </Box>
-          <VStack alignItems={'flex-start'}>
-            <Box w={'full'}>
+          <VStack alignItems={"flex-start"}>
+            <Box w={"full"}>
               <Tabs colorScheme="orange" align="start">
-                <TabList px="8">
+                <TabList px="8" pt="8">
                   <Tab>All products</Tab>
                   <Tab>Create products</Tab>
                   <Tab>All categories</Tab>
+                  <Flex ml="auto" mr="8" alignItems="center" mb="4">
+                    <Menu>
+                      <MenuButton
+                        as={Button}
+                        rounded={"full"}
+                        variant={"link"}
+                        cursor={"pointer"}
+                        minW={0}
+                      >
+                        <Avatar size={"md"} src={profile} />
+                      </MenuButton>
+                      <MenuList alignItems={"center"}>
+                        <br />
+                        <Center>
+                          <Avatar size={"2xl"} src={profile} />
+                        </Center>
+                        <br />
+                        <Center>
+                          <p>Username</p>
+                        </Center>
+                        <br />
+                        <MenuDivider />
+                        <MenuItem>Account Settings</MenuItem>
+                        <MenuItem>Logout</MenuItem>
+                      </MenuList>
+                    </Menu>
+                  </Flex>
                 </TabList>
                 <Box>
                   <TabPanels>
-                    <TabPanel bgColor={'white'} p="8">
+                    <TabPanel bgColor={"white"} p="8">
                       <AllProducts />
                     </TabPanel>
                     <TabPanel bgColor="white">
@@ -129,7 +163,7 @@ const Products = () => {
                         onReceiveFormData={createProductHandler}
                       />
                     </TabPanel>
-                    <TabPanel bgColor={'white'}>
+                    <TabPanel bgColor={"white"}>
                       <AllCategories
                         onReceiveCategoryData={createCategoryHandler}
                       />
@@ -142,7 +176,7 @@ const Products = () => {
         </Box>
       </Box>
     </>
-  )
-}
+  );
+};
 
-export default Products
+export default Products;

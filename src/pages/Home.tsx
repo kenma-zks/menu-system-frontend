@@ -12,12 +12,13 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { FiShoppingCart } from "react-icons/fi";
+import { FiBell, FiShoppingCart } from "react-icons/fi";
 import { useSelector } from "react-redux";
 import CategoryItemList from "../components/Card/CategoryItemList";
 import MenuItemList from "../components/Card/MenuItemList";
 import CartDrawer from "../components/UI/CartDrawer";
 import { ICategoryData, IProductData } from "../types/types";
+import SearchBar from "../components/UI/Searchbar";
 
 interface RootState {
   cart: CartState;
