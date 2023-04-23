@@ -1,7 +1,18 @@
 import { Box, HStack, Image, Text, VStack } from "@chakra-ui/react";
+import { useState } from "react";
 import { IProductData } from "../../types/types";
+import FoodDetailsModal from "../UI/FoodDetailsModal";
 
 const MenuItemCard = ({ product }: { product: IProductData }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedFoodItems, setSelectedFoodItem] =
+    useState<IProductData | null>(null);
+
+  const openFoodDetailsModal = () => {
+    setIsModalOpen(true);
+    setSelectedFoodItem(product);
+  };
+
   return (
     <Box
       maxW={"270px"}
@@ -14,8 +25,11 @@ const MenuItemCard = ({ product }: { product: IProductData }) => {
       flexShrink={0}
       mr="4"
       mb="4"
-      key={product.id}
+      key={product.food_id}
       _hover={{ boxShadow: "md", cursor: "pointer" }}
+      onClick={openFoodDetailsModal}
+      pointerEvents={product.food_available ? "auto" : "none"}
+      opacity={product.food_available ? 1 : 0.5}
     >
       <HStack alignItems={"center"} spacing="2">
         <Box p="2">
@@ -48,7 +62,7 @@ const MenuItemCard = ({ product }: { product: IProductData }) => {
           </Box>
           <Box>
             <Box color="gray" fontSize="sm" fontWeight={"medium"}>
-              $ {product.food_price}
+              Rs {product.food_price}
             </Box>
           </Box>
           <Box>
@@ -66,6 +80,13 @@ const MenuItemCard = ({ product }: { product: IProductData }) => {
           </Box>
         </VStack>
       </HStack>
+      {selectedFoodItems && (
+        <FoodDetailsModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          foodItem={selectedFoodItems}
+        />
+      )}
     </Box>
   );
 };

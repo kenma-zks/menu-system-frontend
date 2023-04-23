@@ -1,87 +1,87 @@
-import { Box, Button, Flex, HStack, Text, VStack } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
-import { FiImage, FiX } from 'react-icons/fi'
+import { Box, Button, Flex, HStack, Text, VStack } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import { FiImage, FiX } from "react-icons/fi";
 
 interface UploadImageProps {
-  onImageUpload: (image: File | null) => void
-  defaultImage?: string
+  onImageUpload: (image: File | null) => void;
+  defaultImage?: string;
 }
 
-let removeCalled = false
+let removeCalled = false;
 
 const UploadImage = ({ onImageUpload, defaultImage }: UploadImageProps) => {
-  const [imagePreview, setImagePreview] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<File | null>(null);
 
   const [currentFile, setCurrentFile] = useState<string | null>(
-    defaultImage || null,
-  )
+    defaultImage || null
+  );
 
-  const [dragActive, setDragActive] = useState(false)
+  const [dragActive, setDragActive] = useState(false);
 
   const handleImageUpload = (e: any) => {
     if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0]
-      setImagePreview(file)
-      onImageUpload(file)
+      const file = e.target.files[0];
+      setImagePreview(file);
+      onImageUpload(file);
     }
-  }
+  };
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDragActive(true)
-  }
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(true);
+  };
 
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDragActive(false)
-  }
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+  };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDragActive(true)
-  }
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(true);
+  };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDragActive(false)
-    const file = e.dataTransfer.files[0]
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    const file = e.dataTransfer.files[0];
     if (file) {
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(file)
-      }
-      reader.readAsDataURL(file)
+        setImagePreview(file);
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   useEffect(() => {
     if (imagePreview) {
-      onImageUpload(imagePreview)
+      onImageUpload(imagePreview);
     }
-  }, [imagePreview])
+  }, [imagePreview]);
 
   useEffect(() => {
     if (defaultImage) {
-      setCurrentFile(defaultImage)
+      setCurrentFile(defaultImage);
     }
-  }, [defaultImage])
+  }, [defaultImage]);
 
   useEffect(() => {
     if (removeCalled) {
-      onImageUpload(null)
-      removeCalled = false
+      onImageUpload(null);
+      removeCalled = false;
     }
-  }, [removeCalled])
+  }, [removeCalled]);
 
   return (
     <Box
       borderRadius="md"
       width="100%"
-      border={dragActive ? '2px dashed blue' : '2px dashed #e2e8f0'}
+      border={dragActive ? "2px dashed blue" : "2px dashed #e2e8f0"}
       height="200px"
       display="flex"
       alignItems="center"
@@ -114,9 +114,9 @@ const UploadImage = ({ onImageUpload, defaultImage }: UploadImageProps) => {
               size="sm"
               colorScheme="red"
               onClick={() => {
-                removeCalled = true
-                setImagePreview(null)
-                setCurrentFile(null)
+                removeCalled = true;
+                setImagePreview(null);
+                setCurrentFile(null);
               }}
             >
               <FiX />
@@ -132,17 +132,17 @@ const UploadImage = ({ onImageUpload, defaultImage }: UploadImageProps) => {
             <Text fontSize="sm">Drag and Drop or</Text>
             <Text
               fontSize="sm"
-              fontWeight={'semibold'}
+              fontWeight={"semibold"}
               cursor="pointer"
-              onClick={() => document.getElementById('fileInput')?.click()}
+              onClick={() => document.getElementById("fileInput")?.click()}
             >
               Browse
             </Text>
             <input
-              type={'file'}
+              type={"file"}
               accept=".jpg, .jpeg, .png"
               id="fileInput"
-              style={{ display: 'none' }}
+              style={{ display: "none" }}
               onChange={handleImageUpload}
             ></input>
           </HStack>
@@ -153,7 +153,7 @@ const UploadImage = ({ onImageUpload, defaultImage }: UploadImageProps) => {
         </VStack>
       )}
     </Box>
-  )
-}
+  );
+};
 
-export default UploadImage
+export default UploadImage;

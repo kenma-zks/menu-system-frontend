@@ -30,8 +30,9 @@ import {
 import { RootState } from "../../store/store";
 import OrderReceipt from "./OrderReceipt";
 import { FiInfo } from "react-icons/fi";
+import OrderHistory from "../../pages/admin/OrderHistory";
 
-const OrderedItems = () => {
+const OrderedHistoryItems = () => {
   const dispatch = useDispatch();
 
   const orders = useSelector((state: RootState) => state.orders.orders);
@@ -130,61 +131,15 @@ const OrderedItems = () => {
     }
   };
 
-  const handleAccept = (order_id: number) => {
-    fetch(`http://127.0.0.1:8000/api/order/${order_id}/`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ order_status: "Completed" }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        dispatch(updateOrderStatus(data));
-        toast({
-          title: "Order Accepted",
-          description: `Order #${order_id} has been accepted, notify the customer`,
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-      })
-      .catch((error) => {
-        console.error("Error updating order status:", error);
-        // Handle error here
-      });
-  };
-
-  const handleReject = (order_id: number) => {
-    fetch(`http://127.0.0.1:8000/api/order/${order_id}/`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ order_status: "Rejected" }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        dispatch(updateOrderStatus(data));
-        toast({
-          title: "Order Rejected",
-          description: `Order #${order_id} has been rejected, notify the customer`,
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-      })
-      .catch((error) => {
-        console.error("Error updating order status:", error);
-        // Handle error here
-      });
-  };
-
   return (
     <>
       <Flex flexWrap={"wrap"}>
         {orders
-          .filter((order) => order.order_status === "Pending")
+          .filter(
+            (order) =>
+              order.order_status === "Completed" ||
+              order.order_status === "Rejected"
+          )
           .map((order) => (
             <Box
               bg={useColorModeValue("white", "gray.800")}
@@ -301,24 +256,19 @@ const OrderedItems = () => {
                       </Stack>
                       <Spacer />
                       <Stack direction={"row"}>
-                        {order.order_status === "Pending" && (
-                          <>
-                            <IconButton
-                              aria-label="Completed order"
-                              icon={<CheckIcon />}
-                              mr={3}
-                              variant="outline"
-                              colorScheme={"green"}
-                              onClick={() => handleAccept(order.order_id)}
-                            />
-                            <IconButton
-                              aria-label="Reject order"
-                              icon={<CloseIcon />}
-                              variant="outline"
-                              colorScheme={"red"}
-                              onClick={() => handleReject(order.order_id)}
-                            />
-                          </>
+                        {order.order_status === "Completed" && (
+                          <Button
+                            colorScheme="green"
+                            size="md"
+                            variant="outline"
+                          >
+                            Completed
+                          </Button>
+                        )}
+                        {order.order_status === "Rejected" && (
+                          <Button colorScheme="red" size="md" variant="outline">
+                            Rejected
+                          </Button>
                         )}
                       </Stack>
                     </Stack>
@@ -337,4 +287,4 @@ const OrderedItems = () => {
     </>
   );
 };
-export default OrderedItems;
+export default OrderedHistoryItems;

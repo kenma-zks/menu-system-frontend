@@ -1,4 +1,4 @@
-import { WarningIcon } from '@chakra-ui/icons'
+import { WarningIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -21,18 +21,18 @@ import {
   Textarea,
   useToast,
   VStack,
-} from '@chakra-ui/react'
-import React, { useCallback, useEffect, useState } from 'react'
-import { fetchBookingDetails } from '../../api/api'
-import useInput from '../../hooks/use-input'
-import { setBookings, updateBookings } from '../../store/bookingSlice'
-import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { IBookingData } from '../../types/types'
+} from "@chakra-ui/react";
+import React, { useCallback, useEffect, useState } from "react";
+import { fetchBookingDetails } from "../../api/api";
+import useInput from "../../hooks/use-input";
+import { setBookings, updateBookings } from "../../store/bookingSlice";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { IBookingData } from "../../types/types";
 
 interface EditBookingModalProps {
-  isOpen: boolean
-  onClose: () => void
-  booking: IBookingData | null
+  isOpen: boolean;
+  onClose: () => void;
+  booking: IBookingData | null;
 }
 
 const EditBookingModal: React.FC<EditBookingModalProps> = ({
@@ -40,8 +40,8 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
   onClose,
   booking,
 }) => {
-  const dispatch = useAppDispatch()
-  const toast = useToast()
+  const dispatch = useAppDispatch();
+  const toast = useToast();
 
   const fetchBookingDetailsCallback = useCallback(() => {
     fetchBookingDetails<IBookingData[]>().then((data) => {
@@ -57,25 +57,25 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
           email: item.email,
           note: item.note,
           status: item.status,
-        }
-      })
-      dispatch(setBookings(transformedData))
-    })
-  }, [dispatch])
+        };
+      });
+      dispatch(setBookings(transformedData));
+    });
+  }, [dispatch]);
 
   useEffect(() => {
-    fetchBookingDetailsCallback()
-  }, [fetchBookingDetailsCallback])
+    fetchBookingDetailsCallback();
+  }, [fetchBookingDetailsCallback]);
 
   const {
     value: enteredStatus,
     isValid: enteredStatusIsValid,
     valueChangeHandler: statusChangeHandler,
-  } = useInput((value) => (value as string).trim() !== '')
+  } = useInput((value) => (value as string).trim() !== "");
 
   const submitHandler = (event: React.FormEvent) => {
-    event.preventDefault()
-    console.log(enteredStatus)
+    event.preventDefault();
+    console.log(enteredStatus);
     if (enteredStatusIsValid) {
       const updatedBooking = {
         id: booking?.id,
@@ -88,30 +88,30 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
         email: booking?.email,
         note: booking?.note,
         status: enteredStatus,
-      }
+      };
       fetch(`http://127.0.0.1:8000/api/booking/list/${booking?.id}/`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(updatedBooking),
       })
         .then((response) => response.json())
         .then((data) => {
-          dispatch(updateBookings(data))
+          dispatch(updateBookings(data));
           toast({
-            title: 'Booking Status Updated',
-            description: 'Booking status has been updated successfully',
-            status: 'success',
+            title: "Booking Status Updated",
+            description: "Booking status has been updated successfully",
+            status: "success",
             duration: 3000,
             isClosable: true,
-          })
+          });
         })
         .catch((error) => {
-          console.log(error)
-        })
+          console.log(error);
+        });
     }
-  }
+  };
 
   return (
     <>
@@ -120,7 +120,7 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
         <ModalContent
           key={booking?.id}
           borderRadius="3xl"
-          as={'form'}
+          as={"form"}
           onSubmit={submitHandler}
         >
           <ModalHeader>Booking Details</ModalHeader>
@@ -202,20 +202,20 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
             </VStack>
           </ModalBody>
 
-          <ModalFooter w="100%" bgColor={'#EBEEF2'} borderBottomRadius="3xl">
+          <ModalFooter w="100%" bgColor={"#EBEEF2"} borderBottomRadius="3xl">
             <Box
               backgroundColor={
-                booking?.status === 'Accepted'
-                  ? 'green.200'
-                  : booking?.status === 'Rejected'
-                  ? 'red.200'
-                  : 'gray.300'
+                booking?.status === "Accepted"
+                  ? "green.200"
+                  : booking?.status === "Rejected"
+                  ? "red.200"
+                  : "gray.300"
               }
               color="white"
-              fontSize={'sm'}
+              fontSize={"sm"}
               w="20%"
               h="10"
-              borderRadius={'md'}
+              borderRadius={"md"}
               display="flex"
               justifyContent="center"
               mx="6"
@@ -225,11 +225,11 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
                 <Text
                   fontWeight="medium"
                   color={
-                    booking?.status === 'Accepted'
-                      ? 'green.600'
-                      : booking?.status === 'Rejected'
-                      ? 'red.600'
-                      : 'gray.600'
+                    booking?.status === "Accepted"
+                      ? "green.600"
+                      : booking?.status === "Rejected"
+                      ? "red.600"
+                      : "gray.600"
                   }
                   textAlign="center"
                 >
@@ -245,7 +245,7 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
         </ModalContent>
       </Modal>
     </>
-  )
-}
+  );
+};
 
-export default EditBookingModal
+export default EditBookingModal;

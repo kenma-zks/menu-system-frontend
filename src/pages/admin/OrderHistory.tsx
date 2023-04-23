@@ -2,8 +2,9 @@ import { Box, Text, VStack } from "@chakra-ui/react";
 import React from "react";
 import OrderedItems from "../../components/Card/OrderedItems";
 import AdminNavbar from "../../components/UI/AdminNavbar";
+import OrderedHistoryItems from "../../components/Card/OrderHistory";
 
-const AdminOrders = () => {
+const OrderHistory = () => {
   return (
     <>
       <Box backgroundColor="#F3F2F2" minH="100vh" p="4">
@@ -11,11 +12,11 @@ const AdminOrders = () => {
         <VStack alignItems={"flex-start"} p="4">
           <Box pb={3}>
             <Text fontWeight="bold" pb="3">
-              ORDER LIST
+              ORDER History
             </Text>
           </Box>
           <Box>
-            <OrderedItems />
+            <OrderedHistoryItems />
           </Box>
         </VStack>
       </Box>
@@ -23,4 +24,4 @@ const AdminOrders = () => {
   );
 };
 
-export default AdminOrders;
+export default OrderHistory;

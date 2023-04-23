@@ -17,7 +17,15 @@ import {
 import { FiBell, FiSearch } from "react-icons/fi";
 import profile from "../../assets/profile.webp";
 
-const AdminNavbar = () => {
+interface AdminNavbarProps {
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+}
+
+const BookingAdminNavbar: React.FC<AdminNavbarProps> = ({
+  searchQuery,
+  setSearchQuery,
+}) => {
   return (
     <>
       <Box px={4}>
@@ -29,6 +37,8 @@ const AdminNavbar = () => {
                 type="text"
                 placeholder="Search"
                 _placeholder={{ color: "black" }}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </InputGroup>
           </Box>
@@ -71,4 +81,4 @@ const AdminNavbar = () => {
   );
 };
 
-export default AdminNavbar;
+export default BookingAdminNavbar;

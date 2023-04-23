@@ -8,9 +8,13 @@ import MenuItemCard from "./MenuItemCard";
 
 interface MenuItemListProps {
   selectedCategoryId: number;
+  searchQuery: string;
 }
 
-const MenuItemList = ({ selectedCategoryId }: MenuItemListProps) => {
+const MenuItemList = ({
+  selectedCategoryId,
+  searchQuery,
+}: MenuItemListProps) => {
   const products = useAppSelector((state) => state.products.products);
   const dispatch = useAppDispatch();
 
@@ -18,7 +22,7 @@ const MenuItemList = ({ selectedCategoryId }: MenuItemListProps) => {
     fetchFoodDetails<IProductData[]>().then((data) => {
       const transformedData = data.map((item) => {
         return {
-          id: item.id,
+          food_id: item.food_id,
           food_name: item.food_name,
           food_price: item.food_price,
           category_id: item.category_id,
@@ -53,19 +57,35 @@ const MenuItemList = ({ selectedCategoryId }: MenuItemListProps) => {
 
   const filteredProducts = useMemo(() => {
     if (selectedCategoryId === null || selectedCategoryId === 0) {
-      return products;
+      return products.filter((product) =>
+        product.food_name.toLowerCase().startsWith(searchQuery.toLowerCase())
+      );
     } else {
       return products.filter(
-        (product) => product.category_id === selectedCategoryId
+        (product) =>
+          product.category_id === selectedCategoryId &&
+          product.food_name.toLowerCase().startsWith(searchQuery.toLowerCase())
       );
     }
-  }, [products, selectedCategoryId]);
+  }, [products, selectedCategoryId, searchQuery]);
 
+  if (filteredProducts.length === 0) {
+    return (
+      <Flex width="100%" justifyContent="center" alignItems="center">
+        <Text fontSize="sm" fontWeight="semibold" color={"gray"}>
+          No items found
+        </Text>
+        <span role="img" aria-label="sad face" style={{ fontSize: "1rem" }}>
+          😞
+        </span>
+      </Flex>
+    );
+  }
   return (
     <>
       <Flex flexWrap={"wrap"}>
         {filteredProducts.map((product) => (
-          <MenuItemCard key={product.id} product={product} />
+          <MenuItemCard key={product.food_id} product={product} />
         ))}
       </Flex>
     </>

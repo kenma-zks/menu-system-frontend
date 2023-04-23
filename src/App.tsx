@@ -1,99 +1,113 @@
-import { ChakraProvider } from '@chakra-ui/react'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import Sidebar from './components/UI/Sidebar'
-import BookVisit from './pages/BookVisit'
-import CallWaiter from './pages/CallWaiter'
-import MyCart from './pages/MyCart'
-import MyOrders from './pages/MyOrders'
-import Info from './pages/Info'
-import Home from './pages/Home'
-import Login from './pages/admin/Login'
-import SignUp from './pages/admin/SignUp'
-import RequireAuth from './routes/requireAuth'
-import AdminSidebar from './components/UI/AdminSidebar'
+import { ChakraProvider } from "@chakra-ui/react";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Sidebar from "./components/UI/Sidebar";
+import BookVisit from "./pages/BookVisit";
+import CallWaiter from "./pages/CallWaiter";
+import MyCart from "./pages/MyCart";
+import MyOrders from "./pages/MyOrders";
+import Info from "./pages/Info";
+import Home from "./pages/Home";
+import Login from "./pages/admin/Login";
+import SignUp from "./pages/admin/SignUp";
+import RequireAuth from "./routes/requireAuth";
+import AdminSidebar from "./components/UI/AdminSidebar";
+import ForgotPassword from "./pages/admin/ForgotPassword";
+import ResetPassword from "./components/Form/ResetPassword";
 
 const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: <Sidebar />,
     children: [
       {
-        path: 'home',
+        path: "home",
         element: <Home />,
       },
       {
-        path: 'call-waiter',
+        path: "call-waiter",
         element: <CallWaiter />,
       },
       {
-        path: 'book-visit',
+        path: "book-visit",
         element: <BookVisit />,
       },
       {
-        path: 'my-orders',
+        path: "my-orders",
         element: <MyOrders />,
       },
       {
-        path: 'my-cart',
+        path: "my-cart",
         element: <MyCart />,
       },
       {
-        path: 'info',
+        path: "info",
         element: <Info />,
       },
     ],
   },
 
   {
-    path: '/admin',
+    path: "/admin",
     children: [
       {
-        path: 'login',
+        path: "login",
         element: <Login />,
       },
       {
-        path: 'signup',
+        path: "signup",
         element: <SignUp />,
+      },
+      {
+        path: "forgot-password",
+        element: <ForgotPassword />,
+      },
+      {
+        path: "forgot-password/reset-password",
+        element: <ResetPassword />,
       },
       {
         element: <AdminSidebar />,
         children: [
           {
-            path: 'home',
+            path: "home",
             element: <RequireAuth route="home" />,
           },
           {
-            path: 'products',
+            path: "products",
             element: <RequireAuth route="products" />,
           },
           {
-            path: 'orders',
+            path: "orders",
             element: <RequireAuth route="orders" />,
           },
           {
-            path: 'bookings',
+            path: "bookings",
             element: <RequireAuth route="bookings" />,
           },
           {
-            path: 'order-history',
+            path: "tables",
+            element: <RequireAuth route="tables" />,
+          },
+          {
+            path: "order-history",
             element: <RequireAuth route="order-history" />,
           },
           {
-            path: 'booking-history',
+            path: "booking-history",
             element: <RequireAuth route="booking-history" />,
           },
         ],
       },
     ],
   },
-])
+]);
 
 function App() {
   return (
     <ChakraProvider>
       <RouterProvider router={router} />
     </ChakraProvider>
-  )
+  );
 }
 
-export default App
+export default App;

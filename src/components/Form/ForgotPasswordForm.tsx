@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Checkbox,
   FormControl,
   FormLabel,
   Input,
@@ -12,19 +11,24 @@ import {
   Image,
   Heading,
   useToast,
+  Divider,
+  HStack,
+  FormErrorMessage,
 } from "@chakra-ui/react";
 import React, { Fragment, useState } from "react";
-import { ILoginData } from "../../types/types";
 import login2 from "../../assets/login2.webp";
 import logo from "../../assets/logo.png";
 import { Link as RouterLink } from "react-router-dom";
 import useInput from "../../hooks/use-input";
+import { IVerifyEmailData } from "../../types/types";
 
-interface ILoginFormProps {
-  onReceiveFormData: (data: ILoginData) => void;
+interface IForgotPasswordFormProps {
+  onReceiveFormData: (data: IVerifyEmailData) => void;
 }
 
-const LoginForm = ({ onReceiveFormData }: ILoginFormProps) => {
+const ForgotPasswordForm = ({
+  onReceiveFormData,
+}: IForgotPasswordFormProps) => {
   const toast = useToast();
 
   const {
@@ -35,30 +39,19 @@ const LoginForm = ({ onReceiveFormData }: ILoginFormProps) => {
     inputBlurHandler: emailBlurHandler,
   } = useInput((value) => (value as string).includes("@"));
 
-  const {
-    value: enteredPassword,
-    isValid: enteredPasswordIsValid,
-    hasError: enteredPasswordHasError,
-    valueChangeHandler: passwordChangeHandler,
-    inputBlurHandler: passwordBlurHandler,
-  } = useInput((value) => (value as string).trim().length >= 8);
-
-  const validate = enteredEmailIsValid && enteredPasswordIsValid;
-
   const submitHandler = (
     e: React.FormEvent<HTMLDivElement | HTMLFormElement>
   ) => {
     e.preventDefault();
-    if (validate) {
-      onReceiveFormData({ email: enteredEmail, password: enteredPassword });
+    if (enteredEmailIsValid) {
+      onReceiveFormData({ email: enteredEmail });
     } else {
       toast({
-        title: "Login failed.",
+        title: "Reset password failed.",
         description: "Please check your credentials.",
         status: "error",
         duration: 9000,
         isClosable: true,
-        position: "top",
       });
     }
   };
@@ -81,7 +74,7 @@ const LoginForm = ({ onReceiveFormData }: ILoginFormProps) => {
                 pb={4}
                 color="#633c7e"
               >
-                Login
+                Trouble logging in?
               </Heading>
               <Text
                 fontSize={"small"}
@@ -89,7 +82,8 @@ const LoginForm = ({ onReceiveFormData }: ILoginFormProps) => {
                 color={"gray"}
                 pb={4}
               >
-                Login to your account
+                Enter your email and we'll send you a code to reset your
+                password.
               </Text>
 
               <FormControl
@@ -108,44 +102,12 @@ const LoginForm = ({ onReceiveFormData }: ILoginFormProps) => {
                   onBlur={emailBlurHandler}
                   autoComplete="off"
                 />
+                {enteredEmailHasError && (
+                  <FormErrorMessage>
+                    Please enter a valid email address.
+                  </FormErrorMessage>
+                )}
               </FormControl>
-              <FormControl
-                id="password"
-                isRequired
-                isInvalid={enteredPasswordHasError}
-              >
-                <FormLabel fontSize={"small"} color="#633c7e">
-                  Password
-                </FormLabel>
-                <Input
-                  type="password"
-                  placeholder="Password"
-                  value={enteredPassword}
-                  onChange={passwordChangeHandler}
-                  onBlur={passwordBlurHandler}
-                  autoComplete="off"
-                />
-              </FormControl>
-              <Stack
-                direction={{ base: "column", sm: "row" }}
-                align={"start"}
-                justify={"space-between"}
-                pb={4}
-              >
-                <Checkbox>
-                  <Text fontSize={"small"} color={"gray"}>
-                    Remember me
-                  </Text>
-                </Checkbox>
-                <Link
-                  color={"#03a6d4"}
-                  fontSize={"small"}
-                  as={RouterLink}
-                  to="/admin/forgot-password"
-                >
-                  Forgot password?
-                </Link>
-              </Stack>
 
               <Button
                 bg={"#144ec7"}
@@ -158,21 +120,47 @@ const LoginForm = ({ onReceiveFormData }: ILoginFormProps) => {
                 }}
                 type="submit"
               >
-                Sign in
+                Send Code
               </Button>
-              <Stack pt={3}>
-                <Text
-                  fontSize={"small"}
-                  fontWeight={"semibold"}
-                  color={"gray"}
-                  align="center"
-                >
-                  Don't have an account?
-                  <Link color={"#03a6d4"} as={RouterLink} to="/admin/signup">
-                    Sign Up
+              <HStack pt={3} justify="center" align="center">
+                <Divider
+                  borderBottomColor={"gray"}
+                  borderBottomWidth={"1px"}
+                  orientation="horizontal"
+                />
+                <Text px={"4"} fontSize="sm" fontWeight="semibold" color="gray">
+                  OR
+                </Text>
+                <Divider
+                  borderBottomColor={"gray"}
+                  borderBottomWidth={"1px"}
+                  orientation="horizontal"
+                />
+              </HStack>
+              <Flex justify="space-between" align="center" pt={3}>
+                <Text fontSize="sm" fontWeight="semibold" color="gray">
+                  <Link color="black.100" as={RouterLink} to="/admin/login">
+                    Back to login
                   </Link>
                 </Text>
-              </Stack>
+
+                <Stack>
+                  <Text
+                    fontSize={"sm"}
+                    fontWeight={"semibold"}
+                    color={"gray"}
+                    align="center"
+                  >
+                    <Link
+                      color={"black.100"}
+                      as={RouterLink}
+                      to="/admin/signup"
+                    >
+                      Create new account
+                    </Link>
+                  </Text>
+                </Stack>
+              </Flex>
             </Stack>
           </Flex>
         </Stack>
@@ -181,4 +169,4 @@ const LoginForm = ({ onReceiveFormData }: ILoginFormProps) => {
   );
 };
 
-export default LoginForm;
+export default ForgotPasswordForm;

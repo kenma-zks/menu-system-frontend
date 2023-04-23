@@ -24,20 +24,21 @@ import {
   Textarea,
   useToast,
   VStack,
-} from '@chakra-ui/react'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { fetchCategories } from '../../api/api'
-import useInput from '../../hooks/use-input'
-import { setCategories } from '../../store/categoriesSlice'
-import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { deleteProduct, updateProduct } from '../../store/productsSlice'
-import { ICategoryData, IProductData } from '../../types/types'
-import UploadImage from './UploadImage'
+} from "@chakra-ui/react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { fetchCategories } from "../../api/api";
+import useInputProduct from "../../hooks/use-input";
+import { setCategories } from "../../store/categoriesSlice";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { deleteProduct, updateProduct } from "../../store/productsSlice";
+import { ICategoryData, IProductData } from "../../types/types";
+import UploadImage from "./UploadImage";
+import useDefaultInput from "../../hooks/use-defaultinput";
 
 interface EditProductDrawerProps {
-  isOpen: boolean
-  onClose: () => void
-  product: IProductData | null
+  isOpen: boolean;
+  onClose: () => void;
+  product: IProductData | null;
 }
 
 const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
@@ -45,10 +46,10 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
   onClose,
   product,
 }) => {
-  const categories = useAppSelector((state) => state.categories.categories)
-  const dispatch = useAppDispatch()
-  const [imagePreview, setImagePreview] = useState<File | null>(null)
-  const toast = useToast()
+  const categories = useAppSelector((state) => state.categories.categories);
+  const dispatch = useAppDispatch();
+  const [imagePreview, setImagePreview] = useState<File | null>(null);
+  const toast = useToast();
 
   const fetchCategoriesCallback = useCallback(() => {
     fetchCategories<ICategoryData[]>().then((data) => {
@@ -56,133 +57,127 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
         return {
           id: item.id,
           category_name: item.category_name,
-        }
-      })
-      dispatch(setCategories(transformedData))
-    })
-  }, [])
+        };
+      });
+      dispatch(setCategories(transformedData));
+    });
+  }, []);
 
   useEffect(() => {
-    fetchCategoriesCallback()
-  }, [fetchCategoriesCallback])
+    fetchCategoriesCallback();
+  }, [fetchCategoriesCallback]);
 
-  const {
-    value: enteredName,
-    isValid: enteredNameIsValid,
-    hasError: enteredNameHasError,
-    valueChangeHandler: nameChangeHandler,
-  } = useInput((value) => (value as string).trim() !== '')
-
-  const {
-    value: enteredPrice,
-    isValid: enteredPriceIsValid,
-    hasError: enteredPriceHasError,
-    valueChangeHandler: priceChangeHandler,
-  } = useInput((value) => (value as number) > 0)
-
-  const {
-    value: enteredAvailable,
-    isValid: enteredAvailableIsValid,
-    hasError: enteredAvailableHasError,
-    valueChangeHandler: availableChangeHandler,
-  } = useInput((value) => (value as string).trim() !== '')
-
-  const {
-    value: enteredCategory,
-    isValid: enteredCategoryIsValid,
-    hasError: enteredCategoryHasError,
-    valueChangeHandler: categoryChangeHandler,
-  } = useInput((value) => (value as string).trim() !== '')
-
-  const {
-    value: enteredDescription,
-    isValid: enteredDescriptionIsValid,
-    hasError: enteredDescriptionHasError,
-    valueChangeHandler: descriptionChangeHandler,
-  } = useInput((value) => (value as string).trim() !== '')
+  const nameInput = useDefaultInput(
+    (value) => (value as string).trim() !== "",
+    product?.food_name ?? ""
+  );
+  const priceInput = useDefaultInput(
+    (value) => (value as number) > 0,
+    product?.food_price ?? ""
+  );
+  const availableInput = useDefaultInput(
+    (value) => (value as string).trim() !== "",
+    product?.food_available ?? ""
+  );
+  const categoryInput = useDefaultInput(
+    (value) => (value as string).trim() !== "",
+    product?.category_id ?? ""
+  );
+  const descriptionInput = useDefaultInput(
+    (value) => (value as string).trim() !== "",
+    product?.food_description ?? ""
+  );
 
   const formIsValid =
-    enteredNameIsValid &&
-    enteredPriceIsValid &&
-    enteredAvailableIsValid &&
-    enteredCategoryIsValid &&
-    enteredDescriptionIsValid
+    nameInput.isValid &&
+    priceInput.isValid &&
+    availableInput.isValid &&
+    categoryInput.isValid &&
+    descriptionInput.isValid;
 
   const submitHandler = (event: React.FormEvent) => {
-    event.preventDefault()
-    console.log('submit')
+    event.preventDefault();
     if (formIsValid) {
-      const productData = {
-        id: product?.id,
-        food_name: enteredName,
-        food_price: enteredPrice,
-        category_id: enteredCategory,
-        food_description: enteredDescription,
-        food_image: imagePreview || product?.food_image,
-        food_available: true,
+      const productData = new FormData();
+      productData.append("food_id", String(product?.food_id));
+      productData.append("food_name", nameInput.value.toString());
+      productData.append("food_price", priceInput.value.toString());
+      productData.append("category_id", categoryInput.value.toString());
+      productData.append("food_available", availableInput.value.toString());
+      productData.append("food_description", descriptionInput.value.toString());
+      if (imagePreview) {
+        productData.append("food_image", imagePreview);
       }
-      fetch('http://127.0.0.1:8000/api/menu/fooddetails/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(productData),
+      fetch(`http://127.0.0.1:8000/api/menu/fooddetails/${product?.food_id}/`, {
+        method: "PUT",
+        body: productData,
       })
         .then((response) => response.json())
         .then((data) => {
-          dispatch(updateProduct(data))
+          dispatch(updateProduct(data));
           toast({
-            title: 'Product Updated',
-            description: 'Product has been updated successfully',
-            status: 'success',
+            title: "Product Updated",
+            description: "Product has been updated successfully",
+            status: "success",
             duration: 3000,
             isClosable: true,
-          })
-        })
+          });
+        });
+      console.log(productData);
     } else {
       toast({
-        title: 'Invalid Input',
-        description: 'Please check your input',
-        status: 'error',
+        title: "Invalid Input",
+        description: "Please check your input",
+        status: "error",
         duration: 3000,
         isClosable: true,
-      })
+      });
     }
-  }
+  };
 
-  const leastDestructiveRef = useRef<HTMLButtonElement | null>(null)
-  const cancelRef = useRef<HTMLButtonElement | null>(null)
-  const [alertIsOpen, setAlertIsOpen] = useState(false)
+  useEffect(() => {
+    setImagePreview(null);
+    nameInput.reset();
+    priceInput.reset();
+    availableInput.reset();
+    categoryInput.reset();
+    descriptionInput.reset();
+  }, [product]);
+
+  const leastDestructiveRef = useRef<HTMLButtonElement | null>(null);
+  const cancelRef = useRef<HTMLButtonElement | null>(null);
+  const [alertIsOpen, setAlertIsOpen] = useState(false);
 
   const onDeleteClick = () => {
-    setAlertIsOpen(true)
-  }
+    setAlertIsOpen(true);
+  };
 
   const alertOnClose = () => {
-    setAlertIsOpen(false)
-  }
+    setAlertIsOpen(false);
+  };
 
   const onDeleteConfirm = async () => {
-    fetch(`http://127.0.0.1:8000/api/menu/fooddetails/${product?.id}/`, {
-      method: 'DELETE',
+    fetch(`http://127.0.0.1:8000/api/menu/fooddetails/${product?.food_id}/`, {
+      method: "DELETE",
     }).then(() => {
-      dispatch(deleteProduct(product?.id))
+      dispatch(deleteProduct(product?.food_id));
       toast({
-        title: 'Product Deleted',
-        description: 'Product has been deleted successfully',
-        status: 'success',
+        title: "Product Deleted",
+        description: "Product has been deleted successfully",
+        status: "success",
         duration: 3000,
         isClosable: true,
-      })
-      onClose()
-    })
-  }
+      });
+      onClose();
+      alertOnClose();
+    });
+  };
 
   return (
-    <form>
+    <form encType="multipart/form-data">
       <Drawer isOpen={isOpen} placement="right" onClose={onClose} size="md">
         <DrawerOverlay />
-        <DrawerContent key={product?.id}>
+        <DrawerContent key={product?.food_id}>
           <Box borderBottomWidth="2px">
             <DrawerCloseButton />
             <DrawerHeader>Edit Product</DrawerHeader>
@@ -194,8 +189,8 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                 <Text pb="2">Name</Text>
                 <Input
                   placeholder="Product Name"
-                  onChange={nameChangeHandler}
                   defaultValue={product?.food_name}
+                  onChange={nameInput.valueChangeHandler}
                 />
               </FormControl>
               <HStack w="100%">
@@ -206,8 +201,8 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                     <Input
                       type="number"
                       placeholder="Price"
-                      onChange={priceChangeHandler}
                       defaultValue={product?.food_price}
+                      onChange={priceInput.valueChangeHandler}
                     />
                   </InputGroup>
                 </FormControl>
@@ -215,10 +210,10 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                   <Text pb="2">Available</Text>
                   <Select
                     placeholder="Available"
-                    onChange={availableChangeHandler}
                     defaultValue={
                       product ? String(product.food_available) : undefined
                     }
+                    onChange={availableInput.valueChangeHandler}
                   >
                     <option value="true">Yes</option>
                     <option value="false">No</option>
@@ -228,8 +223,8 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                   <Text pb="2">Category</Text>
                   <Select
                     placeholder="Select Category"
-                    onChange={categoryChangeHandler}
                     defaultValue={product?.category_id}
+                    onChange={categoryInput.valueChangeHandler}
                   >
                     {categories.map((category) => (
                       <option key={category.id} value={category.id}>
@@ -244,15 +239,15 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                 <Text pb="2">Description</Text>
                 <Textarea
                   placeholder="Product Description"
-                  onChange={descriptionChangeHandler}
                   defaultValue={product?.food_description}
+                  onChange={descriptionInput.valueChangeHandler}
                 />
               </FormControl>
 
               <FormControl>
                 <Text pb="2">Image</Text>
                 <UploadImage
-                  onImageUpload={(file) => setImagePreview(file)}
+                  onImageUpload={setImagePreview}
                   defaultImage={
                     product?.food_image instanceof File
                       ? URL.createObjectURL(product?.food_image)
@@ -317,7 +312,7 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
         </DrawerContent>
       </Drawer>
     </form>
-  )
-}
+  );
+};
 
-export default EditProductDrawer
+export default EditProductDrawer;
