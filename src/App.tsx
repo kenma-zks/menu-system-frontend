@@ -85,8 +85,8 @@ const router = createBrowserRouter([
             element: <RequireAuth route="bookings" />,
           },
           {
-            path: "tables",
-            element: <RequireAuth route="tables" />,
+            path: "QRCode",
+            element: <RequireAuth route="qrcode" />,
           },
           {
             path: "order-history",

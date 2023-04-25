@@ -9,7 +9,8 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import React from "react";
-import CreateTableForm from "../../components/Form/CreateTableForm";
+
+import GenQRCode from "../../components/Form/QRCode";
 
 const Tables = () => {
   return (
@@ -19,16 +20,12 @@ const Tables = () => {
           <Box w={"full"}>
             <Tabs colorScheme="orange" align="start">
               <TabList px="8" pt="8">
-                <Tab>Create Tables</Tab>
-                <Tab>All Tables</Tab>
+                <Tab>QR Code</Tab>
               </TabList>
               <Box>
                 <TabPanels>
                   <TabPanel bgColor="white">
-                    <CreateTableForm />
-                  </TabPanel>
-                  <TabPanel bgColor={"white"} p="8">
-                    All Tables
+                    <GenQRCode />
                   </TabPanel>
                 </TabPanels>
               </Box>
