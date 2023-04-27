@@ -7,7 +7,7 @@ import AdminOrders from "../pages/admin/Orders";
 import Products from "../pages/admin/Products";
 import { useAppSelector } from "../store/hooks";
 import OrderHistory from "../pages/admin/OrderHistory";
-import Tables from "../pages/admin/Tables";
+import GenQRCode from "../components/Form/QRCode";
 
 const RequireAuth = ({ route }: { route: string }) => {
   const user = useAppSelector((state) => state.auth.user);
@@ -25,8 +25,8 @@ const RequireAuth = ({ route }: { route: string }) => {
       return <AdminOrders />;
     case "bookings":
       return <Booking />;
-    case "tables":
-      return <Tables />;
+    case "qrcode":
+      return <GenQRCode />;
     case "order-history":
       return <OrderHistory />;
     case "booking-history":

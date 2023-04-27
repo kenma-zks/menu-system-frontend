@@ -17,6 +17,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogOverlay,
+  HStack,
 } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -54,6 +55,8 @@ const OrderedItems = () => {
     );
 
     return {
+      user_name: order.user_name,
+      table_no: order.table_no,
       order_id: order.order_id,
       items: cartItems,
       total_price: order.total_price,
@@ -130,7 +133,7 @@ const OrderedItems = () => {
     }
   };
 
-  const handleAccept = (order_id: number) => {
+  const handleAccept = (order_id?: number) => {
     fetch(`http://127.0.0.1:8000/api/order/${order_id}/`, {
       method: "PATCH",
       headers: {
@@ -155,7 +158,7 @@ const OrderedItems = () => {
       });
   };
 
-  const handleReject = (order_id: number) => {
+  const handleReject = (order_id?: number) => {
     fetch(`http://127.0.0.1:8000/api/order/${order_id}/`, {
       method: "PATCH",
       headers: {
@@ -200,12 +203,8 @@ const OrderedItems = () => {
                 <>
                   <Stack direction={"row"}>
                     <Stack direction={"column"}>
-                      <Text fontWeight={600}> Order # {order.order_id}</Text>
-
-                      <Text color="#B4B4B4" fontSize={"small"} fontWeight={500}>
-                        {order.ordered_date},{"   "}
-                        {order.ordered_time.split(":").slice(0, 2).join(":")}
-                      </Text>
+                      <Text fontWeight={600}>{order.user_name}</Text>
+                      <Text fontWeight={600}> Table : {order.table_no}</Text>
                     </Stack>
                     <Spacer />
                     <IconButton

@@ -49,7 +49,7 @@ const LinkItems: Array<LinkItemProps> = [
   { name: "Products", icon: FiArchive, link: "/admin/products" },
   { name: "Orders", icon: FiShoppingCart, link: "/admin/orders" },
   { name: "Bookings", icon: FiCalendar, link: "/admin/bookings" },
-  { name: "Tables", icon: FiBookOpen, link: "/admin/tables" },
+  { name: "QR Code", icon: FiBookOpen, link: "/admin/qrcode" },
   { name: "Order History", icon: FiFileText, link: "/admin/order-history" },
   { name: "Booking History", icon: FiFileText, link: "/admin/booking-history" },
 ];
