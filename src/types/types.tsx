@@ -80,18 +80,20 @@ export interface CartItem {
 export interface OrderedItem {
   food_id: number;
   quantity: number;
-  food_name: string;
-  food_price: number | string;
-  food_image: string;
+  food_name?: string;
+  food_price?: number | string;
+  food_image?: string;
 }
 
 export interface IOrderData {
-  order_id: number;
+  user_name: string;
+  table_no: string;
+  order_id?: number;
   items: OrderedItem[];
   total_price: number | string;
   total_items: number | string;
   payment_method: string;
-  order_status: string;
-  ordered_date: string;
-  ordered_time: string;
+  order_status?: string;
+  ordered_date?: string;
+  ordered_time?: string;
 }

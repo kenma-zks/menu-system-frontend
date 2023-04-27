@@ -15,8 +15,12 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
   IconButton,
   Image,
+  Input,
   Spacer,
   Stack,
   Text,
@@ -24,11 +28,12 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { CartItem } from "../../types/types";
+import { CartItem, IOrderData, OrderedItem } from "../../types/types";
 import { addItemToCart, removeItemFromCart } from "../../store/cartSlice";
 import { addOrder, deleteOrder, setOrders } from "../../store/orderSlice";
 import KhaltiConfig from "../Khalti/KhaltiConfig";
 import KhaltiCheckout from "khalti-checkout-web";
+import useInput from "../../hooks/use-input";
 
 interface RootState {
   cart: {
@@ -43,19 +48,6 @@ interface CartDrawerProps {
   onClose: () => void;
 }
 
-interface OrderedItem {
-  food_id: number;
-  quantity: number;
-}
-
-interface IOrderData {
-  order_id?: number;
-  items: OrderedItem[];
-  total_price: number | string;
-  total_items: number | string;
-  payment_method: string;
-}
-
 const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const cartItems = useSelector((state: RootState) => state.cart.cartItems);
   const totalAmount = useSelector((state: RootState) => state.cart.totalAmount);
@@ -67,6 +59,24 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const toast = useToast();
   const [isOrderPlaced, setIsOrderPlaced] = useState(false);
   const [newOrder, setNewOrder] = useState<IOrderData | null>(null);
+
+  const {
+    value: enteredName,
+    isValid: enteredNameisValid,
+    hasError: enteredNameHasError,
+    valueChangeHandler: nameChangeHandler,
+    inputBlurHandler: nameBlurHandler,
+    reset: resetNameInput,
+  } = useInput((value) => (value as string).trim() !== "");
+
+  const {
+    value: enteredTable,
+    isValid: enteredTableisValid,
+    hasError: enteredTableHasError,
+    valueChangeHandler: tableChangeHandler,
+    inputBlurHandler: tableBlurHandler,
+    reset: resetTableInput,
+  } = useInput((value) => (value as string).trim() !== "");
 
   const addItemHandler = (
     id: number,
@@ -127,51 +137,64 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
 
   const submitHandler = async (e: React.FormEvent) => {
     e.preventDefault();
-    const orderedItems = await Promise.all(
-      cartItems.map(async (item) => {
-        const response = await fetch(
-          "http://127.0.0.1:8000/api/menu/fooddetails/" + item.id
-        );
-        const food = await response.json();
-        const orderedItem: OrderedItem = {
-          food_id: food.food_id,
-          quantity: item.quantity,
-        };
-        return orderedItem;
-      })
-    );
+    if (enteredNameisValid && enteredTableisValid) {
+      const orderedItems = await Promise.all(
+        cartItems.map(async (item) => {
+          const response = await fetch(
+            "http://127.0.0.1:8000/api/menu/fooddetails/" + item.id
+          );
+          const food = await response.json();
+          const orderedItem: OrderedItem = {
+            food_id: food.food_id,
+            quantity: item.quantity,
+          };
+          return orderedItem;
+        })
+      );
 
-    console.log(orderedItems);
-    const order: IOrderData = {
-      items: orderedItems,
-      total_price: totalAmount,
-      total_items: totalQuantity,
-      payment_method: paymentMethod,
-    };
-    try {
-      const response = await fetch("http://127.0.0.1:8000/api/order/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(order),
-      });
-      const data = await response.json();
-      dispatch(addOrder(data));
-      alertOnClose();
-      setNewOrder(data);
-      setIsOrderPlaced(true);
-      console.log(data);
+      const order: IOrderData = {
+        user_name: enteredName,
+        table_no: enteredTable,
+        items: orderedItems,
+        total_price: totalAmount,
+        total_items: totalQuantity,
+        payment_method: paymentMethod,
+      };
+      try {
+        const response = await fetch("http://127.0.0.1:8000/api/order/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(order),
+        });
+        const data = await response.json();
+        dispatch(addOrder(data));
+        alertOnClose();
+        setNewOrder(data);
+        setIsOrderPlaced(true);
+        console.log(data);
 
+        toast({
+          title: "Order Placed",
+          description: `Your order #${data.order_id} has been placed successfully!`,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      } catch (error) {
+        console.error(error);
+      }
+      resetNameInput();
+      resetTableInput();
+    } else {
       toast({
-        title: "Order Placed",
-        description: `Your order #${data.order_id} has been placed successfully!`,
-        status: "success",
+        title: "Invalid Input",
+        description: "Please check your inputs and try again!",
+        status: "error",
         duration: 3000,
         isClosable: true,
       });
-    } catch (error) {
-      console.error(error);
     }
   };
 
@@ -438,8 +461,54 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                     </AlertDialogHeader>
 
                     <AlertDialogBody>
-                      Is this order correct? You cannot make changes after
-                      5mins.
+                      <FormControl
+                        id="firstName"
+                        isRequired
+                        pb="4"
+                        isInvalid={enteredNameHasError}
+                      >
+                        <FormLabel fontSize={"small"} color="#633c7e">
+                          Enter your name
+                        </FormLabel>
+                        <Input
+                          type="text"
+                          placeholder="Name"
+                          onChange={nameChangeHandler}
+                          onBlur={nameBlurHandler}
+                          value={enteredName}
+                        />
+                        {enteredNameHasError && (
+                          <FormErrorMessage>
+                            Please enter a valid name
+                          </FormErrorMessage>
+                        )}
+                      </FormControl>
+                      <FormControl
+                        id="firstName"
+                        isRequired
+                        pb="4"
+                        isInvalid={enteredTableHasError}
+                      >
+                        <FormLabel fontSize={"small"} color="#633c7e">
+                          Enter table number
+                        </FormLabel>
+                        <Input
+                          type="text"
+                          placeholder="Table number"
+                          onChange={tableChangeHandler}
+                          onBlur={tableBlurHandler}
+                          value={enteredTable}
+                        />
+                      </FormControl>
+                      {enteredTableHasError && (
+                        <FormErrorMessage>
+                          Please enter a valid table number
+                        </FormErrorMessage>
+                      )}
+
+                      <Text fontWeight={"semibold"} fontSize={"sm"} pt="4">
+                        You cannot cancel your order once it is accepted.
+                      </Text>
                     </AlertDialogBody>
 
                     <AlertDialogFooter>
