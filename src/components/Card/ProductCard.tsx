@@ -11,9 +11,9 @@ const ProductCard = ({
 }) => {
   return (
     <Box
-      maxW={"270px"}
+      maxW={{ base: "240px", md: "300px", lg: "290px" }}
+      minW={{ base: "240px", md: "300px", lg: "290px" }}
       maxH={"110px"}
-      minW={"270px"}
       minH={"110px"}
       borderRadius="4"
       borderWidth={1}
@@ -34,9 +34,9 @@ const ProductCard = ({
                 : product.food_image ?? undefined
             }
             alt="item"
-            minW={"100px"}
+            maxW={{ base: "100px", md: "120px", lg: "100px" }}
+            minW={{ base: "100px", md: "120px", lg: "100px" }}
             minH={"90px"}
-            maxW={"100px"}
             maxH={"90px"}
             borderRadius="4"
             objectFit={"cover"}
@@ -49,7 +49,7 @@ const ProductCard = ({
               overflow="hidden"
               textOverflow="ellipsis"
               whiteSpace="nowrap"
-              maxW={"120px"}
+              maxW={{ base: "100px", md: "120px" }}
             >
               {product.food_name}
             </Box>

@@ -33,6 +33,7 @@ const SearchBar = ({ onSearch, products }: SearchBarProps) => {
         borderRadius="0"
         borderWidth="1px"
         borderColor="gray.400"
+        borderRightRadius="md"
         _hover={{ borderColor: "gray.400" }}
         _focus={{ borderColor: "gray.400", boxShadow: "none" }}
       />

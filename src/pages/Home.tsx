@@ -61,7 +61,11 @@ const Home = () => {
           w="100%"
           pr="8"
         >
-          <InputGroup backgroundColor={"white"} borderRadius="6px" w="40%">
+          <InputGroup
+            backgroundColor={"white"}
+            borderRadius="6px"
+            w={{ base: "60%", md: "40%" }}
+          >
             <Input
               type="text"
               placeholder="Search menu"

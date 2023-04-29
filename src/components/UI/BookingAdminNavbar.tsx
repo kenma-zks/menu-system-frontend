@@ -42,39 +42,6 @@ const BookingAdminNavbar: React.FC<AdminNavbarProps> = ({
               />
             </InputGroup>
           </Box>
-
-          <Flex alignItems={"center"} pr="8">
-            <Stack direction={"row"} spacing={5}>
-              <Button backgroundColor="inherit" size={"lg"}>
-                <FiBell />
-              </Button>
-
-              <Menu>
-                <MenuButton
-                  as={Button}
-                  rounded={"full"}
-                  variant={"link"}
-                  cursor={"pointer"}
-                  minW={0}
-                >
-                  <Avatar size={"md"} src={profile} />
-                </MenuButton>
-                <MenuList alignItems={"center"}>
-                  <br />
-                  <Center>
-                    <Avatar size={"2xl"} src={profile} />
-                  </Center>
-                  <br />
-                  <Center>
-                    <p>Username</p>
-                  </Center>
-                  <br />
-                  <MenuDivider />
-                  <MenuItem>Account Settings</MenuItem>
-                </MenuList>
-              </Menu>
-            </Stack>
-          </Flex>
         </Flex>
       </Box>
     </>

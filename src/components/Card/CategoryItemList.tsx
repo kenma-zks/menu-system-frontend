@@ -1,4 +1,4 @@
-import { Box, Flex } from "@chakra-ui/react";
+import { Box, Flex, HStack } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useState } from "react";
 import { fetchCategories } from "../../api/api";
 import { ICategoryData } from "../../types/types";
@@ -41,7 +41,7 @@ const CategoryItemList = ({
 
   return (
     <>
-      <Flex flexWrap={"wrap"}>
+      <HStack spacing="4" overflowX="scroll" w="100%" px="4" py="2">
         <CategoryMenuCard
           category={{ id: 0, category_name: "All" }}
           handleCategoryClick={() => {
@@ -58,7 +58,7 @@ const CategoryItemList = ({
             isActive={selectedCategoryId === category.id}
           />
         ))}
-      </Flex>
+      </HStack>
     </>
   );
 };

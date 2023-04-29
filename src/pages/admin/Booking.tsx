@@ -80,18 +80,22 @@ const Booking = () => {
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
       />
-      <VStack alignItems={"flex-start"} p="4">
-        <Box pb={3}>
-          <Text fontWeight="bold" pb="1">
+      <VStack alignItems={"flex-start"} p={{ base: "2", md: "4" }}>
+        <Box pb={{ base: "2", md: "3" }}>
+          <Text fontWeight="bold" pb={{ base: "1", md: "2" }}>
             BOOKINGS
           </Text>
         </Box>
-        <Box w="15%" pb="2">
-          <Text color="gray" fontSize={"sm"} pb="2">
+        <Box w={{ base: "40%", md: "30%" }} pb={{ base: "2", md: "0" }}>
+          <Text
+            color="gray"
+            fontSize={{ base: "sm", md: "md" }}
+            pb={{ base: "2", md: "3" }}
+          >
             Filter by Status
           </Text>
           <Select
-            fontSize="sm"
+            fontSize={{ base: "sm", md: "md" }}
             backgroundColor={"white"}
             borderRadius="md"
             value={selectedStatus}
@@ -115,7 +119,12 @@ const Booking = () => {
             return (
               <React.Fragment key={date}>
                 <Box pb="4">
-                  <Text fontWeight="medium" fontSize="sm" pb="1" color="gray">
+                  <Text
+                    fontWeight="medium"
+                    fontSize={{ base: "sm", md: "md" }}
+                    pb="1"
+                    color="gray"
+                  >
                     {new Date(date).toLocaleDateString("en-US", {
                       weekday: "long",
                       year: "numeric",
@@ -129,7 +138,7 @@ const Booking = () => {
                     filteredBookings.map((booking) => (
                       <Box
                         key={booking.id}
-                        w="60%"
+                        w={{ base: "100%", md: "100%", lg: "70%" }}
                         p="4"
                         backgroundColor="white"
                         borderRadius="md"
@@ -142,7 +151,11 @@ const Booking = () => {
                           alignItems="center"
                           justifyContent="space-between"
                         >
-                          <Text fontWeight="medium" fontSize={"sm"} w="40%">
+                          <Text
+                            fontWeight="medium"
+                            fontSize={{ base: "sm", md: "md" }}
+                            w={{ base: "20%", md: "30%" }}
+                          >
                             {booking.first_name} {booking.last_name}
                           </Text>
                           <Text color="gray" fontSize={"sm"} w="30%">
@@ -158,7 +171,7 @@ const Booking = () => {
                             }
                             color="white"
                             fontSize={"sm"}
-                            w="20%"
+                            w={{ base: "40%", md: "40%", lg: "30%" }}
                             py="2"
                             borderRadius={"md"}
                             display="flex"

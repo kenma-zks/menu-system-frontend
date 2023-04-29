@@ -38,12 +38,12 @@ const AllProducts = () => {
 
   return (
     <VStack alignItems={"flex-start"}>
-      <HStack pb="6" spacing={0} width={"40%"}>
+      <HStack pb="6" spacing={0} width={["80%", "60%", "60%", "40%"]}>
         <Menu>
           <MenuButton
             as={Button}
             rightIcon={<ChevronDownIcon />}
-            width="25%"
+            width={["50%", "50%", "50%", "40%"]}
             backgroundColor="white"
             border="1px"
             borderColor="gray.400"
@@ -52,12 +52,15 @@ const AllProducts = () => {
             _expanded={{ bg: "white" }}
             _focus={{ bg: "white" }}
             borderRightRadius="0"
-            iconSpacing="20"
+            iconSpacing={["1", "1", "2", "2"]}
             fontSize={"sm"}
             color="gray.600"
+            paddingLeft={["2", "2", "4", "4"]}
+            paddingRight={["4", "4", "4", "4"]}
           >
             Filter
           </MenuButton>
+
           <MenuList>
             <MenuItem
               key={0}

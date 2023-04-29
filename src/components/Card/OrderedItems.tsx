@@ -191,7 +191,7 @@ const OrderedItems = () => {
           .map((order) => (
             <Box
               bg={useColorModeValue("white", "gray.800")}
-              width="360px"
+              width={{ base: "300px", md: "360px" }}
               p="4"
               borderRadius={"8"}
               height="330px"

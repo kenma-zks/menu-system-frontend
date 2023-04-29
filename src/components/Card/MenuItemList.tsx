@@ -83,7 +83,7 @@ const MenuItemList = ({
   }
   return (
     <>
-      <Flex flexWrap={"wrap"}>
+      <Flex justifyContent="flex-start" flexWrap="wrap">
         {filteredProducts.map((product) => (
           <MenuItemCard key={product.food_id} product={product} />
         ))}

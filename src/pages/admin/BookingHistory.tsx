@@ -85,7 +85,12 @@ const BookingHistory = () => {
             return (
               <React.Fragment key={date}>
                 <Box pb="4">
-                  <Text fontWeight="medium" fontSize="sm" pb="1" color="gray">
+                  <Text
+                    fontWeight="medium"
+                    fontSize={{ base: "sm", md: "md" }}
+                    pb="1"
+                    color="gray"
+                  >
                     {new Date(date).toLocaleDateString("en-US", {
                       weekday: "long",
                       year: "numeric",
@@ -96,7 +101,7 @@ const BookingHistory = () => {
                   {bookings.map((booking) => (
                     <Box
                       key={booking.id}
-                      w="60%"
+                      w={{ base: "100%", md: "100%", lg: "70%" }}
                       p="4"
                       backgroundColor="white"
                       borderRadius="md"
@@ -109,10 +114,18 @@ const BookingHistory = () => {
                         alignItems="center"
                         justifyContent="space-between"
                       >
-                        <Text fontWeight="medium" fontSize={"sm"} w="40%">
+                        <Text
+                          fontWeight="medium"
+                          fontSize={{ base: "sm", md: "md" }}
+                          w={{ base: "30%", md: "40%" }}
+                        >
                           {booking.first_name} {booking.last_name}
                         </Text>
-                        <Text color="gray" fontSize={"sm"} w="30%">
+                        <Text
+                          color="gray"
+                          fontSize={{ base: "sm", md: "md" }}
+                          w={{ base: "20%", md: "30%" }}
+                        >
                           {booking.booking_duration}
                         </Text>
                         <Box
@@ -125,7 +138,7 @@ const BookingHistory = () => {
                           }
                           color="white"
                           fontSize={"sm"}
-                          w="20%"
+                          w={{ base: "40%", md: "40%", lg: "30%" }}
                           py="2"
                           borderRadius={"md"}
                           display="flex"

@@ -1,4 +1,4 @@
-import { Box, HStack, Image, Text, VStack } from "@chakra-ui/react";
+import { Box, Flex, HStack, Image, Text, VStack } from "@chakra-ui/react";
 import { useState } from "react";
 import { IProductData } from "../../types/types";
 import FoodDetailsModal from "../UI/FoodDetailsModal";
@@ -15,24 +15,22 @@ const MenuItemCard = ({ product }: { product: IProductData }) => {
 
   return (
     <Box
-      maxW={"270px"}
-      maxH={"110px"}
-      minW={"270px"}
-      minH={"110px"}
       borderRadius="4"
       borderWidth={1}
-      width="25%"
-      flexShrink={0}
-      mr="4"
-      mb="4"
+      maxW={{ base: "calc(50% - 2rem)", md: "180px" }}
+      minW={{ base: "calc(50% - 2rem)", md: "180px" }}
+      maxH={{ base: "220px", md: "200px" }}
+      minH={{ base: "220px", md: "200px" }}
+      mr={{ base: "8", md: "4" }}
+      mb={{ base: "8", md: "4" }}
       key={product.food_id}
       _hover={{ boxShadow: "md", cursor: "pointer" }}
       onClick={openFoodDetailsModal}
       pointerEvents={product.food_available ? "auto" : "none"}
       opacity={product.food_available ? 1 : 0.5}
     >
-      <HStack alignItems={"center"} spacing="2">
-        <Box p="2">
+      <VStack alignItems={"flex-start"} textAlign="left">
+        <Box pl="2" pr="2" pt="2" w="100%" onClick={openFoodDetailsModal}>
           <Image
             src={
               product.food_image instanceof File
@@ -40,28 +38,29 @@ const MenuItemCard = ({ product }: { product: IProductData }) => {
                 : product.food_image ?? undefined
             }
             alt="item"
-            minW={"100px"}
-            minH={"90px"}
-            maxW={"100px"}
-            maxH={"90px"}
+            maxW={{ base: "100%", md: "160px" }}
+            minW={{ base: "100%", md: "160px" }}
+            maxH={{ base: "120px", md: "90px" }}
+            minH={{ base: "120px", md: "90px" }}
             borderRadius="4"
             objectFit={"cover"}
           />
         </Box>
-        <VStack alignItems={"flex-start"} pl="1">
+        <VStack alignItems={"flex-start"} pl="3" spacing={1} w="100%">
           <Box>
             <Box
               fontWeight="bold"
               overflow="hidden"
               textOverflow="ellipsis"
               whiteSpace="nowrap"
-              maxW={"120px"}
+              maxW={{ base: "100px", md: "150px" }}
             >
               {product.food_name}
             </Box>
           </Box>
+
           <Box>
-            <Box color="gray" fontSize="sm" fontWeight={"medium"}>
+            <Box color={"gray"} fontWeight="semibold" fontSize="sm">
               Rs {product.food_price}
             </Box>
           </Box>
@@ -79,7 +78,7 @@ const MenuItemCard = ({ product }: { product: IProductData }) => {
             </Box>
           </Box>
         </VStack>
-      </HStack>
+      </VStack>
       {selectedFoodItems && (
         <FoodDetailsModal
           isOpen={isModalOpen}

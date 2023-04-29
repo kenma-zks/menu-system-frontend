@@ -125,33 +125,6 @@ const Products = () => {
                   <Tab>All products</Tab>
                   <Tab>Create products</Tab>
                   <Tab>All categories</Tab>
-                  <Flex ml="auto" mr="8" alignItems="center" mb="4">
-                    <Menu>
-                      <MenuButton
-                        as={Button}
-                        rounded={"full"}
-                        variant={"link"}
-                        cursor={"pointer"}
-                        minW={0}
-                      >
-                        <Avatar size={"md"} src={profile} />
-                      </MenuButton>
-                      <MenuList alignItems={"center"}>
-                        <br />
-                        <Center>
-                          <Avatar size={"2xl"} src={profile} />
-                        </Center>
-                        <br />
-                        <Center>
-                          <p>Username</p>
-                        </Center>
-                        <br />
-                        <MenuDivider />
-                        <MenuItem>Account Settings</MenuItem>
-                        <MenuItem>Logout</MenuItem>
-                      </MenuList>
-                    </Menu>
-                  </Flex>
                 </TabList>
                 <Box>
                   <TabPanels>
