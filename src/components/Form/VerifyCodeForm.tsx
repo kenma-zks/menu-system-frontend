@@ -58,11 +58,17 @@ const VerifyCodeForm = ({ onReceiveFormData }: IVerifyCodeFormProps) => {
     <Fragment>
       <Box as="form" onSubmit={submitHandler}>
         <Stack minH={"100vh"} direction={{ base: "column", md: "row" }}>
-          <Flex flex={1.25}>
+          <Flex flex={1.25} display={{ base: "none", md: "none", lg: "flex" }}>
             <Image alt={"Login Image"} objectFit={"cover"} src={login2} />
           </Flex>
           <Flex flex={1} w="full">
-            <Stack spacing={4} w={"full"} pl={"60px"} pt={10} pr={40}>
+            <Stack
+              spacing={4}
+              w={"full"}
+              pl={{ base: 10, md: "60px" }}
+              pt={10}
+              pr={{ base: 10, md: "60px" }}
+            >
               <Image alt={"logo"} src={logo} h={75} w={75} />
 
               <Heading
@@ -71,6 +77,7 @@ const VerifyCodeForm = ({ onReceiveFormData }: IVerifyCodeFormProps) => {
                 fontWeight={"semibold"}
                 pb={4}
                 color="#633c7e"
+                w={"full"}
               >
                 Verify Code
               </Heading>
@@ -83,7 +90,12 @@ const VerifyCodeForm = ({ onReceiveFormData }: IVerifyCodeFormProps) => {
                 Please enter the code sent to your email address
               </Text>
 
-              <FormControl id="Code" isRequired isInvalid={enteredCodeHasError}>
+              <FormControl
+                id="Code"
+                isRequired
+                isInvalid={enteredCodeHasError}
+                pb={4}
+              >
                 <FormLabel fontSize={"small"} color="#633c7e">
                   Code
                 </FormLabel>

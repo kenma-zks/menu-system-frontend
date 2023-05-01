@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -14,15 +14,15 @@ import {
   Stack,
   Text,
   useToast,
-} from '@chakra-ui/react'
-import bg1 from '../../assets/bg1.webp'
-import useInput from '../../hooks/use-input'
+} from "@chakra-ui/react";
+import bg1 from "../../assets/bg1.webp";
+import useInput from "../../hooks/use-input";
 
-import { Link as RouterLink } from 'react-router-dom'
-import { IRegisterData } from '../../types/types'
+import { Link as RouterLink } from "react-router-dom";
+import { IRegisterData } from "../../types/types";
 
 interface IRegisterFormProps {
-  onReceiveFormData: (data: IRegisterData) => void
+  onReceiveFormData: (data: IRegisterData) => void;
 }
 
 const SignUpForm = ({ onReceiveFormData }: IRegisterFormProps) => {
@@ -33,7 +33,7 @@ const SignUpForm = ({ onReceiveFormData }: IRegisterFormProps) => {
     valueChangeHandler: firstNameChangeHandler,
     inputBlurHandler: firstNameBlurHandler,
     reset: resetFirstNameInput,
-  } = useInput((value) => (value as string).trim() !== '')
+  } = useInput((value) => (value as string).trim() !== "");
 
   const {
     value: enteredLastName,
@@ -42,7 +42,7 @@ const SignUpForm = ({ onReceiveFormData }: IRegisterFormProps) => {
     valueChangeHandler: lastNameChangeHandler,
     inputBlurHandler: lastNameBlurHandler,
     reset: resetLastNameInput,
-  } = useInput((value) => (value as string).trim() !== '')
+  } = useInput((value) => (value as string).trim() !== "");
 
   const {
     value: enteredEmail,
@@ -51,7 +51,7 @@ const SignUpForm = ({ onReceiveFormData }: IRegisterFormProps) => {
     valueChangeHandler: emailChangeHandler,
     inputBlurHandler: emailBlurHandler,
     reset: resetEmailInput,
-  } = useInput((value) => (value as string).includes('@'))
+  } = useInput((value) => (value as string).includes("@"));
 
   const {
     value: enteredPhoneNumber,
@@ -60,7 +60,7 @@ const SignUpForm = ({ onReceiveFormData }: IRegisterFormProps) => {
     valueChangeHandler: phoneNumberChangeHandler,
     inputBlurHandler: phoneNumberBlurHandler,
     reset: resetPhoneNumberInput,
-  } = useInput((value) => (value as number).toString().length === 10)
+  } = useInput((value) => (value as number).toString().length === 10);
 
   const {
     value: enteredPassword,
@@ -69,7 +69,7 @@ const SignUpForm = ({ onReceiveFormData }: IRegisterFormProps) => {
     valueChangeHandler: passwordChangeHandler,
     inputBlurHandler: passwordBlurHandler,
     reset: resetPasswordInput,
-  } = useInput((value) => (value as string).trim().length >= 8)
+  } = useInput((value) => (value as string).trim().length >= 8);
 
   const {
     value: enteredConfirmPassword,
@@ -81,8 +81,8 @@ const SignUpForm = ({ onReceiveFormData }: IRegisterFormProps) => {
   } = useInput(
     (value) =>
       (value as string).trim() === enteredPassword &&
-      enteredPassword.trim().length >= 8,
-  )
+      enteredPassword.trim().length >= 8
+  );
 
   const validate =
     enteredFirstNameIsValid &&
@@ -90,12 +90,12 @@ const SignUpForm = ({ onReceiveFormData }: IRegisterFormProps) => {
     enteredEmailIsValid &&
     enteredPhoneNumberIsValid &&
     enteredPasswordIsValid &&
-    enteredConfirmPasswordIsValid
+    enteredConfirmPasswordIsValid;
 
   function submitHandler(
-    event: React.FormEvent<HTMLFormElement | HTMLDivElement>,
+    event: React.FormEvent<HTMLFormElement | HTMLDivElement>
   ) {
-    event.preventDefault()
+    event.preventDefault();
 
     if (validate) {
       const data = {
@@ -105,60 +105,67 @@ const SignUpForm = ({ onReceiveFormData }: IRegisterFormProps) => {
         phone_number: enteredPhoneNumber,
         password: enteredPassword,
         confirm_password: enteredConfirmPassword,
-      }
-      resetFirstNameInput()
-      resetLastNameInput()
-      resetEmailInput()
-      resetPhoneNumberInput()
-      resetPasswordInput()
-      resetConfirmPasswordInput()
-      onReceiveFormData(data)
+      };
+      resetFirstNameInput();
+      resetLastNameInput();
+      resetEmailInput();
+      resetPhoneNumberInput();
+      resetPasswordInput();
+      resetConfirmPasswordInput();
+      onReceiveFormData(data);
     } else {
       toast({
-        title: 'Invalid input.',
-        description: 'Please check your input.',
-        status: 'error',
+        title: "Invalid input.",
+        description: "Please check your input.",
+        status: "error",
         duration: 9000,
         isClosable: true,
-        variant: 'left-accent',
-      })
+        variant: "left-accent",
+      });
     }
   }
 
-  const toast = useToast()
+  const toast = useToast();
 
   return (
     <Box as="form" onSubmit={submitHandler}>
-      <Stack minH={'100vh'} direction={{ base: 'column', md: 'row' }}>
-        <Flex flex={1}>
-          <Image alt={'Signup Image'} objectFit={'cover'} src={bg1} w={600} />
+      <Stack minH={"100vh"} direction={{ base: "column", md: "row" }}>
+        <Flex flex={1} display={{ base: "none", md: "none", lg: "flex" }}>
+          <Image alt={"Signup Image"} objectFit={"cover"} src={bg1} w={600} />
         </Flex>
-        <Flex flex={1} w={'full'} justify={'center'} pt={40} pl={20} pr={60}>
-          <Stack spacing={4} w={'full'}>
+        <Flex
+          flex={1}
+          w={"full"}
+          justify={"center"}
+          pt={{ base: 10, md: 40, lg: 20 }}
+          pl={10}
+          pr={{ base: 20, md: 40, lg: 60 }}
+        >
+          <Stack spacing={4} w={"full"}>
             <Heading
-              fontSize={'3xl'}
-              fontWeight={'semibold'}
+              fontSize={"3xl"}
+              fontWeight={"semibold"}
               pb={4}
               color="#633c7e"
             >
               Register
             </Heading>
             <Text
-              fontSize={'small'}
-              fontWeight={'medium'}
-              color={'gray'}
+              fontSize={"small"}
+              fontWeight={"medium"}
+              color={"gray"}
               pb={4}
             >
               Let's get you set up with an account. Please fill out the form
               below
             </Text>
-            <HStack>
+            <Stack direction={{ base: "column", md: "row" }} spacing={4}>
               <FormControl
                 id="firstName"
                 isRequired
                 isInvalid={enteredFirstNameHasError}
               >
-                <FormLabel fontSize={'small'} color="#633c7e">
+                <FormLabel fontSize={"small"} color="#633c7e">
                   First Name
                 </FormLabel>
                 <Input
@@ -168,18 +175,18 @@ const SignUpForm = ({ onReceiveFormData }: IRegisterFormProps) => {
                   onBlur={firstNameBlurHandler}
                   value={enteredFirstName}
                 />
-                {/* {enteredFirstNameHasError && (
+                {enteredFirstNameHasError && (
                   <FormErrorMessage>
                     Please enter a valid first name.
                   </FormErrorMessage>
-                )} */}
+                )}
               </FormControl>
               <FormControl
                 id="lastName"
                 isRequired
                 isInvalid={enteredLastNameHasError}
               >
-                <FormLabel fontSize={'small'} color="#633c7e">
+                <FormLabel fontSize={"small"} color="#633c7e">
                   Last Name
                 </FormLabel>
                 <Input
@@ -189,20 +196,20 @@ const SignUpForm = ({ onReceiveFormData }: IRegisterFormProps) => {
                   onBlur={lastNameBlurHandler}
                   value={enteredLastName}
                 />
-                {/* {enteredLastNameHasError && (
+                {enteredLastNameHasError && (
                   <FormErrorMessage>
                     Please enter a valid last name.
                   </FormErrorMessage>
-                )} */}
+                )}
               </FormControl>
-            </HStack>
-            <HStack>
+            </Stack>
+            <Stack direction={{ base: "column", md: "row" }} spacing={4}>
               <FormControl
                 id="phoneNumber"
                 isRequired
                 isInvalid={enteredPhoneNumberHasError}
               >
-                <FormLabel fontSize={'small'} color="#633c7e">
+                <FormLabel fontSize={"small"} color="#633c7e">
                   Phone Number
                 </FormLabel>
                 <Input
@@ -212,18 +219,18 @@ const SignUpForm = ({ onReceiveFormData }: IRegisterFormProps) => {
                   onBlur={phoneNumberBlurHandler}
                   value={enteredPhoneNumber}
                 />
-                {/* {enteredPhoneNumberHasError && (
+                {enteredPhoneNumberHasError && (
                   <FormErrorMessage>
                     Please enter a valid phone number.
                   </FormErrorMessage>
-                )} */}
+                )}
               </FormControl>
               <FormControl
                 id="email"
                 isRequired
                 isInvalid={enteredEmailHasError}
               >
-                <FormLabel fontSize={'small'} color="#633c7e">
+                <FormLabel fontSize={"small"} color="#633c7e">
                   Email address
                 </FormLabel>
                 <Input
@@ -233,20 +240,20 @@ const SignUpForm = ({ onReceiveFormData }: IRegisterFormProps) => {
                   onBlur={emailBlurHandler}
                   value={enteredEmail}
                 />
-                {/* {enteredEmailHasError && (
+                {enteredEmailHasError && (
                   <FormErrorMessage>
                     Please enter a valid email address.
                   </FormErrorMessage>
-                )} */}
+                )}
               </FormControl>
-            </HStack>
-            <HStack>
+            </Stack>
+            <Stack direction={{ base: "column", md: "row" }} spacing={4}>
               <FormControl
                 id="password"
                 isRequired
                 isInvalid={enteredPasswordHasError}
               >
-                <FormLabel fontSize={'small'} color="#633c7e">
+                <FormLabel fontSize={"small"} color="#633c7e">
                   Password
                 </FormLabel>
                 <Input
@@ -256,18 +263,18 @@ const SignUpForm = ({ onReceiveFormData }: IRegisterFormProps) => {
                   onBlur={passwordBlurHandler}
                   value={enteredPassword}
                 />
-                {/* {enteredPasswordHasError && (
+                {enteredPasswordHasError && (
                   <FormErrorMessage>
                     Password must be at least 8 characters.
                   </FormErrorMessage>
-                )} */}
+                )}
               </FormControl>
               <FormControl
                 id="confirmPassword"
                 isRequired
                 isInvalid={enteredConfirmPasswordHasError}
               >
-                <FormLabel fontSize={'small'} color="#633c7e">
+                <FormLabel fontSize={"small"} color="#633c7e">
                   Confirm Password
                 </FormLabel>
                 <Input
@@ -277,21 +284,21 @@ const SignUpForm = ({ onReceiveFormData }: IRegisterFormProps) => {
                   onBlur={confirmPasswordBlurHandler}
                   value={enteredConfirmPassword}
                 />
-                {/* {enteredConfirmPasswordHasError && (
+                {enteredConfirmPasswordHasError && (
                   <FormErrorMessage>Password does not match.</FormErrorMessage>
-                )} */}
+                )}
               </FormControl>
-            </HStack>
+            </Stack>
             <Box pt={4}>
               <Button
                 backgroundColor="#144ec7"
                 color="white"
                 w={200}
                 _hover={{
-                  backgroundColor: '#1B1091',
+                  backgroundColor: "#1B1091",
                 }}
                 _active={{
-                  backgroundColor: '#1B1091',
+                  backgroundColor: "#1B1091",
                 }}
                 type="submit"
               >
@@ -300,12 +307,12 @@ const SignUpForm = ({ onReceiveFormData }: IRegisterFormProps) => {
             </Box>
             <Stack>
               <Text
-                align={'left'}
-                fontSize={'small'}
-                fontWeight={'semibold'}
-                color={'gray'}
+                align={"left"}
+                fontSize={"small"}
+                fontWeight={"semibold"}
+                color={"gray"}
               >
-                Already have an account?{' '}
+                Already have an account?{" "}
                 <Link color="#03a6d4" as={RouterLink} to="/admin/login">
                   Login
                 </Link>
@@ -315,7 +322,7 @@ const SignUpForm = ({ onReceiveFormData }: IRegisterFormProps) => {
         </Flex>
       </Stack>
     </Box>
-  )
-}
+  );
+};
 
-export default SignUpForm
+export default SignUpForm;

@@ -1,4 +1,4 @@
-import { WarningIcon } from '@chakra-ui/icons'
+import { WarningIcon } from "@chakra-ui/icons";
 import {
   AlertDialog,
   AlertDialogBody,
@@ -23,21 +23,22 @@ import {
   ModalHeader,
   ModalOverlay,
   Select,
+  Stack,
   Text,
   Textarea,
   useToast,
   VStack,
-} from '@chakra-ui/react'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { fetchPastBookingDetails } from '../../api/api'
-import { deleteBookings, setBookings } from '../../store/bookingSlice'
-import { useAppDispatch } from '../../store/hooks'
-import { IBookingData } from '../../types/types'
+} from "@chakra-ui/react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { fetchPastBookingDetails } from "../../api/api";
+import { deleteBookings, setBookings } from "../../store/bookingSlice";
+import { useAppDispatch } from "../../store/hooks";
+import { IBookingData } from "../../types/types";
 
 interface ViewBookingModalProps {
-  isOpen: boolean
-  onClose: () => void
-  booking: IBookingData | null
+  isOpen: boolean;
+  onClose: () => void;
+  booking: IBookingData | null;
 }
 
 const BookingHistoryModal: React.FC<ViewBookingModalProps> = ({
@@ -45,8 +46,8 @@ const BookingHistoryModal: React.FC<ViewBookingModalProps> = ({
   onClose,
   booking,
 }) => {
-  const dispatch = useAppDispatch()
-  const toast = useToast()
+  const dispatch = useAppDispatch();
+  const toast = useToast();
 
   const fetchPastBookingDetailsCallback = useCallback(() => {
     fetchPastBookingDetails<IBookingData[]>().then((data) => {
@@ -62,65 +63,72 @@ const BookingHistoryModal: React.FC<ViewBookingModalProps> = ({
           email: item.email,
           note: item.note,
           status: item.status,
-        }
-      })
-      dispatch(setBookings(transformedData))
-    })
-  }, [dispatch])
+        };
+      });
+      dispatch(setBookings(transformedData));
+    });
+  }, [dispatch]);
 
   useEffect(() => {
-    fetchPastBookingDetailsCallback()
-  }, [fetchPastBookingDetailsCallback])
+    fetchPastBookingDetailsCallback();
+  }, [fetchPastBookingDetailsCallback]);
 
-  const leastDestructiveRef = useRef<HTMLButtonElement | null>(null)
-  const cancelRef = useRef<HTMLButtonElement | null>(null)
-  const [alertIsOpen, setAlertIsOpen] = useState(false)
+  const leastDestructiveRef = useRef<HTMLButtonElement | null>(null);
+  const cancelRef = useRef<HTMLButtonElement | null>(null);
+  const [alertIsOpen, setAlertIsOpen] = useState(false);
 
   const onDeleteClick = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
-    event.preventDefault()
-    setAlertIsOpen(true)
-  }
+    event.preventDefault();
+    setAlertIsOpen(true);
+  };
 
   const alertOnClose = () => {
-    setAlertIsOpen(false)
-  }
+    setAlertIsOpen(false);
+  };
 
   const onDeleteConfirm = async () => {
     fetch(`http://127.0.0.1:8000/api/booking/list/past/${booking?.id}/`, {
-      method: 'DELETE',
+      method: "DELETE",
     }).then(() => {
-      dispatch(deleteBookings(booking?.id))
+      dispatch(deleteBookings(booking?.id));
       toast({
-        title: 'Booking deleted',
-        description: 'Booking has been deleted successfully',
-        status: 'success',
+        title: "Booking deleted",
+        description: "Booking has been deleted successfully",
+        status: "success",
         duration: 3000,
         isClosable: true,
-      })
-      onClose()
-    })
-  }
+      });
+      onClose();
+    });
+  };
 
   return (
     <form>
       <Modal isOpen={isOpen} onClose={onClose} size="2xl">
         <ModalOverlay />
-        <ModalContent key={booking?.id} borderRadius="3xl" as={'form'}>
+        <ModalContent key={booking?.id} borderRadius="3xl" as={"form"}>
           <ModalHeader>Booking Details</ModalHeader>
 
           <ModalCloseButton />
           <ModalBody overflowY="auto">
             <VStack>
-              <HStack w="100%">
+              <Stack
+                direction={{
+                  base: "column",
+                  md: "row",
+                }}
+                spacing={4}
+                w="100%"
+              >
                 <FormControl>
                   <FormLabel fontWeight="normal">First name</FormLabel>
                   <Input
                     placeholder="First name"
                     defaultValue={booking?.first_name}
                     isDisabled
-                    textColor={'black'}
+                    textColor={"black"}
                   />
                 </FormControl>
                 <FormControl>
@@ -131,7 +139,7 @@ const BookingHistoryModal: React.FC<ViewBookingModalProps> = ({
                     isDisabled
                   />
                 </FormControl>
-              </HStack>
+              </Stack>
               <FormControl>
                 <FormLabel fontWeight="normal"> Email</FormLabel>
                 <Input
@@ -140,7 +148,14 @@ const BookingHistoryModal: React.FC<ViewBookingModalProps> = ({
                   isDisabled
                 />
               </FormControl>
-              <HStack w="100%">
+              <Stack
+                direction={{
+                  base: "column",
+                  md: "row",
+                }}
+                spacing={4}
+                w="100%"
+              >
                 <FormControl>
                   <FormLabel fontWeight="normal">Phone number</FormLabel>
                   <InputGroup>
@@ -160,8 +175,15 @@ const BookingHistoryModal: React.FC<ViewBookingModalProps> = ({
                     isDisabled
                   />
                 </FormControl>
-              </HStack>
-              <HStack w="100%">
+              </Stack>
+              <Stack
+                direction={{
+                  base: "column",
+                  md: "row",
+                }}
+                spacing={4}
+                w="100%"
+              >
                 <FormControl>
                   <FormLabel fontWeight="normal">Booking date</FormLabel>
                   <Input
@@ -190,7 +212,7 @@ const BookingHistoryModal: React.FC<ViewBookingModalProps> = ({
                     <option value="Pending">Pending</option>
                   </Select>
                 </FormControl>
-              </HStack>
+              </Stack>
 
               <FormControl>
                 <FormLabel fontWeight="normal">Note</FormLabel>
@@ -203,20 +225,20 @@ const BookingHistoryModal: React.FC<ViewBookingModalProps> = ({
             </VStack>
           </ModalBody>
 
-          <ModalFooter w="100%" bgColor={'#EBEEF2'} borderBottomRadius="3xl">
+          <ModalFooter w="100%" bgColor={"#EBEEF2"} borderBottomRadius="3xl">
             <Box
               backgroundColor={
-                booking?.status === 'Accepted'
-                  ? 'green.200'
-                  : booking?.status === 'Rejected'
-                  ? 'red.200'
-                  : 'gray.300'
+                booking?.status === "Accepted"
+                  ? "green.200"
+                  : booking?.status === "Rejected"
+                  ? "red.200"
+                  : "gray.300"
               }
               color="white"
-              fontSize={'sm'}
-              w="20%"
+              fontSize={"sm"}
+              w={{ base: "30%", md: "20%" }}
               h="10"
-              borderRadius={'md'}
+              borderRadius={"md"}
               display="flex"
               justifyContent="center"
               mx="6"
@@ -226,11 +248,11 @@ const BookingHistoryModal: React.FC<ViewBookingModalProps> = ({
                 <Text
                   fontWeight="medium"
                   color={
-                    booking?.status === 'Accepted'
-                      ? 'green.600'
-                      : booking?.status === 'Rejected'
-                      ? 'red.600'
-                      : 'gray.600'
+                    booking?.status === "Accepted"
+                      ? "green.600"
+                      : booking?.status === "Rejected"
+                      ? "red.600"
+                      : "gray.600"
                   }
                   textAlign="center"
                 >
@@ -241,8 +263,8 @@ const BookingHistoryModal: React.FC<ViewBookingModalProps> = ({
 
             <Button
               type="submit"
-              variant={'solid'}
-              colorScheme={'red'}
+              variant={"solid"}
+              colorScheme={"red"}
               onClick={onDeleteClick}
               ref={leastDestructiveRef}
             >
@@ -281,7 +303,7 @@ const BookingHistoryModal: React.FC<ViewBookingModalProps> = ({
         </ModalContent>
       </Modal>
     </form>
-  )
-}
+  );
+};
 
-export default BookingHistoryModal
+export default BookingHistoryModal;

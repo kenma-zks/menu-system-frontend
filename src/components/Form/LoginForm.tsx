@@ -67,16 +67,21 @@ const LoginForm = ({ onReceiveFormData }: ILoginFormProps) => {
     <Fragment>
       <Box as="form" onSubmit={submitHandler}>
         <Stack minH={"100vh"} direction={{ base: "column", md: "row" }}>
-          <Flex flex={1.25}>
+          <Flex flex={1} display={{ base: "none", md: "flex" }}>
             <Image alt={"Login Image"} objectFit={"cover"} src={login2} />
           </Flex>
           <Flex flex={1} w="full">
-            <Stack spacing={4} w={"full"} pl={"60px"} pt={10} pr={40}>
+            <Stack
+              spacing={4}
+              w={"full"}
+              p={6}
+              pr={{ base: 6, md: 30, lg: 40 }}
+            >
               <Image alt={"logo"} src={logo} h={75} w={75} />
 
               <Heading
                 pt={20}
-                fontSize={"3xl"}
+                fontSize={{ base: "2xl", md: "3xl" }}
                 fontWeight={"semibold"}
                 pb={4}
                 color="#633c7e"
@@ -127,7 +132,7 @@ const LoginForm = ({ onReceiveFormData }: ILoginFormProps) => {
                 />
               </FormControl>
               <Stack
-                direction={{ base: "column", sm: "row" }}
+                direction={"row"}
                 align={"start"}
                 justify={"space-between"}
                 pb={4}

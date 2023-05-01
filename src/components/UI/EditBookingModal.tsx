@@ -17,6 +17,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Select,
+  Stack,
   Text,
   Textarea,
   useToast,
@@ -128,7 +129,14 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
           <ModalCloseButton />
           <ModalBody overflowY="auto">
             <VStack>
-              <HStack w="100%">
+              <Stack
+                direction={{
+                  base: "column",
+                  md: "row",
+                }}
+                spacing={4}
+                w="100%"
+              >
                 <FormControl>
                   <FormLabel fontWeight="normal">First name</FormLabel>
                   <Input
@@ -143,12 +151,19 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
                     defaultValue={booking?.last_name}
                   />
                 </FormControl>
-              </HStack>
+              </Stack>
               <FormControl>
                 <FormLabel fontWeight="normal"> Email</FormLabel>
                 <Input placeholder="Email" defaultValue={booking?.email} />
               </FormControl>
-              <HStack w="100%">
+              <Stack
+                direction={{
+                  base: "column",
+                  md: "row",
+                }}
+                spacing={4}
+                w="100%"
+              >
                 <FormControl>
                   <FormLabel fontWeight="normal">Phone number</FormLabel>
                   <InputGroup>
@@ -166,8 +181,15 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
                     defaultValue={booking?.table_capacity}
                   />
                 </FormControl>
-              </HStack>
-              <HStack w="100%">
+              </Stack>
+              <Stack
+                direction={{
+                  base: "column",
+                  md: "row",
+                }}
+                spacing={4}
+                w="100%"
+              >
                 <FormControl>
                   <FormLabel fontWeight="normal">Booking date</FormLabel>
                   <Input
@@ -193,7 +215,7 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
                     <option value="Rejected">Rejected</option>
                   </Select>
                 </FormControl>
-              </HStack>
+              </Stack>
 
               <FormControl>
                 <FormLabel fontWeight="normal">Note</FormLabel>
@@ -213,7 +235,7 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
               }
               color="white"
               fontSize={"sm"}
-              w="20%"
+              w={{ base: "30%", md: "20%" }}
               h="10"
               borderRadius={"md"}
               display="flex"
