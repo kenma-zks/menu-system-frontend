@@ -1,7 +1,17 @@
-import { Box, Text, VStack } from "@chakra-ui/react";
+import {
+  Box,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 import React from "react";
 import OrderedItems from "../../components/Card/OrderedItems";
 import AdminNavbar from "../../components/UI/AdminNavbar";
+import PreparingOrders from "../../components/Card/PreparingOrders";
 
 const AdminOrders = () => {
   return (
@@ -10,12 +20,22 @@ const AdminOrders = () => {
         <AdminNavbar />
         <VStack alignItems={"flex-start"} p="4">
           <Box pb={3}>
-            <Text fontWeight="bold" pb="3">
-              ORDER LIST
-            </Text>
-          </Box>
-          <Box>
-            <OrderedItems />
+            <Tabs colorScheme="orange" align="start">
+              <TabList px="8">
+                <Tab>Live Orders</Tab>
+                <Tab>Preparing Orders</Tab>
+              </TabList>
+              <Box>
+                <TabPanels>
+                  <TabPanel p="8">
+                    <OrderedItems />
+                  </TabPanel>
+                  <TabPanel p="8">
+                    <PreparingOrders />
+                  </TabPanel>
+                </TabPanels>
+              </Box>
+            </Tabs>
           </Box>
         </VStack>
       </Box>

@@ -34,6 +34,8 @@ import { addOrder, deleteOrder, setOrders } from "../../store/orderSlice";
 import KhaltiConfig from "../Khalti/KhaltiConfig";
 import KhaltiCheckout from "khalti-checkout-web";
 import useInput from "../../hooks/use-input";
+import Cookies from "js-cookie";
+import ViewBill from "../Card/ViewBill";
 
 interface RootState {
   cart: {
@@ -59,6 +61,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const toast = useToast();
   const [isOrderPlaced, setIsOrderPlaced] = useState(false);
   const [newOrder, setNewOrder] = useState<IOrderData | null>(null);
+  const [showReceipt, setShowReceipt] = useState(false);
 
   const {
     value: enteredName,
@@ -98,11 +101,44 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
         })
       );
     }
+
+    const cartItemsCookie = Cookies.get("cart");
+    let cartData = [];
+    if (cartItemsCookie) {
+      cartData = JSON.parse(cartItemsCookie);
+    }
+    cartData.push({
+      id: id,
+      food_name: food_name,
+      food_price: food_price,
+      food_image: food_image,
+      quantity,
+      totalAmount,
+    });
+    Cookies.set("cart", JSON.stringify(cartData));
   };
 
   const removeItemHandler = (id: number) => {
     if (!isOrderPlaced) {
+      // Remove the item from the Redux store
       dispatch(removeItemFromCart(id));
+
+      const cartItemsCookie = Cookies.get("cart");
+      let cartData = [];
+      if (cartItemsCookie) {
+        cartData = JSON.parse(cartItemsCookie);
+      }
+
+      const itemIndex = cartData.findIndex((item: any) => item.id === id);
+      if (itemIndex >= 0) {
+        cartData[itemIndex].quantity--;
+        if (cartData[itemIndex].quantity === 0) {
+          // Remove the item from the cart data if the quantity is zero
+          cartData.splice(itemIndex, 1);
+        }
+      }
+
+      Cookies.set("cart", JSON.stringify(cartData));
     }
   };
 
@@ -110,6 +146,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const cancelRef = useRef<HTMLButtonElement | null>(null);
   const [alertIsOpen, setAlertIsOpen] = useState(false);
   const [cancelAlertIsOpen, setCancelAlertIsOpen] = useState(false);
+  const [orderStatus, setOrderStatus] = useState("");
 
   const alertOnClose = () => {
     setAlertIsOpen(false);
@@ -173,7 +210,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
         alertOnClose();
         setNewOrder(data);
         setIsOrderPlaced(true);
-        console.log(data);
 
         toast({
           title: "Order Placed",
@@ -182,11 +218,13 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
           duration: 3000,
           isClosable: true,
         });
+        Cookies.set("orderId", data.order_id, { expires: 1 });
       } catch (error) {
         console.error(error);
       }
       resetNameInput();
       resetTableInput();
+      Cookies.set("orderPlaced", "true", { expires: 1 });
     } else {
       toast({
         title: "Invalid Input",
@@ -216,10 +254,137 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
           isClosable: true,
         });
       }
+
+      Cookies.remove("orderPlaced");
+      const orderId = Cookies.get("orderId");
+      if (orderId) {
+        await fetch(`http://127.0.0.1:8000/api/order/${orderId}`, {
+          method: "DELETE",
+        });
+        setIsOrderPlaced(false);
+        cancelAlertOnClose();
+        toast({
+          title: "Order Cancelled",
+          description: `Your order #${orderId} has been cancelled successfully!`,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+      Cookies.remove("orderId");
     } catch (error) {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    const cartItemsCookie = Cookies.get("cart");
+
+    if (cartItemsCookie) {
+      const cartItems = JSON.parse(cartItemsCookie);
+      cartItems.forEach((item: CartItem) => {
+        dispatch(
+          addItemToCart({
+            id: item.id,
+            food_name: item.food_name,
+            food_price: item.food_price,
+            food_image: item.food_image,
+            quantity: item.quantity,
+            totalAmount: item.totalAmount,
+          })
+        );
+      });
+    }
+
+    const orderPlacedCookie = Cookies.get("orderPlaced");
+    if (orderPlacedCookie) {
+      setIsOrderPlaced(true);
+    }
+  }, [dispatch]);
+
+  const [orderData, setOrderData] = useState<IOrderData>();
+
+  const viewBillHandler = async () => {
+    try {
+      const orderId = Cookies.get("orderId");
+
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/order/${orderId}`
+      );
+      const data = await response.json();
+
+      const itemRequests = data.items.map(async (item: OrderedItem) => {
+        const response = await fetch(
+          `http://127.0.0.1:8000/api/menu/fooddetails/${item.food_id}`
+        );
+        const food = await response.json();
+        return {
+          food_name: food.food_name,
+          food_price: food.food_price,
+          quantity: item.quantity,
+        };
+      });
+
+      const items = await Promise.all(itemRequests);
+
+      data.items = items;
+
+      setOrderData(data);
+      setShowReceipt(true);
+      Cookies.remove("orderId");
+      Cookies.remove("orderPlaced");
+      Cookies.remove("cart");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchOrderStatus = async () => {
+    try {
+      const orderId = Cookies.get("orderId");
+      if (orderId) {
+        const response = await fetch(
+          `http://127.0.0.1:8000/api/order/${orderId}`
+        );
+
+        const data = await response.json();
+        setOrderStatus(data.order_status);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrderStatus();
+
+    const interval = setInterval(fetchOrderStatus, 5000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  // useEffect(() => {
+  //   const ws = new WebSocket("ws://localhost:8000/ws/cart/order_id/");
+  //   ws.onopen = () => {
+  //     console.log("WebSocket connection opened.");
+  //   };
+  //   ws.onmessage = (event) => {
+  //     const data = JSON.parse(event.data);
+  //     if (data.order_id === newOrder?.order_id) {
+  //       setStatus(data.order_status);
+  //     }
+  //     console.log(data);
+  //   };
+  //   ws.onclose = () => {
+  //     console.log("WebSocket connection closed.");
+  //   };
+
+  //   return () => {
+  //     ws.close();
+  //   };
+  // }, []);
 
   return (
     <Box>
@@ -399,16 +564,39 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
           <DrawerFooter>
             {isOrderPlaced ? (
               <>
-                <Button
-                  variant="solid"
-                  colorScheme="orange"
-                  width="100%"
-                  borderRadius="md"
-                  _hover={{ bg: "orange.400" }}
-                  onClick={() => setCancelAlertIsOpen(true)}
-                >
-                  Cancel Order
-                </Button>
+                {orderStatus === "Completed" ? (
+                  <Button
+                    variant="solid"
+                    colorScheme="green"
+                    width="100%"
+                    borderRadius="md"
+                    _hover={{ bg: "green.400" }}
+                    onClick={viewBillHandler}
+                  >
+                    View Receipt
+                  </Button>
+                ) : orderStatus === "Preparing" ? (
+                  <Button
+                    variant="solid"
+                    colorScheme="yellow"
+                    width="100%"
+                    borderRadius="md"
+                    _hover={{ bg: "yellow.400" }}
+                  >
+                    Preparing
+                  </Button>
+                ) : (
+                  <Button
+                    variant="solid"
+                    colorScheme="orange"
+                    width="100%"
+                    borderRadius="md"
+                    _hover={{ bg: "orange.400" }}
+                    onClick={() => setCancelAlertIsOpen(true)}
+                  >
+                    Cancel Order
+                  </Button>
+                )}
                 <AlertDialog
                   isOpen={cancelAlertIsOpen}
                   leastDestructiveRef={leastDestructiveRef}
@@ -529,6 +717,9 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
+      {showReceipt && (
+        <ViewBill order={orderData} onClose={() => setShowReceipt(false)} />
+      )}
     </Box>
   );
 };

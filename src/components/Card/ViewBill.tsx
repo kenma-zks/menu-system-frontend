@@ -11,37 +11,45 @@ import {
   VStack,
   ModalFooter,
   Button,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  FormLabel,
+  FormControl,
+  Input,
+  FormErrorMessage,
 } from "@chakra-ui/react";
 import { IOrderData } from "../../types/types";
-import jsPDF from "jspdf";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import useInput from "../../hooks/use-input";
 
-interface OrderReceiptProps {
+interface ViewBillProps {
   order: IOrderData | undefined;
   onClose: () => void;
 }
 
-const OrderReceipt = ({ order, onClose }: OrderReceiptProps) => {
-  const modalContentRef = useRef<HTMLDivElement>(null);
+const ViewBill = ({ order, onClose }: ViewBillProps) => {
+  const {
+    value: enteredEmail,
+    isValid: enteredEmailIsValid,
+    hasError: enteredEmailHasError,
+    valueChangeHandler: emailChangeHandler,
+    inputBlurHandler: emailBlurHandler,
+  } = useInput((value) => (value as string).includes("@"));
 
-  const generatePDF = () => {
-    const doc = new jsPDF();
+  const leastDestructiveRef = useRef<HTMLButtonElement | null>(null);
+  const cancelRef = useRef<HTMLButtonElement | null>(null);
+  const [alertIsOpen, setAlertIsOpen] = useState(false);
 
-    if (modalContentRef.current) {
-      doc.html(modalContentRef.current, {
-        callback: function (pdf) {
-          pdf.save("order.pdf");
-        },
-      });
-    } else {
-      console.log("Modal content not found");
-    }
+  const mailPDF = () => {
+    setAlertIsOpen(true);
   };
-
   return (
     <Modal isOpen={true} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent w={"400px"} ref={modalContentRef}>
+      <ModalContent w={"400px"}>
         <ModalHeader>
           <Text pb="2">Order #{order?.order_id}</Text>
           <Text pb="2" fontSize={"xs"} fontWeight={"semibold"} color={"gray"}>
@@ -110,14 +118,63 @@ const OrderReceipt = ({ order, onClose }: OrderReceiptProps) => {
             </Text>
           </HStack>
         </ModalBody>
-        {/* <ModalFooter>
-          <Button w={"100%"} onClick={generatePDF}>
-            Create a PDF
+        <ModalFooter>
+          <Button w={"100%"} onClick={mailPDF}>
+            Mail Bill
           </Button>
-        </ModalFooter> */}
+          <AlertDialog
+            isOpen={alertIsOpen}
+            leastDestructiveRef={leastDestructiveRef}
+            onClose={() => setAlertIsOpen(false)}
+          >
+            <AlertDialogContent>
+              <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                Enter your email address
+              </AlertDialogHeader>
+
+              <AlertDialogBody>
+                <FormControl
+                  id="email"
+                  isRequired
+                  isInvalid={enteredEmailHasError}
+                >
+                  <FormLabel fontSize={"small"} color="#633c7e">
+                    Email address
+                  </FormLabel>
+                  <Input
+                    type="email"
+                    placeholder="Email"
+                    value={enteredEmail}
+                    onChange={emailChangeHandler}
+                    onBlur={emailBlurHandler}
+                    autoComplete="off"
+                  />
+                  {enteredEmailHasError && (
+                    <FormErrorMessage>
+                      Please enter a valid email address.
+                    </FormErrorMessage>
+                  )}
+                </FormControl>
+              </AlertDialogBody>
+
+              <AlertDialogFooter>
+                <Button ref={cancelRef} onClick={() => setAlertIsOpen(false)}>
+                  Cancel
+                </Button>
+                <Button
+                  colorScheme="red"
+                  onClick={() => setAlertIsOpen(false)}
+                  ml={3}
+                >
+                  Send
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </ModalFooter>
       </ModalContent>
     </Modal>
   );
 };
 
-export default OrderReceipt;
+export default ViewBill;

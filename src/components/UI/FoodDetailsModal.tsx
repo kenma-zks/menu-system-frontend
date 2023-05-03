@@ -22,6 +22,7 @@ import { IProductData } from "../../types/types";
 import { addItemToCart } from "../../store/cartSlice";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
+import Cookies from "js-cookie";
 
 interface FoodDetailsModalProps {
   isOpen: boolean;
@@ -91,12 +92,42 @@ const FoodDetailsModal: React.FC<FoodDetailsModalProps> = ({
           totalAmount,
         })
       );
+
       toast({
         title: "Item added to cart",
         status: "success",
         duration: 3000,
         isClosable: true,
       });
+      // Get the current cart items from the cookie
+      const cartItemsCookie = Cookies.get("cart");
+      let cartData = [];
+      if (cartItemsCookie) {
+        cartData = JSON.parse(cartItemsCookie);
+      }
+
+      // Check if the item with the given ID already exists in the cart
+      const existingCartItem = cartData.find((item: any) => item.id === id);
+
+      // If the item already exists, update its quantity and totalAmount
+      if (existingCartItem) {
+        existingCartItem.quantity += quantity;
+        existingCartItem.totalAmount += totalAmount;
+      } else {
+        // Otherwise, add the new item to the cart
+        const cartItem = {
+          id,
+          food_name,
+          food_price,
+          food_image,
+          quantity,
+          totalAmount,
+        };
+        cartData.push(cartItem);
+      }
+
+      // Update the cookie with the updated cart data
+      Cookies.set("cart", JSON.stringify(cartData));
     } else {
       toast({
         title: "Order already placed",

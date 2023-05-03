@@ -1,4 +1,5 @@
-import { CheckIcon, CloseIcon, DeleteIcon, ViewIcon } from "@chakra-ui/icons";
+import { CheckIcon, DeleteIcon } from "@chakra-ui/icons";
+import { GiCampCookingPot } from "react-icons/gi";
 import {
   Box,
   Flex,
@@ -21,8 +22,8 @@ import {
 } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchOrderDetails, fetchOrderedItemsDetails } from "../../api/api";
-import { IOrderData, OrderedItem } from "../../types/types";
+import { fetchOrderDetails } from "../../api/api";
+import { IOrderData } from "../../types/types";
 import {
   deleteOrder,
   setOrders,
@@ -92,7 +93,6 @@ const OrderedItems = () => {
       const transformedData = data.map(transformOrderData);
       Promise.all(transformedData).then((result) => {
         dispatch(setOrders(result));
-        console.log(result);
       });
     });
   }, []);
@@ -133,7 +133,7 @@ const OrderedItems = () => {
     }
   };
 
-  const handleAccept = (order_id?: number) => {
+  const handleComplete = (order_id?: number) => {
     fetch(`http://127.0.0.1:8000/api/order/${order_id}/`, {
       method: "PATCH",
       headers: {
@@ -145,8 +145,8 @@ const OrderedItems = () => {
       .then((data) => {
         dispatch(updateOrderStatus(data));
         toast({
-          title: "Order Accepted",
-          description: `Order #${order_id} has been accepted, notify the customer`,
+          title: "Order Completed",
+          description: `Order #${order_id} has been completed, notify the customer`,
           status: "success",
           duration: 3000,
           isClosable: true,
@@ -158,20 +158,20 @@ const OrderedItems = () => {
       });
   };
 
-  const handleReject = (order_id?: number) => {
+  const handlePrepare = (order_id?: number) => {
     fetch(`http://127.0.0.1:8000/api/order/${order_id}/`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ order_status: "Rejected" }),
+      body: JSON.stringify({ order_status: "Preparing" }),
     })
       .then((response) => response.json())
       .then((data) => {
         dispatch(updateOrderStatus(data));
         toast({
-          title: "Order Rejected",
-          description: `Order #${order_id} has been rejected, notify the customer`,
+          title: "Order is being Prepared",
+          description: `Order #${order_id} is being prepared, notify the customer`,
           status: "success",
           duration: 3000,
           isClosable: true,
@@ -303,19 +303,19 @@ const OrderedItems = () => {
                         {order.order_status === "Pending" && (
                           <>
                             <IconButton
+                              aria-label="Prepare order"
+                              icon={<GiCampCookingPot />}
+                              variant="outline"
+                              colorScheme={"orange"}
+                              onClick={() => handlePrepare(order.order_id)}
+                            />
+                            <IconButton
                               aria-label="Completed order"
                               icon={<CheckIcon />}
                               mr={3}
                               variant="outline"
                               colorScheme={"green"}
-                              onClick={() => handleAccept(order.order_id)}
-                            />
-                            <IconButton
-                              aria-label="Reject order"
-                              icon={<CloseIcon />}
-                              variant="outline"
-                              colorScheme={"red"}
-                              onClick={() => handleReject(order.order_id)}
+                              onClick={() => handleComplete(order.order_id)}
                             />
                           </>
                         )}

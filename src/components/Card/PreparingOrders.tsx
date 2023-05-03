@@ -1,4 +1,5 @@
-import { CheckIcon, CloseIcon, DeleteIcon, ViewIcon } from "@chakra-ui/icons";
+import { CheckIcon, DeleteIcon } from "@chakra-ui/icons";
+import { GiCampCookingPot } from "react-icons/gi";
 import {
   Box,
   Flex,
@@ -17,11 +18,12 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogOverlay,
+  HStack,
 } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchOrderDetails, fetchOrderedItemsDetails } from "../../api/api";
-import { IOrderData, OrderedItem } from "../../types/types";
+import { fetchOrderDetails } from "../../api/api";
+import { IOrderData } from "../../types/types";
 import {
   deleteOrder,
   setOrders,
@@ -30,9 +32,8 @@ import {
 import { RootState } from "../../store/store";
 import OrderReceipt from "./OrderReceipt";
 import { FiInfo } from "react-icons/fi";
-import OrderHistory from "../../pages/admin/OrderHistory";
 
-const OrderedHistoryItems = () => {
+const PreparingOrders = () => {
   const dispatch = useDispatch();
 
   const orders = useSelector((state: RootState) => state.orders.orders);
@@ -92,7 +93,6 @@ const OrderedHistoryItems = () => {
       const transformedData = data.map(transformOrderData);
       Promise.all(transformedData).then((result) => {
         dispatch(setOrders(result));
-        console.log(result);
       });
     });
   }, []);
@@ -133,15 +133,40 @@ const OrderedHistoryItems = () => {
     }
   };
 
+  const handleComplete = (order_id?: number) => {
+    fetch(`http://127.0.0.1:8000/api/order/${order_id}/`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ order_status: "Completed" }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        dispatch(updateOrderStatus(data));
+        toast({
+          title: "Order Completed",
+          description: `Order #${order_id} has been completed, notify the customer`,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      })
+      .catch((error) => {
+        console.error("Error updating order status:", error);
+        // Handle error here
+      });
+  };
+
   return (
     <>
       <Flex flexWrap={"wrap"}>
         {orders
-          .filter((order) => order.order_status === "Completed")
+          .filter((order) => order.order_status === "Preparing")
           .map((order) => (
             <Box
               bg={useColorModeValue("white", "gray.800")}
-              width="360px"
+              width={{ base: "300px", md: "360px" }}
               p="4"
               borderRadius={"8"}
               height="330px"
@@ -250,14 +275,24 @@ const OrderedHistoryItems = () => {
                       </Stack>
                       <Spacer />
                       <Stack direction={"row"}>
-                        {order.order_status === "Completed" && (
-                          <Button
-                            colorScheme="green"
-                            size="md"
-                            variant="outline"
-                          >
-                            Completed
-                          </Button>
+                        {order.order_status === "Preparing" && (
+                          <>
+                            <Button
+                              colorScheme={"orange"}
+                              isDisabled={true}
+                              variant="outline"
+                            >
+                              Preparing
+                            </Button>
+                            <IconButton
+                              aria-label="Completed order"
+                              icon={<CheckIcon />}
+                              mr={3}
+                              variant="outline"
+                              colorScheme={"green"}
+                              onClick={() => handleComplete(order.order_id)}
+                            />
+                          </>
                         )}
                       </Stack>
                     </Stack>
@@ -276,4 +311,4 @@ const OrderedHistoryItems = () => {
     </>
   );
 };
-export default OrderedHistoryItems;
+export default PreparingOrders;
