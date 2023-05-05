@@ -29,7 +29,13 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CartItem, IOrderData, OrderedItem } from "../../types/types";
-import { addItemToCart, removeItemFromCart } from "../../store/cartSlice";
+import {
+  addItemToCart,
+  removeItemFromCart,
+  setCart,
+  setTotalAmount,
+  setTotalQuantity,
+} from "../../store/cartSlice";
 import { addOrder, deleteOrder, setOrders } from "../../store/orderSlice";
 import KhaltiConfig from "../Khalti/KhaltiConfig";
 import KhaltiCheckout from "khalti-checkout-web";
@@ -90,6 +96,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     totalAmount: number | string
   ) => {
     if (food_name && food_price && quantity && !isOrderPlaced) {
+      // Dispatch an action to add the item to the Redux store
       dispatch(
         addItemToCart({
           id: id,
@@ -100,47 +107,92 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
           totalAmount,
         })
       );
-    }
 
-    const cartItemsCookie = Cookies.get("cart");
-    let cartData = [];
-    if (cartItemsCookie) {
-      cartData = JSON.parse(cartItemsCookie);
+      // Get the cart items from the cookie (if it exists)
+      const cartCookie = Cookies.get("cart");
+      const cartItems: CartItem[] = cartCookie ? JSON.parse(cartCookie) : [];
+
+      // Find the index of the existing item (if it exists) in the cart cookie
+      const existingItemIndex = cartItems.findIndex((item) => item.id === id);
+
+      if (existingItemIndex !== -1) {
+        // If the item already exists, update its quantity and totalAmount in the cart cookie
+        cartItems[existingItemIndex].quantity += quantity;
+        cartItems[existingItemIndex].totalAmount =
+          Number(cartItems[existingItemIndex].food_price) *
+          cartItems[existingItemIndex].quantity;
+      } else {
+        // If the item does not exist, add it to the cart cookie
+        cartItems.push({
+          id: id,
+          food_name: food_name,
+          food_price: food_price,
+          food_image: food_image,
+          quantity,
+          totalAmount,
+        });
+      }
+
+      Cookies.set("cart", JSON.stringify(cartItems));
     }
-    cartData.push({
-      id: id,
-      food_name: food_name,
-      food_price: food_price,
-      food_image: food_image,
-      quantity,
-      totalAmount,
-    });
-    Cookies.set("cart", JSON.stringify(cartData));
   };
 
   const removeItemHandler = (id: number) => {
     if (!isOrderPlaced) {
-      // Remove the item from the Redux store
+      // Dispatch an action to remove the item from the Redux store
       dispatch(removeItemFromCart(id));
 
-      const cartItemsCookie = Cookies.get("cart");
-      let cartData = [];
-      if (cartItemsCookie) {
-        cartData = JSON.parse(cartItemsCookie);
-      }
+      // Get the cart items from the cookie (if it exists)
+      const cartCookie = Cookies.get("cart");
+      const cartItems: CartItem[] = cartCookie ? JSON.parse(cartCookie) : [];
 
-      const itemIndex = cartData.findIndex((item: any) => item.id === id);
-      if (itemIndex >= 0) {
-        cartData[itemIndex].quantity--;
-        if (cartData[itemIndex].quantity === 0) {
-          // Remove the item from the cart data if the quantity is zero
-          cartData.splice(itemIndex, 1);
+      // Find the index of the existing item in the cart cookie
+      const existingItemIndex = cartItems.findIndex((item) => item.id === id);
+
+      if (existingItemIndex !== -1) {
+        // If the item exists, update its quantity and totalAmount in the cart cookie
+        cartItems[existingItemIndex].quantity--;
+        cartItems[existingItemIndex].totalAmount =
+          Number(cartItems[existingItemIndex].totalAmount) -
+          Number(cartItems[existingItemIndex].food_price);
+
+        if (cartItems[existingItemIndex].quantity === 0) {
+          // If the item quantity reaches 0, remove it from the cart cookie
+          cartItems.splice(existingItemIndex, 1);
         }
-      }
 
-      Cookies.set("cart", JSON.stringify(cartData));
+        // Set the updated cart items in the cookie
+        Cookies.set("cart", JSON.stringify(cartItems));
+      }
     }
   };
+
+  useEffect(() => {
+    const cartCookie = Cookies.get("cart");
+    if (cartCookie) {
+      const cartItems = JSON.parse(cartCookie);
+      dispatch(setCart(cartItems));
+
+      const totalQuantity = cartItems.reduce(
+        (acc: number, item: CartItem) => acc + item.quantity,
+        0
+      );
+
+      const totalAmount = cartItems.reduce(
+        (acc: number, item: CartItem) =>
+          acc + Number(item.food_price) * item.quantity,
+        0
+      );
+
+      dispatch(setTotalQuantity(totalQuantity));
+      dispatch(setTotalAmount(totalAmount));
+    }
+
+    const orderPlacedCookie = Cookies.get("orderPlaced");
+    if (orderPlacedCookie) {
+      setIsOrderPlaced(true);
+    }
+  }, [dispatch]);
 
   const leastDestructiveRef = useRef<HTMLButtonElement | null>(null);
   const cancelRef = useRef<HTMLButtonElement | null>(null);
@@ -276,31 +328,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
       console.error(error);
     }
   };
-
-  useEffect(() => {
-    const cartItemsCookie = Cookies.get("cart");
-
-    if (cartItemsCookie) {
-      const cartItems = JSON.parse(cartItemsCookie);
-      cartItems.forEach((item: CartItem) => {
-        dispatch(
-          addItemToCart({
-            id: item.id,
-            food_name: item.food_name,
-            food_price: item.food_price,
-            food_image: item.food_image,
-            quantity: item.quantity,
-            totalAmount: item.totalAmount,
-          })
-        );
-      });
-    }
-
-    const orderPlacedCookie = Cookies.get("orderPlaced");
-    if (orderPlacedCookie) {
-      setIsOrderPlaced(true);
-    }
-  }, [dispatch]);
 
   const [orderData, setOrderData] = useState<IOrderData>();
 

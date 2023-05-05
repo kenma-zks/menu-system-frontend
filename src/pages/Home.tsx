@@ -19,6 +19,7 @@ import MenuItemList from "../components/Card/MenuItemList";
 import CartDrawer from "../components/UI/CartDrawer";
 import { ICategoryData, IProductData } from "../types/types";
 import SearchBar from "../components/UI/Searchbar";
+import Cookies from "js-cookie";
 
 interface RootState {
   cart: CartState;

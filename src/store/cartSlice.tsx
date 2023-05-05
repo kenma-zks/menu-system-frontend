@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { CartItem, IOrderData } from "../types/types";
+import Cookies from "js-cookie";
 
 interface CartState {
   cartItems: CartItem[];
@@ -17,6 +18,16 @@ const cartSlice = createSlice({
     paymentMethod: "",
   },
   reducers: {
+    setCart(state: CartState, action: PayloadAction<CartItem[]>) {
+      state.cartItems = action.payload;
+    },
+    setTotalQuantity(state: CartState, action: PayloadAction<number>) {
+      state.totalQuantity = action.payload;
+    },
+    setTotalAmount(state: CartState, action: PayloadAction<number>) {
+      state.totalAmount = action.payload;
+    },
+
     addItemToCart(state: CartState, action: PayloadAction<CartItem>) {
       const newItem = action.payload;
       const existingItemIndex = state.cartItems.findIndex(
@@ -59,6 +70,12 @@ const cartSlice = createSlice({
   },
 });
 
-export const { addItemToCart, removeItemFromCart } = cartSlice.actions;
+export const {
+  addItemToCart,
+  removeItemFromCart,
+  setCart,
+  setTotalQuantity,
+  setTotalAmount,
+} = cartSlice.actions;
 
 export default cartSlice.reducer;
