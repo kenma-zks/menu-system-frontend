@@ -358,9 +358,9 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
 
       setOrderData(data);
       setShowReceipt(true);
-      Cookies.remove("orderId");
-      Cookies.remove("orderPlaced");
-      Cookies.remove("cart");
+      // Cookies.remove("orderId");
+      // Cookies.remove("orderPlaced");
+      // Cookies.remove("cart");
     } catch (error) {
       console.error(error);
     }

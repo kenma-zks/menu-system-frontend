@@ -13,7 +13,6 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { IOrderData } from "../../types/types";
-import jsPDF from "jspdf";
 import { useRef } from "react";
 
 interface OrderReceiptProps {
@@ -22,26 +21,26 @@ interface OrderReceiptProps {
 }
 
 const OrderReceipt = ({ order, onClose }: OrderReceiptProps) => {
-  const modalContentRef = useRef<HTMLDivElement>(null);
+  const generateOrderPDF = () => {
+    fetch(`http://localhost:8000/api/order/pdf/${order?.order_id}/`)
+      .then((res) => res.blob())
+      .then((blob) => {
+        const url = window.URL.createObjectURL(new Blob([blob]));
+        const link = document.createElement("a");
 
-  const generatePDF = () => {
-    const doc = new jsPDF();
-
-    if (modalContentRef.current) {
-      doc.html(modalContentRef.current, {
-        callback: function (pdf) {
-          pdf.save("order.pdf");
-        },
-      });
-    } else {
-      console.log("Modal content not found");
-    }
+        link.href = url;
+        link.setAttribute("download", `Order-${order?.order_id}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode?.removeChild(link);
+      })
+      .catch((err) => console.log(err));
   };
 
   return (
     <Modal isOpen={true} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent w={"400px"} ref={modalContentRef}>
+      <ModalContent w={"400px"}>
         <ModalHeader>
           <Text pb="2">Order #{order?.order_id}</Text>
           <Text pb="2" fontSize={"xs"} fontWeight={"semibold"} color={"gray"}>
@@ -110,11 +109,11 @@ const OrderReceipt = ({ order, onClose }: OrderReceiptProps) => {
             </Text>
           </HStack>
         </ModalBody>
-        {/* <ModalFooter>
-          <Button w={"100%"} onClick={generatePDF}>
-            Create a PDF
+        <ModalFooter>
+          <Button w={"100%"} onClick={generateOrderPDF}>
+            Create Bill
           </Button>
-        </ModalFooter> */}
+        </ModalFooter>
       </ModalContent>
     </Modal>
   );

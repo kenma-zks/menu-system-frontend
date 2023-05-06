@@ -24,6 +24,7 @@ import {
 import { IOrderData } from "../../types/types";
 import { useRef, useState } from "react";
 import useInput from "../../hooks/use-input";
+import PDFDocument from "pdfkit";
 
 interface ViewBillProps {
   order: IOrderData | undefined;
@@ -43,9 +44,8 @@ const ViewBill = ({ order, onClose }: ViewBillProps) => {
   const cancelRef = useRef<HTMLButtonElement | null>(null);
   const [alertIsOpen, setAlertIsOpen] = useState(false);
 
-  const mailPDF = () => {
-    setAlertIsOpen(true);
-  };
+  const mailPDF = async () => {};
+
   return (
     <Modal isOpen={true} onClose={onClose}>
       <ModalOverlay />
@@ -119,7 +119,7 @@ const ViewBill = ({ order, onClose }: ViewBillProps) => {
           </HStack>
         </ModalBody>
         <ModalFooter>
-          <Button w={"100%"} onClick={mailPDF}>
+          <Button w={"100%"} onClick={() => setAlertIsOpen(true)}>
             Mail Bill
           </Button>
           <AlertDialog
@@ -161,11 +161,7 @@ const ViewBill = ({ order, onClose }: ViewBillProps) => {
                 <Button ref={cancelRef} onClick={() => setAlertIsOpen(false)}>
                   Cancel
                 </Button>
-                <Button
-                  colorScheme="red"
-                  onClick={() => setAlertIsOpen(false)}
-                  ml={3}
-                >
+                <Button colorScheme="red" onClick={mailPDF} ml={3}>
                   Send
                 </Button>
               </AlertDialogFooter>
