@@ -26,7 +26,12 @@ const GenQRCode = () => {
 
   const handleQRCodeClick = () => {
     const qrCodeWindow = window.open("", "Print", "height=600,width=800");
-    qrCodeWindow?.document.write(`<img src="${qrCodeImage}" />`);
+    qrCodeWindow?.document.write(
+      `<div style="display: flex; flex-direction: column; height: 100vh; justify-content: center; align-items: center; width: 100%;">
+        <h1>QR Code</h1>
+        <img src="${qrCodeImage}" width="600" height="600" style="display: block; margin: 0 auto;" />
+      </div>`
+    );
     qrCodeWindow?.document.close();
     qrCodeWindow?.focus();
     qrCodeWindow?.print();
