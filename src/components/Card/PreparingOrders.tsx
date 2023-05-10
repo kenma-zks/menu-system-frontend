@@ -30,8 +30,8 @@ import {
   updateOrderStatus,
 } from "../../store/orderSlice";
 import { RootState } from "../../store/store";
-import OrderReceipt from "./OrderReceipt";
 import { FiInfo } from "react-icons/fi";
+import OrderDetailsModal from "../UI/OrderDetailsModal";
 
 const PreparingOrders = () => {
   const dispatch = useDispatch();
@@ -62,6 +62,7 @@ const PreparingOrders = () => {
       items: cartItems,
       total_price: order.total_price,
       total_items: order.total_items,
+      note: order.note,
       payment_method: order.payment_method,
       order_status: order.order_status,
       ordered_date: order.ordered_date,
@@ -157,6 +158,13 @@ const PreparingOrders = () => {
         // Handle error here
       });
   };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchOrderDetailsCallback();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [fetchOrderDetailsCallback]);
 
   return (
     <>
@@ -302,7 +310,7 @@ const PreparingOrders = () => {
             </Box>
           ))}
         {previewOrder && (
-          <OrderReceipt
+          <OrderDetailsModal
             order={previewOrder}
             onClose={() => setPreviewOrder(null)}
           />

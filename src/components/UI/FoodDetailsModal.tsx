@@ -38,9 +38,6 @@ const FoodDetailsModal: React.FC<FoodDetailsModalProps> = ({
   const dispatch = useAppDispatch();
   const toast = useToast();
   const [quantity, setQuantity] = useState(1);
-  const isOrderPlaced = useSelector(
-    (state: RootState) => state.orders.isOrderPlaced
-  );
 
   const handleIncrement = () => {
     setQuantity((prev) => prev + 1);
@@ -81,62 +78,52 @@ const FoodDetailsModal: React.FC<FoodDetailsModalProps> = ({
     quantity: number,
     totalAmount: number | string
   ) => {
-    if (!isOrderPlaced) {
-      dispatch(
-        addItemToCart({
-          id,
-          food_name,
-          food_price,
-          food_image,
-          quantity,
-          totalAmount,
-        })
-      );
+    dispatch(
+      addItemToCart({
+        id,
+        food_name,
+        food_price,
+        food_image,
+        quantity,
+        totalAmount,
+      })
+    );
 
-      toast({
-        title: "Item added to cart",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
-      // Get the current cart items from the cookie
-      const cartItemsCookie = Cookies.get("cart");
-      let cartData = [];
-      if (cartItemsCookie) {
-        cartData = JSON.parse(cartItemsCookie);
-      }
-
-      // Check if the item with the given ID already exists in the cart
-      const existingCartItem = cartData.find((item: any) => item.id === id);
-
-      // If the item already exists, update its quantity and totalAmount
-      if (existingCartItem) {
-        existingCartItem.quantity += quantity;
-        existingCartItem.totalAmount += totalAmount;
-      } else {
-        // Otherwise, add the new item to the cart
-        const cartItem = {
-          id,
-          food_name,
-          food_price,
-          food_image,
-          quantity,
-          totalAmount,
-        };
-        cartData.push(cartItem);
-      }
-
-      // Update the cookie with the updated cart data
-      Cookies.set("cart", JSON.stringify(cartData));
-    } else {
-      toast({
-        title: "Order already placed",
-        description: "Please place a new order",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+    toast({
+      title: "Item added to cart",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+    // Get the current cart items from the cookie
+    const cartItemsCookie = Cookies.get("cart");
+    let cartData = [];
+    if (cartItemsCookie) {
+      cartData = JSON.parse(cartItemsCookie);
     }
+
+    // Check if the item with the given ID already exists in the cart
+    const existingCartItem = cartData.find((item: any) => item.id === id);
+
+    // If the item already exists, update its quantity and totalAmount
+    if (existingCartItem) {
+      existingCartItem.quantity += quantity;
+      existingCartItem.totalAmount += totalAmount;
+    } else {
+      // Otherwise, add the new item to the cart
+      const cartItem = {
+        id,
+        food_name,
+        food_price,
+        food_image,
+        quantity,
+        totalAmount,
+      };
+      cartData.push(cartItem);
+    }
+
+    // Update the cookie with the updated cart data
+    Cookies.set("cart", JSON.stringify(cartData));
   };
 
   return (

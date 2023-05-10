@@ -3,12 +3,10 @@ import { IOrderData } from "../types/types";
 
 interface OrderState {
   orders: IOrderData[];
-  isOrderPlaced: boolean;
 }
 
 const initialState: OrderState = {
   orders: [],
-  isOrderPlaced: false,
 };
 
 const orderSlice = createSlice({
@@ -22,11 +20,9 @@ const orderSlice = createSlice({
       state.orders = state.orders.filter(
         (order) => order.order_id !== action.payload
       );
-      state.isOrderPlaced = false;
     },
     addOrder(state, action: PayloadAction<IOrderData>) {
       state.orders.push(action.payload);
-      state.isOrderPlaced = true;
     },
     updateOrderStatus(state, action: PayloadAction<IOrderData>) {
       const orderIndex = state.orders.findIndex(

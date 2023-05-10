@@ -27,7 +27,11 @@ const cartSlice = createSlice({
     setTotalAmount(state: CartState, action: PayloadAction<number>) {
       state.totalAmount = action.payload;
     },
-
+    clearCart(state: CartState) {
+      state.cartItems = [];
+      state.totalQuantity = 0;
+      state.totalAmount = 0;
+    },
     addItemToCart(state: CartState, action: PayloadAction<CartItem>) {
       const newItem = action.payload;
       const existingItemIndex = state.cartItems.findIndex(
@@ -76,6 +80,7 @@ export const {
   setCart,
   setTotalQuantity,
   setTotalAmount,
+  clearCart,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

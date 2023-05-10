@@ -62,6 +62,18 @@ export const fetchOrderDetails = async <tdata>(): Promise<tdata> => {
   }
 };
 
+export const fetchOrdersByIds = (orderId: number[]): Promise<any[]> => {
+  const promises = orderId.map((id) => {
+    return fetch(`http://127.0.0.1:8000/api/order/${id}`).then((response) => {
+      if (!response.ok) {
+        throw new Error("Something went wrong");
+      }
+      return response.json();
+    });
+  });
+  return Promise.all(promises);
+};
+
 export const fetchOrderedItemsDetails = async <tdata>(): Promise<tdata> => {
   try {
     const response = await fetch("http://127.0.0.1:8000/api/ordereditem/");

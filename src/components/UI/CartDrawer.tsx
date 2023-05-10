@@ -31,6 +31,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { CartItem, IOrderData, OrderedItem } from "../../types/types";
 import {
   addItemToCart,
+  clearCart,
   removeItemFromCart,
   setCart,
   setTotalAmount,
@@ -65,7 +66,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const toast = useToast();
-  const [isOrderPlaced, setIsOrderPlaced] = useState(false);
+  // const [isOrderPlaced, setIsOrderPlaced] = useState(false);
   const [newOrder, setNewOrder] = useState<IOrderData | null>(null);
   const [showReceipt, setShowReceipt] = useState(false);
 
@@ -95,7 +96,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     quantity: number,
     totalAmount: number | string
   ) => {
-    if (food_name && food_price && quantity && !isOrderPlaced) {
+    if (food_name && food_price && quantity) {
       // Dispatch an action to add the item to the Redux store
       dispatch(
         addItemToCart({
@@ -138,32 +139,30 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   };
 
   const removeItemHandler = (id: number) => {
-    if (!isOrderPlaced) {
-      // Dispatch an action to remove the item from the Redux store
-      dispatch(removeItemFromCart(id));
+    // Dispatch an action to remove the item from the Redux store
+    dispatch(removeItemFromCart(id));
 
-      // Get the cart items from the cookie (if it exists)
-      const cartCookie = Cookies.get("cart");
-      const cartItems: CartItem[] = cartCookie ? JSON.parse(cartCookie) : [];
+    // Get the cart items from the cookie (if it exists)
+    const cartCookie = Cookies.get("cart");
+    const cartItems: CartItem[] = cartCookie ? JSON.parse(cartCookie) : [];
 
-      // Find the index of the existing item in the cart cookie
-      const existingItemIndex = cartItems.findIndex((item) => item.id === id);
+    // Find the index of the existing item in the cart cookie
+    const existingItemIndex = cartItems.findIndex((item) => item.id === id);
 
-      if (existingItemIndex !== -1) {
-        // If the item exists, update its quantity and totalAmount in the cart cookie
-        cartItems[existingItemIndex].quantity--;
-        cartItems[existingItemIndex].totalAmount =
-          Number(cartItems[existingItemIndex].totalAmount) -
-          Number(cartItems[existingItemIndex].food_price);
+    if (existingItemIndex !== -1) {
+      // If the item exists, update its quantity and totalAmount in the cart cookie
+      cartItems[existingItemIndex].quantity--;
+      cartItems[existingItemIndex].totalAmount =
+        Number(cartItems[existingItemIndex].totalAmount) -
+        Number(cartItems[existingItemIndex].food_price);
 
-        if (cartItems[existingItemIndex].quantity === 0) {
-          // If the item quantity reaches 0, remove it from the cart cookie
-          cartItems.splice(existingItemIndex, 1);
-        }
-
-        // Set the updated cart items in the cookie
-        Cookies.set("cart", JSON.stringify(cartItems));
+      if (cartItems[existingItemIndex].quantity === 0) {
+        // If the item quantity reaches 0, remove it from the cart cookie
+        cartItems.splice(existingItemIndex, 1);
       }
+
+      // Set the updated cart items in the cookie
+      Cookies.set("cart", JSON.stringify(cartItems));
     }
   };
 
@@ -188,10 +187,10 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
       dispatch(setTotalAmount(totalAmount));
     }
 
-    const orderPlacedCookie = Cookies.get("orderPlaced");
-    if (orderPlacedCookie) {
-      setIsOrderPlaced(true);
-    }
+    // const orderPlacedCookie = Cookies.get("orderPlaced");
+    // if (orderPlacedCookie) {
+    //   setIsOrderPlaced(true);
+    // }
   }, [dispatch]);
 
   const leastDestructiveRef = useRef<HTMLButtonElement | null>(null);
@@ -202,10 +201,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
 
   const alertOnClose = () => {
     setAlertIsOpen(false);
-  };
-
-  const cancelAlertOnClose = () => {
-    setCancelAlertIsOpen(false);
   };
 
   const handlePayment = () => {
@@ -258,10 +253,22 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
           body: JSON.stringify(order),
         });
         const data = await response.json();
+
         dispatch(addOrder(data));
+
         alertOnClose();
         setNewOrder(data);
-        setIsOrderPlaced(true);
+
+        // Retrieve old order IDs from cookies
+        const oldOrderIds = JSON.parse(Cookies.get("orderId") || "[]");
+
+        // Add the new order ID to the array
+        oldOrderIds.push(data.order_id);
+
+        // Set the updated order IDs in the cookie
+        Cookies.set("orderId", JSON.stringify(oldOrderIds));
+
+        console.log(Cookies.get("orderId"));
 
         toast({
           title: "Order Placed",
@@ -270,13 +277,13 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
           duration: 3000,
           isClosable: true,
         });
-        Cookies.set("orderId", data.order_id, { expires: 1 });
       } catch (error) {
         console.error(error);
       }
       resetNameInput();
       resetTableInput();
-      Cookies.set("orderPlaced", "true", { expires: 1 });
+      dispatch(clearCart());
+      Cookies.remove("cart");
     } else {
       toast({
         title: "Invalid Input",
@@ -288,130 +295,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  const cancelHandler = async () => {
-    try {
-      if (newOrder) {
-        // Check if a new order was created
-        await fetch(`http://127.0.0.1:8000/api/order/${newOrder.order_id}`, {
-          method: "DELETE",
-        });
-        dispatch(deleteOrder(newOrder.order_id));
-        setIsOrderPlaced(false);
-        cancelAlertOnClose();
-        toast({
-          title: "Order Cancelled",
-          description: `Your order #${newOrder.order_id} has been cancelled successfully!`,
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-
-      Cookies.remove("orderPlaced");
-      const orderId = Cookies.get("orderId");
-      if (orderId) {
-        await fetch(`http://127.0.0.1:8000/api/order/${orderId}`, {
-          method: "DELETE",
-        });
-        setIsOrderPlaced(false);
-        cancelAlertOnClose();
-        toast({
-          title: "Order Cancelled",
-          description: `Your order #${orderId} has been cancelled successfully!`,
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-      Cookies.remove("orderId");
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const [orderData, setOrderData] = useState<IOrderData>();
-
-  const viewBillHandler = async () => {
-    try {
-      const orderId = Cookies.get("orderId");
-
-      const response = await fetch(
-        `http://127.0.0.1:8000/api/order/${orderId}`
-      );
-      const data = await response.json();
-
-      const itemRequests = data.items.map(async (item: OrderedItem) => {
-        const response = await fetch(
-          `http://127.0.0.1:8000/api/menu/fooddetails/${item.food_id}`
-        );
-        const food = await response.json();
-        return {
-          food_name: food.food_name,
-          food_price: food.food_price,
-          quantity: item.quantity,
-        };
-      });
-
-      const items = await Promise.all(itemRequests);
-
-      data.items = items;
-
-      setOrderData(data);
-      setShowReceipt(true);
-      Cookies.remove("orderId");
-      Cookies.remove("orderPlaced");
-      Cookies.remove("cart");
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const fetchOrderStatus = async () => {
-    try {
-      const orderId = Cookies.get("orderId");
-      if (orderId) {
-        const response = await fetch(
-          `http://127.0.0.1:8000/api/order/${orderId}`
-        );
-
-        const data = await response.json();
-        setOrderStatus(data.order_status);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
-    fetchOrderStatus();
-
-    const interval = setInterval(fetchOrderStatus, 5000);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
-
-  // useEffect(() => {
-  //   const ws = new WebSocket("ws://localhost:8000/ws/cart/order_id/");
-  //   ws.onopen = () => {
-  //     console.log("WebSocket connection opened.");
-  //   };
-  //   ws.onmessage = (event) => {
-  //     const data = JSON.parse(event.data);
-  //     if (data.order_id === newOrder?.order_id) {
-  //       setStatus(data.order_status);
-  //     }
-  //     console.log(data);
-  //   };
-  //   ws.onclose = () => {
-  //     console.log("WebSocket connection closed.");
-  //   };
-
-  //   return () => {
-  //     ws.close();
-  //   };
-  // }, []);
 
   return (
     <Box>
@@ -464,7 +348,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                             size="xs"
                             data-index={index}
                             onClick={() => removeItemHandler(item.id!)}
-                            isDisabled={isOrderPlaced}
+                            // isDisabled={isOrderPlaced}
                           />
                           <Text fontSize={"md"}>{item.quantity}</Text>
                           <IconButton
@@ -484,7 +368,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                                 item.totalAmount
                               );
                             }}
-                            isDisabled={isOrderPlaced}
+                            // isDisabled={isOrderPlaced}
                           />
                           <Spacer />
                           <Text
@@ -589,158 +473,93 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
             </Stack>
           </DrawerBody>
           <DrawerFooter>
-            {isOrderPlaced ? (
-              <>
-                {orderStatus === "Completed" ? (
-                  <Button
-                    variant="solid"
-                    colorScheme="green"
-                    width="100%"
-                    borderRadius="md"
-                    _hover={{ bg: "green.400" }}
-                    onClick={viewBillHandler}
-                  >
-                    View Receipt
-                  </Button>
-                ) : orderStatus === "Preparing" ? (
-                  <Button
-                    variant="solid"
-                    colorScheme="yellow"
-                    width="100%"
-                    borderRadius="md"
-                    _hover={{ bg: "yellow.400" }}
-                  >
-                    Preparing
-                  </Button>
-                ) : (
-                  <Button
-                    variant="solid"
-                    colorScheme="orange"
-                    width="100%"
-                    borderRadius="md"
-                    _hover={{ bg: "orange.400" }}
-                    onClick={() => setCancelAlertIsOpen(true)}
-                  >
-                    Cancel Order
-                  </Button>
-                )}
-                <AlertDialog
-                  isOpen={cancelAlertIsOpen}
-                  leastDestructiveRef={leastDestructiveRef}
-                  onClose={() => setCancelAlertIsOpen(false)}
-                >
-                  <AlertDialogContent>
-                    <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                      Confirm Cancellation
-                    </AlertDialogHeader>
+            <>
+              <Button
+                variant="solid"
+                colorScheme="orange"
+                width="100%"
+                borderRadius="md"
+                _hover={{ bg: "orange.400" }}
+                onClick={() => setAlertIsOpen(true)}
+                disabled={cartItems.length === 0}
+              >
+                Process Transaction
+              </Button>
+              <AlertDialog
+                isOpen={alertIsOpen}
+                leastDestructiveRef={leastDestructiveRef}
+                onClose={alertOnClose}
+              >
+                <AlertDialogContent>
+                  <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                    Confirm Order
+                  </AlertDialogHeader>
 
-                    <AlertDialogBody>
-                      Are you sure you want to cancel your order?
-                    </AlertDialogBody>
-
-                    <AlertDialogFooter>
-                      <Button
-                        ref={cancelRef}
-                        onClick={() => setCancelAlertIsOpen(false)}
-                      >
-                        No, keep my order
-                      </Button>
-                      <Button colorScheme="red" onClick={cancelHandler} ml={3}>
-                        Yes, cancel my order
-                      </Button>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </>
-            ) : (
-              <>
-                <Button
-                  variant="solid"
-                  colorScheme="orange"
-                  width="100%"
-                  borderRadius="md"
-                  _hover={{ bg: "orange.400" }}
-                  onClick={() => setAlertIsOpen(true)}
-                  disabled={cartItems.length === 0}
-                >
-                  Process Transaction
-                </Button>
-                <AlertDialog
-                  isOpen={alertIsOpen}
-                  leastDestructiveRef={leastDestructiveRef}
-                  onClose={alertOnClose}
-                >
-                  <AlertDialogContent>
-                    <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                      Confirm Order
-                    </AlertDialogHeader>
-
-                    <AlertDialogBody>
-                      <FormControl
-                        id="firstName"
-                        isRequired
-                        pb="4"
-                        isInvalid={enteredNameHasError}
-                      >
-                        <FormLabel fontSize={"small"} color="#633c7e">
-                          Enter your name
-                        </FormLabel>
-                        <Input
-                          type="text"
-                          placeholder="Name"
-                          onChange={nameChangeHandler}
-                          onBlur={nameBlurHandler}
-                          value={enteredName}
-                        />
-                        {enteredNameHasError && (
-                          <FormErrorMessage>
-                            Please enter a valid name
-                          </FormErrorMessage>
-                        )}
-                      </FormControl>
-                      <FormControl
-                        id="firstName"
-                        isRequired
-                        pb="4"
-                        isInvalid={enteredTableHasError}
-                      >
-                        <FormLabel fontSize={"small"} color="#633c7e">
-                          Enter table number
-                        </FormLabel>
-                        <Input
-                          type="text"
-                          placeholder="Table number"
-                          onChange={tableChangeHandler}
-                          onBlur={tableBlurHandler}
-                          value={enteredTable}
-                        />
-                      </FormControl>
-                      {enteredTableHasError && (
+                  <AlertDialogBody>
+                    <FormControl
+                      id="firstName"
+                      isRequired
+                      pb="4"
+                      isInvalid={enteredNameHasError}
+                    >
+                      <FormLabel fontSize={"small"} color="#633c7e">
+                        Enter your name
+                      </FormLabel>
+                      <Input
+                        type="text"
+                        placeholder="Name"
+                        onChange={nameChangeHandler}
+                        onBlur={nameBlurHandler}
+                        value={enteredName}
+                      />
+                      {enteredNameHasError && (
                         <FormErrorMessage>
-                          Please enter a valid table number
+                          Please enter a valid name
                         </FormErrorMessage>
                       )}
+                    </FormControl>
+                    <FormControl
+                      id="firstName"
+                      isRequired
+                      pb="4"
+                      isInvalid={enteredTableHasError}
+                    >
+                      <FormLabel fontSize={"small"} color="#633c7e">
+                        Enter table number
+                      </FormLabel>
+                      <Input
+                        type="text"
+                        placeholder="Table number"
+                        onChange={tableChangeHandler}
+                        onBlur={tableBlurHandler}
+                        value={enteredTable}
+                      />
+                    </FormControl>
+                    {enteredTableHasError && (
+                      <FormErrorMessage>
+                        Please enter a valid table number
+                      </FormErrorMessage>
+                    )}
 
-                      <Text fontWeight={"semibold"} fontSize={"sm"} pt="4">
-                        You cannot cancel your order once it is accepted.
-                      </Text>
-                    </AlertDialogBody>
+                    <Text fontWeight={"semibold"} fontSize={"sm"} pt="4">
+                      You cannot cancel your order once it is accepted.
+                    </Text>
+                  </AlertDialogBody>
 
-                    <AlertDialogFooter>
-                      <Button
-                        ref={cancelRef}
-                        onClick={() => setAlertIsOpen(false)}
-                      >
-                        Cancel
-                      </Button>
-                      <Button colorScheme="red" onClick={submitHandler} ml={3}>
-                        Order
-                      </Button>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </>
-            )}
+                  <AlertDialogFooter>
+                    <Button
+                      ref={cancelRef}
+                      onClick={() => setAlertIsOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button colorScheme="red" onClick={submitHandler} ml={3}>
+                      Order
+                    </Button>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </>
           </DrawerFooter>
         </DrawerContent>
       </Drawer>

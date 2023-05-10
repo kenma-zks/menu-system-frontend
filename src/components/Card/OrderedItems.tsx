@@ -30,8 +30,8 @@ import {
   updateOrderStatus,
 } from "../../store/orderSlice";
 import { RootState } from "../../store/store";
-import OrderReceipt from "./OrderReceipt";
 import { FiInfo } from "react-icons/fi";
+import OrderDetailsModal from "../UI/OrderDetailsModal";
 
 const OrderedItems = () => {
   const dispatch = useDispatch();
@@ -183,6 +183,13 @@ const OrderedItems = () => {
       });
   };
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchOrderDetailsCallback();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [fetchOrderDetailsCallback]);
+
   return (
     <>
       <Flex flexWrap={"wrap"}>
@@ -327,9 +334,9 @@ const OrderedItems = () => {
             </Box>
           ))}
         {previewOrder && (
-          <OrderReceipt
-            order={previewOrder}
+          <OrderDetailsModal
             onClose={() => setPreviewOrder(null)}
+            order={previewOrder}
           />
         )}
       </Flex>
