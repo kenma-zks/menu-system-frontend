@@ -44,7 +44,29 @@ const ViewBill = ({ order, onClose }: ViewBillProps) => {
   const cancelRef = useRef<HTMLButtonElement | null>(null);
   const [alertIsOpen, setAlertIsOpen] = useState(false);
 
-  const mailPDF = async () => {};
+  const mailPDF = async () => {
+    if (enteredEmailIsValid) {
+      try {
+        const response = await fetch(
+          `http://127.0.0.1:8000/api/order/email/${order?.order_id}/`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: enteredEmail,
+            }),
+          }
+        );
+
+        const data = await response.json();
+        console.log(data);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
 
   return (
     <Modal isOpen={true} onClose={onClose}>
@@ -98,6 +120,15 @@ const ViewBill = ({ order, onClose }: ViewBillProps) => {
                 </Text>
               ))}
             </VStack>
+          </HStack>
+          <Divider my="4" borderBottomWidth={"2px"} borderColor={"gray"} />
+          <HStack alignItems="flex-start" justifyContent="space-between">
+            <Text fontSize="sm" fontWeight="semibold">
+              Additional Notes :
+            </Text>
+            <Text fontSize="sm" fontWeight="semibold" color="gray">
+              {order?.note}
+            </Text>
           </HStack>
           <Divider my="4" borderBottomWidth={"2px"} borderColor={"gray"} />
           <HStack alignItems="flex-start" justifyContent="space-between">
@@ -161,7 +192,12 @@ const ViewBill = ({ order, onClose }: ViewBillProps) => {
                 <Button ref={cancelRef} onClick={() => setAlertIsOpen(false)}>
                   Cancel
                 </Button>
-                <Button colorScheme="red" onClick={mailPDF} ml={3}>
+                <Button
+                  colorScheme="red"
+                  onClick={mailPDF}
+                  ml={3}
+                  type="submit"
+                >
                   Send
                 </Button>
               </AlertDialogFooter>

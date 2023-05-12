@@ -24,6 +24,7 @@ import {
   Spacer,
   Stack,
   Text,
+  Textarea,
   useToast,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
@@ -43,6 +44,8 @@ import KhaltiCheckout from "khalti-checkout-web";
 import useInput from "../../hooks/use-input";
 import Cookies from "js-cookie";
 import ViewBill from "../Card/ViewBill";
+import { m } from "framer-motion";
+import { options } from "pdfkit";
 
 interface RootState {
   cart: {
@@ -69,6 +72,10 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   // const [isOrderPlaced, setIsOrderPlaced] = useState(false);
   const [newOrder, setNewOrder] = useState<IOrderData | null>(null);
   const [showReceipt, setShowReceipt] = useState(false);
+  const expirationTime = new Date().getTime() + 6 * 60 * 60 * 1000;
+  const options = {
+    expires: new Date(expirationTime),
+  };
 
   const {
     value: enteredName,
@@ -198,6 +205,8 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const [alertIsOpen, setAlertIsOpen] = useState(false);
   const [cancelAlertIsOpen, setCancelAlertIsOpen] = useState(false);
   const [orderStatus, setOrderStatus] = useState("");
+  const [notes, setNotes] = useState("");
+  const MAX_NOTES_LENGTH = 350;
 
   const alertOnClose = () => {
     setAlertIsOpen(false);
@@ -217,6 +226,13 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
       document.body.appendChild(script);
     };
     addKhaltiScript();
+  };
+
+  const handleChangeNotes = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const inputValue = e.target.value;
+    if (inputValue.length <= MAX_NOTES_LENGTH) {
+      setNotes(inputValue);
+    }
   };
 
   const submitHandler = async (e: React.FormEvent) => {
@@ -240,6 +256,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
         user_name: enteredName,
         table_no: enteredTable,
         items: orderedItems,
+        note: notes,
         total_price: totalAmount,
         total_items: totalQuantity,
         payment_method: paymentMethod,
@@ -266,7 +283,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
         oldOrderIds.push(data.order_id);
 
         // Set the updated order IDs in the cookie
-        Cookies.set("orderId", JSON.stringify(oldOrderIds));
+        Cookies.set("orderId", JSON.stringify(oldOrderIds), options);
 
         console.log(Cookies.get("orderId"));
 
@@ -282,6 +299,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
       }
       resetNameInput();
       resetTableInput();
+      setNotes("");
       dispatch(clearCart());
       Cookies.remove("cart");
     } else {
@@ -391,6 +409,23 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
               </Box>
               <Divider pt="2" borderBottomWidth={"3px"} />
               <Box>
+                <Stack direction={"row"} spacing={"4"} pt="2">
+                  <Text fontWeight={"semibold"} fontSize={"sm"} color="gray">
+                    Additional Notes:
+                  </Text>
+                  <Spacer />
+                  <Textarea
+                    fontWeight={"semibold"}
+                    fontSize={"sm"}
+                    maxLength={MAX_NOTES_LENGTH}
+                    value={notes}
+                    onChange={handleChangeNotes}
+                  ></Textarea>
+                </Stack>
+                <Text color="red.500" fontSize="xs" textAlign={"right"}>
+                  {notes.length}/{MAX_NOTES_LENGTH}
+                </Text>
+                <Divider pt={2} pb="2" borderBottomWidth={"3px"} />
                 <Stack direction={"row"} spacing={"4"} pt="2">
                   <Text fontWeight={"semibold"} fontSize={"sm"} color="gray">
                     Item

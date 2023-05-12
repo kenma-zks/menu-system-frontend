@@ -209,7 +209,7 @@ const PreparingOrders = () => {
                     >
                       <AlertDialogContent>
                         <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                          Delete Product
+                          Delete Order
                         </AlertDialogHeader>
 
                         <AlertDialogBody>

@@ -123,7 +123,7 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
             isClosable: true,
           });
         });
-      console.log(productData);
+      onClose();
     } else {
       toast({
         title: "Invalid Input",
@@ -197,7 +197,7 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                 <FormControl w="60%">
                   <Text pb="2">Price</Text>
                   <InputGroup>
-                    <InputLeftElement pointerEvents="none" children="$" />
+                    <InputLeftElement pointerEvents="none" children="Rs" />
                     <Input
                       type="number"
                       placeholder="Price"

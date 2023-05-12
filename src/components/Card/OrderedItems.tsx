@@ -60,6 +60,7 @@ const OrderedItems = () => {
       table_no: order.table_no,
       order_id: order.order_id,
       items: cartItems,
+      note: order.note,
       total_price: order.total_price,
       total_items: order.total_items,
       payment_method: order.payment_method,
@@ -233,7 +234,7 @@ const OrderedItems = () => {
                     >
                       <AlertDialogContent>
                         <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                          Delete Product
+                          Delete Order
                         </AlertDialogHeader>
 
                         <AlertDialogBody>

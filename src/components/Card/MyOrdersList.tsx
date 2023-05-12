@@ -40,9 +40,6 @@ const MyOrdersList = () => {
   const [previewOrder, setPreviewOrder] = useState<IOrderData | null>(null);
   const toast = useToast();
   const [orderStatus, setOrderStatus] = useState("");
-  const [order, setOrder] = useState<IOrderData | null>(null);
-  const [showReceipt, setShowReceipt] = useState(false);
-  const [orderData, setOrderData] = useState<IOrderData>();
 
   const transformOrderData = async (order: IOrderData): Promise<IOrderData> => {
     const cartItems = await Promise.all(
@@ -63,6 +60,7 @@ const MyOrdersList = () => {
       table_no: order.table_no,
       order_id: order.order_id,
       items: cartItems,
+      note: order.note,
       total_price: order.total_price,
       total_items: order.total_items,
       payment_method: order.payment_method,
@@ -119,6 +117,12 @@ const MyOrdersList = () => {
   const handleDelete = () => {
     if (selectedOrder) {
       const { order_id } = selectedOrder;
+      const orderIdArray = JSON.parse(Cookies.get("orderId") || "[]");
+      const index = orderIdArray.indexOf(order_id);
+      if (index > -1) {
+        orderIdArray.splice(index, 1);
+      }
+      Cookies.set("orderId", JSON.stringify(orderIdArray));
       fetch(`http://127.0.0.1:8000/api/order/${order_id}`, {
         method: "DELETE",
       }).then(() => {
@@ -132,8 +136,6 @@ const MyOrdersList = () => {
           isClosable: true,
         });
       });
-
-      Cookies.remove("orderId");
     }
   };
 

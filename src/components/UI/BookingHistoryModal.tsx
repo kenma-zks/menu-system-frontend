@@ -57,7 +57,7 @@ const BookingHistoryModal: React.FC<ViewBookingModalProps> = ({
           first_name: item.first_name,
           last_name: item.last_name,
           booking_date: item.booking_date,
-          booking_duration: item.booking_duration,
+          booking_time: item.booking_time,
           table_capacity: item.table_capacity,
           phone_number: item.phone_number,
           email: item.email,
@@ -193,10 +193,10 @@ const BookingHistoryModal: React.FC<ViewBookingModalProps> = ({
                   />
                 </FormControl>
                 <FormControl>
-                  <FormLabel fontWeight="normal">Booking duration</FormLabel>
+                  <FormLabel fontWeight="normal">Booking time</FormLabel>
                   <Input
-                    placeholder="Booking duration"
-                    defaultValue={booking?.booking_duration}
+                    placeholder="Booking time"
+                    defaultValue={booking?.booking_time}
                     isDisabled
                   />
                 </FormControl>

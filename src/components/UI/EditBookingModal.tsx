@@ -1,4 +1,4 @@
-import { WarningIcon } from "@chakra-ui/icons";
+import { CheckIcon, CloseIcon, WarningIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -6,6 +6,7 @@ import {
   FormControl,
   FormLabel,
   HStack,
+  IconButton,
   Input,
   InputGroup,
   InputLeftAddon,
@@ -52,7 +53,7 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
           first_name: item.first_name,
           last_name: item.last_name,
           booking_date: item.booking_date,
-          booking_duration: item.booking_duration,
+          booking_time: item.booking_time,
           table_capacity: item.table_capacity,
           phone_number: item.phone_number,
           email: item.email,
@@ -61,6 +62,7 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
         };
       });
       dispatch(setBookings(transformedData));
+      console.log(transformedData);
     });
   }, [dispatch]);
 
@@ -68,62 +70,110 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
     fetchBookingDetailsCallback();
   }, [fetchBookingDetailsCallback]);
 
-  const {
-    value: enteredStatus,
-    isValid: enteredStatusIsValid,
-    valueChangeHandler: statusChangeHandler,
-  } = useInput((value) => (value as string).trim() !== "");
-
-  const submitHandler = (event: React.FormEvent) => {
-    event.preventDefault();
-    console.log(enteredStatus);
-    if (enteredStatusIsValid) {
-      const updatedBooking = {
-        id: booking?.id,
-        first_name: booking?.first_name,
-        last_name: booking?.last_name,
-        booking_date: booking?.booking_date,
-        booking_duration: booking?.booking_duration,
-        table_capacity: booking?.table_capacity,
-        phone_number: booking?.phone_number,
-        email: booking?.email,
-        note: booking?.note,
-        status: enteredStatus,
-      };
-      fetch(`http://127.0.0.1:8000/api/booking/list/${booking?.id}/`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedBooking),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          dispatch(updateBookings(data));
-          toast({
-            title: "Booking Status Updated",
-            description: "Booking status has been updated successfully",
-            status: "success",
-            duration: 3000,
-            isClosable: true,
-          });
-        })
-        .catch((error) => {
-          console.log(error);
+  const handleAccept = (id?: number) => {
+    fetch(`http://127.0.0.1:8000/api/booking/list/${id}/`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status: "Accepted" }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        dispatch(updateBookings(data));
+        toast({
+          title: "Booking Accepted",
+          description: "Booking has been accepted successfully",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
         });
-    }
+        const email = data.email;
+        const booking_date = data.booking_date;
+        const booking_time = data.booking_time;
+        const table_capacity = data.table_capacity;
+        fetch(`http://127.0.0.1:8000/api/booking/email/`, {
+          method: "POST",
+          body: JSON.stringify({
+            email: email,
+            booking_date: booking_date,
+            booking_time: booking_time,
+            table_capacity: table_capacity,
+            status: "Accepted",
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+          })
+
+          .catch((error) => {
+            console.log(error);
+          });
+        onClose();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const handleReject = (id?: number) => {
+    fetch(`http://127.0.0.1:8000/api/booking/list/${id}/`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status: "Rejected" }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        dispatch(updateBookings(data));
+        toast({
+          title: "Booking Rejected",
+          description: "Booking has been rejected",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        const email = data.email;
+        const booking_date = data.booking_date;
+        const booking_time = data.booking_time;
+        const table_capacity = data.table_capacity;
+        fetch(`http://127.0.0.1:8000/api/booking/email/`, {
+          method: "POST",
+          body: JSON.stringify({
+            email: email,
+            booking_date: booking_date,
+            booking_time: booking_time,
+            table_capacity: table_capacity,
+            status: "Rejected",
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+        onClose();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose} size="2xl">
         <ModalOverlay />
-        <ModalContent
-          key={booking?.id}
-          borderRadius="3xl"
-          as={"form"}
-          onSubmit={submitHandler}
-        >
+        <ModalContent key={booking?.id} borderRadius="3xl">
           <ModalHeader>Booking Details</ModalHeader>
 
           <ModalCloseButton />
@@ -198,22 +248,11 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
                   />
                 </FormControl>
                 <FormControl>
-                  <FormLabel fontWeight="normal">Booking duration</FormLabel>
+                  <FormLabel fontWeight="normal">Booking time</FormLabel>
                   <Input
-                    placeholder="Booking duration"
-                    defaultValue={booking?.booking_duration}
+                    placeholder="Booking time"
+                    defaultValue={booking?.booking_time}
                   />
-                </FormControl>
-                <FormControl>
-                  <FormLabel fontWeight="normal">Status</FormLabel>
-                  <Select
-                    placeholder="Select Option"
-                    defaultValue={booking?.status}
-                    onChange={statusChangeHandler}
-                  >
-                    <option value="Accepted">Accepted</option>
-                    <option value="Rejected">Rejected</option>
-                  </Select>
                 </FormControl>
               </Stack>
 
@@ -225,44 +264,96 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
           </ModalBody>
 
           <ModalFooter w="100%" bgColor={"#EBEEF2"} borderBottomRadius="3xl">
-            <Box
-              backgroundColor={
-                booking?.status === "Accepted"
-                  ? "green.200"
-                  : booking?.status === "Rejected"
-                  ? "red.200"
-                  : "gray.300"
-              }
-              color="white"
-              fontSize={"sm"}
-              w={{ base: "30%", md: "20%" }}
-              h="10"
-              borderRadius={"md"}
-              display="flex"
-              justifyContent="center"
-              mx="6"
-            >
-              <HStack spacing={2}>
-                <WarningIcon />
-                <Text
-                  fontWeight="medium"
-                  color={
-                    booking?.status === "Accepted"
-                      ? "green.600"
-                      : booking?.status === "Rejected"
-                      ? "red.600"
-                      : "gray.600"
-                  }
-                  textAlign="center"
+            {booking?.status === "Pending" && (
+              <>
+                <Button
+                  type="submit"
+                  colorScheme="orange"
+                  mr={3}
+                  variant={"outline"}
+                  _hover={{
+                    bg: "orange.600",
+                    color: "white",
+                  }}
+                  onClick={() => handleReject(booking?.id)}
                 >
-                  {booking?.status}
-                </Text>
-              </HStack>
-            </Box>
-
-            <Button type="submit" colorScheme="orange">
-              Save Changes
-            </Button>
+                  Reject Booking
+                </Button>
+                <Button
+                  type="submit"
+                  colorScheme="green"
+                  mr={3}
+                  variant={"outline"}
+                  _hover={{
+                    bg: "green.600",
+                    color: "white",
+                  }}
+                  onClick={() => handleAccept(booking?.id)}
+                >
+                  Accept Booking
+                </Button>
+              </>
+            )}
+            {booking?.status === "Accepted" && (
+              <>
+                <Button
+                  type="submit"
+                  colorScheme="orange"
+                  mr={3}
+                  variant={"outline"}
+                  _hover={{
+                    bg: "orange.600",
+                    color: "white",
+                  }}
+                  onClick={() => handleReject(booking?.id)}
+                >
+                  Reject Booking
+                </Button>
+                <Button
+                  type="submit"
+                  colorScheme="green"
+                  mr={3}
+                  variant={"solid"}
+                  _hover={{
+                    bg: "green.600",
+                    color: "white",
+                  }}
+                  isDisabled={true}
+                >
+                  Booking Accepted
+                </Button>
+              </>
+            )}
+            {booking?.status === "Rejected" && (
+              <>
+                <Button
+                  type="submit"
+                  colorScheme="green"
+                  mr={3}
+                  variant={"solid"}
+                  _hover={{
+                    bg: "green.600",
+                    color: "white",
+                  }}
+                  onClick={() => handleAccept(booking?.id)}
+                >
+                  Accept Booking
+                </Button>
+                <Button
+                  type="submit"
+                  colorScheme="orange"
+                  mr={3}
+                  variant={"solid"}
+                  _hover={{
+                    bg: "orange.600",
+                    color: "white",
+                  }}
+                  isDisabled={true}
+                >
+                  Booking Rejected
+                </Button>
+              </>
+            )}
           </ModalFooter>
         </ModalContent>
       </Modal>

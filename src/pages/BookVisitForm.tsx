@@ -75,15 +75,21 @@ const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
     valueChangeHandler: bookingDateChangeHandler,
     inputBlurHandler: bookingDateBlurHandler,
     reset: resetBookingDateInput,
-  } = useInput((value) => (value as string).trim() !== "");
+  } = useInput((value) => {
+    const trimmedValue = (value as string).trim();
+    const currentDate = new Date();
+    const enteredDate = new Date(trimmedValue);
+
+    return trimmedValue !== "" && enteredDate >= currentDate;
+  });
 
   const {
-    value: enteredBookingDuration,
-    isValid: enteredBookingDurationIsValid,
-    hasError: enteredBookingDurationHasError,
-    valueChangeHandler: bookingDurationChangeHandler,
-    inputBlurHandler: bookingDurationBlurHandler,
-    reset: resetBookingDurationInput,
+    value: enteredBookingTime,
+    isValid: enteredBookingTimeIsValid,
+    hasError: enteredBookingTimeHasError,
+    valueChangeHandler: bookingTimeChangeHandler,
+    inputBlurHandler: bookingTimeBlurHandler,
+    reset: resetBookingTimeInput,
   } = useInput((value) => (value as string).trim() !== "");
 
   const {
@@ -99,7 +105,7 @@ const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
     enteredPhoneNumberIsValid &&
     enteredTableCapacityIsValid &&
     enteredBookingDateIsValid &&
-    enteredBookingDurationIsValid;
+    enteredBookingTimeIsValid;
 
   function submitHandler(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -112,7 +118,7 @@ const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
         phone_number: enteredPhoneNumber,
         table_capacity: enteredTableCapacity,
         booking_date: enteredBookingDate,
-        booking_duration: enteredBookingDuration,
+        booking_time: enteredBookingTime,
         note: enteredNote,
         status: "Pending",
       };
@@ -122,7 +128,7 @@ const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
       resetPhoneNumberInput();
       resetTableCapacityInput();
       resetBookingDateInput();
-      resetBookingDurationInput();
+      resetBookingTimeInput();
       resetNoteInput();
       onAddBooking(booking);
     } else {
@@ -245,18 +251,18 @@ const BookVisitForm = ({ onAddBooking }: BookVisitProps) => {
           )}
         </FormControl>
 
-        <FormControl mt="3%" isInvalid={enteredBookingDurationHasError}>
-          <FormLabel htmlFor="booking-duration" fontWeight="normal">
-            Booking Duration
+        <FormControl mt="3%" isInvalid={enteredBookingTimeHasError}>
+          <FormLabel htmlFor="booking_time" fontWeight="normal">
+            Booking Time
           </FormLabel>
           <Input
-            placeholder="EG: 10AM - 12PM"
-            onChange={bookingDurationChangeHandler}
-            onBlur={bookingDurationBlurHandler}
-            value={enteredBookingDuration}
+            placeholder="EG: 10AM "
+            onChange={bookingTimeChangeHandler}
+            onBlur={bookingTimeBlurHandler}
+            value={enteredBookingTime}
           />
-          {enteredBookingDurationHasError && (
-            <FormErrorMessage>Enter a valid booking duration</FormErrorMessage>
+          {enteredBookingTimeHasError && (
+            <FormErrorMessage>Enter a valid booking Time</FormErrorMessage>
           )}
         </FormControl>
 

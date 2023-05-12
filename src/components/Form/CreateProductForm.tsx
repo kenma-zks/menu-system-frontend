@@ -12,24 +12,24 @@ import {
   Textarea,
   useToast,
   VStack,
-} from '@chakra-ui/react'
-import React, { useCallback, useEffect, useState } from 'react'
-import { fetchCategories } from '../../api/api'
-import useInput from '../../hooks/use-input'
-import { setCategories } from '../../store/categoriesSlice'
-import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { ICategoryData, IProductData } from '../../types/types'
-import UploadImage from '../UI/UploadImage'
+} from "@chakra-ui/react";
+import React, { useCallback, useEffect, useState } from "react";
+import { fetchCategories } from "../../api/api";
+import useInput from "../../hooks/use-input";
+import { setCategories } from "../../store/categoriesSlice";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { ICategoryData, IProductData } from "../../types/types";
+import UploadImage from "../UI/UploadImage";
 
 interface ICreateProductFormProps {
-  onReceiveFormData: (data: IProductData) => void
+  onReceiveFormData: (data: IProductData) => void;
 }
 
 const CreateProductForm = ({ onReceiveFormData }: ICreateProductFormProps) => {
-  const [imagePreview, setImagePreview] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<File | null>(null);
 
-  const dispatch = useAppDispatch()
-  const categories = useAppSelector((state) => state.categories.categories)
+  const dispatch = useAppDispatch();
+  const categories = useAppSelector((state) => state.categories.categories);
 
   const fetchCategoriesCallback = useCallback(() => {
     fetchCategories<ICategoryData[]>().then((data) => {
@@ -37,15 +37,15 @@ const CreateProductForm = ({ onReceiveFormData }: ICreateProductFormProps) => {
         return {
           id: item.id,
           category_name: item.category_name,
-        }
-      })
-      dispatch(setCategories(transformedData))
-    })
-  }, [])
+        };
+      });
+      dispatch(setCategories(transformedData));
+    });
+  }, []);
 
   useEffect(() => {
-    fetchCategoriesCallback()
-  }, [fetchCategoriesCallback])
+    fetchCategoriesCallback();
+  }, [fetchCategoriesCallback]);
 
   const {
     value: enteredProductName,
@@ -54,7 +54,7 @@ const CreateProductForm = ({ onReceiveFormData }: ICreateProductFormProps) => {
     valueChangeHandler: productNameChangeHandler,
     inputBlurHandler: productNameBlurHandler,
     reset: resetProductNameInput,
-  } = useInput((value) => (value as string).trim() !== '')
+  } = useInput((value) => (value as string).trim() !== "");
 
   const {
     value: enteredPrice,
@@ -63,7 +63,7 @@ const CreateProductForm = ({ onReceiveFormData }: ICreateProductFormProps) => {
     valueChangeHandler: priceChangeHandler,
     inputBlurHandler: priceBlurHandler,
     reset: resetPriceInput,
-  } = useInput((value) => (value as number) > 0)
+  } = useInput((value) => (value as number) > 0);
 
   const {
     value: enteredCategory,
@@ -72,7 +72,7 @@ const CreateProductForm = ({ onReceiveFormData }: ICreateProductFormProps) => {
     valueChangeHandler: categoryChangeHandler,
     inputBlurHandler: categoryBlurHandler,
     reset: resetCategoryInput,
-  } = useInput((value) => (value as string).trim() !== '')
+  } = useInput((value) => (value as string).trim() !== "");
 
   const {
     value: enteredDescription,
@@ -81,17 +81,17 @@ const CreateProductForm = ({ onReceiveFormData }: ICreateProductFormProps) => {
     valueChangeHandler: descriptionChangeHandler,
     inputBlurHandler: descriptionBlurHandler,
     reset: resetDescriptionInput,
-  } = useInput((value) => (value as string).trim() !== '')
+  } = useInput((value) => (value as string).trim() !== "");
 
   const formIsValid =
     enteredProductNameIsValid &&
     enteredPriceIsValid &&
     enteredCategoryIsValid &&
     enteredDescriptionIsValid &&
-    imagePreview !== null
+    imagePreview !== null;
 
   function submitHandler(event: React.FormEvent<HTMLDivElement>) {
-    event.preventDefault()
+    event.preventDefault();
 
     if (formIsValid) {
       const productData = {
@@ -101,47 +101,47 @@ const CreateProductForm = ({ onReceiveFormData }: ICreateProductFormProps) => {
         food_description: enteredDescription,
         food_image: imagePreview,
         food_available: true,
-      }
-      resetProductNameInput()
-      resetPriceInput()
-      resetCategoryInput()
-      resetDescriptionInput()
-      setImagePreview(null)
-      onReceiveFormData(productData)
-      console.log(productData)
+      };
+      resetProductNameInput();
+      resetPriceInput();
+      resetCategoryInput();
+      resetDescriptionInput();
+      setImagePreview(null);
+      onReceiveFormData(productData);
+      console.log(productData);
     } else {
-      let errorMessage = 'Please enter '
+      let errorMessage = "Please enter ";
       if (!enteredProductName.trim()) {
-        errorMessage += 'Product name, '
+        errorMessage += "Product name, ";
       }
       if (!enteredPrice || Number(enteredPrice) <= 0) {
-        errorMessage += 'Price, '
+        errorMessage += "Price, ";
       }
       if (!enteredCategory) {
-        errorMessage += 'Category, '
+        errorMessage += "Category, ";
       }
       if (!enteredDescription.trim()) {
-        errorMessage += 'Description, '
+        errorMessage += "Description, ";
       }
       if (!imagePreview) {
-        errorMessage += 'Image, '
+        errorMessage += "Image, ";
       }
 
-      errorMessage = errorMessage.slice(0, -2) + '.'
+      errorMessage = errorMessage.slice(0, -2) + ".";
       toast({
-        title: 'Invalid input.',
+        title: "Invalid input.",
         description: errorMessage,
-        status: 'error',
+        status: "error",
         duration: 9000,
         isClosable: true,
-        variant: 'left-accent',
-      })
+        variant: "left-accent",
+      });
     }
   }
-  const toast = useToast()
+  const toast = useToast();
 
   return (
-    <VStack display={'flex'} alignItems={'start'} p="4" w="100%">
+    <VStack display={"flex"} alignItems={"start"} p="4" w="100%">
       <VStack
         as="form"
         spacing="4"
@@ -161,7 +161,7 @@ const CreateProductForm = ({ onReceiveFormData }: ICreateProductFormProps) => {
           <FormControl w="50%" isInvalid={enteredPriceHasError}>
             <Text pb="2">Price</Text>
             <InputGroup>
-              <InputLeftElement pointerEvents="none" children="$" />
+              <InputLeftElement pointerEvents="none" children="Rs" />
               <Input
                 type="number"
                 placeholder="Price"
@@ -208,7 +208,7 @@ const CreateProductForm = ({ onReceiveFormData }: ICreateProductFormProps) => {
         </FormControl>
       </VStack>
     </VStack>
-  )
-}
+  );
+};
 
-export default CreateProductForm
+export default CreateProductForm;

@@ -59,6 +59,7 @@ const OrderedHistoryItems = () => {
       table_no: order.table_no,
       order_id: order.order_id,
       items: cartItems,
+      note: order.note,
       total_price: order.total_price,
       total_items: order.total_items,
       payment_method: order.payment_method,
@@ -92,7 +93,6 @@ const OrderedHistoryItems = () => {
       const transformedData = data.map(transformOrderData);
       Promise.all(transformedData).then((result) => {
         dispatch(setOrders(result));
-        console.log(result);
       });
     });
   }, []);

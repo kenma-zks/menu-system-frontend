@@ -6,7 +6,7 @@ export interface IBookingData {
   phone_number: string;
   table_capacity: number | string;
   booking_date: string;
-  booking_duration: string;
+  booking_time: string;
   note: string;
   status?: string;
 }
@@ -97,4 +97,18 @@ export interface IOrderData {
   order_status?: string;
   ordered_date?: string;
   ordered_time?: string;
+}
+
+export interface ISalesData {
+  total_sales: number;
+  total_orders: number;
+  today_sales: number;
+  yesterday_sales: number;
+  last_7_days_sales: number;
+  last_30_days_sales: number;
+  last_365_days_sales: number;
+  sales_data: {
+    name: string;
+    sales: number;
+  }[];
 }

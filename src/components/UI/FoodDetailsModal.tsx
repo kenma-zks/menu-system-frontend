@@ -38,6 +38,10 @@ const FoodDetailsModal: React.FC<FoodDetailsModalProps> = ({
   const dispatch = useAppDispatch();
   const toast = useToast();
   const [quantity, setQuantity] = useState(1);
+  const expirationTime = new Date().getTime() + 6 * 60 * 60 * 1000;
+  const options = {
+    expires: new Date(expirationTime),
+  };
 
   const handleIncrement = () => {
     setQuantity((prev) => prev + 1);
@@ -123,7 +127,7 @@ const FoodDetailsModal: React.FC<FoodDetailsModalProps> = ({
     }
 
     // Update the cookie with the updated cart data
-    Cookies.set("cart", JSON.stringify(cartData));
+    Cookies.set("cart", JSON.stringify(cartData), options);
   };
 
   return (
