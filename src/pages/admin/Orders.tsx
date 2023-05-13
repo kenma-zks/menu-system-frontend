@@ -27,10 +27,10 @@ const AdminOrders = () => {
               </TabList>
               <Box>
                 <TabPanels>
-                  <TabPanel p="8">
+                  <TabPanel p="4">
                     <OrderedItems />
                   </TabPanel>
-                  <TabPanel p="8">
+                  <TabPanel p="4">
                     <PreparingOrders />
                   </TabPanel>
                 </TabPanels>

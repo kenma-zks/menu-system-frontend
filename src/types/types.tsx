@@ -94,6 +94,7 @@ export interface IOrderData {
   total_items: number | string;
   note?: string;
   payment_method: string;
+  payment_status?: string;
   order_status?: string;
   ordered_date?: string;
   ordered_time?: string;

@@ -1,11 +1,20 @@
-import { WarningIcon } from "@chakra-ui/icons";
-import { Box, HStack, Select, Text, VStack } from "@chakra-ui/react";
+import { ChevronDownIcon, WarningIcon } from "@chakra-ui/icons";
+import {
+  Box,
+  HStack,
+  Select,
+  Text,
+  VStack,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Button,
+} from "@chakra-ui/react";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { fetchPastBookingDetails } from "../../api/api";
-import AdminNavbar from "../../components/UI/BookingAdminNavbar";
 import BookingHistoryModal from "../../components/UI/BookingHistoryModal";
-import EditBookingModal from "../../components/UI/EditBookingModal";
 import { setBookings } from "../../store/bookingSlice";
 import { useAppSelector } from "../../store/hooks";
 import { IBookingData } from "../../types/types";
@@ -19,6 +28,8 @@ const BookingHistory = () => {
   );
   const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [bookingFilterOptions, setBookingFilterOptions] =
+    useState<string>("Today");
 
   const filteredBookings = bookings.filter(
     (booking) =>
@@ -46,7 +57,7 @@ const BookingHistory = () => {
           first_name: item.first_name,
           last_name: item.last_name,
           booking_date: item.booking_date,
-          booking_duration: item.booking_duration,
+          booking_time: item.booking_time,
           table_capacity: item.table_capacity,
           phone_number: item.phone_number,
           email: item.email,
@@ -67,6 +78,34 @@ const BookingHistory = () => {
     setSelectedBooking(booking);
   };
 
+  const filteredBookingDate = bookings.filter((booking) => {
+    if (!booking.booking_date) {
+      return false; // Skip this order if ordered_date is undefined
+    }
+
+    const today = new Date();
+    const yesterday = new Date(today);
+
+    yesterday.setDate(yesterday.getDate() - 1);
+    const last7days = new Date(today);
+    last7days.setDate(last7days.getDate() - 7);
+    const last30days = new Date(today);
+    last30days.setDate(last30days.getDate() - 30);
+
+    const bookingDate = new Date(booking.booking_date);
+    if (bookingFilterOptions === "Today") {
+      return bookingDate.getDate() === today.getDate();
+    } else if (bookingFilterOptions === "Yesterday") {
+      return bookingDate.getDate() === yesterday.getDate();
+    } else if (bookingFilterOptions === "Last 7 days") {
+      return bookingDate >= last7days;
+    } else if (bookingFilterOptions === "Last 30 days") {
+      return bookingDate >= last30days;
+    } else if (bookingFilterOptions === "All time") {
+      return true;
+    }
+  });
+
   return (
     <Box minH="100vh" backgroundColor="#EBEEF2" p="4">
       <BookingAdminNavbar
@@ -74,31 +113,71 @@ const BookingHistory = () => {
         setSearchQuery={setSearchQuery}
       />
       <VStack alignItems={"flex-start"} p="4">
-        <Box pb={3}>
+        <HStack justifyContent={"space-between"} w={"100%"} pb={3}>
           <Text fontWeight="bold" pb="1">
             BOOKINGS
           </Text>
-        </Box>
+          <Menu size="sm" matchWidth>
+            <MenuButton
+              as={Button}
+              rightIcon={<ChevronDownIcon />}
+              width="30%"
+              backgroundColor="white"
+              border="1px"
+              borderColor="gray.400"
+              borderRadius="md"
+              _hover={{ bg: "white" }}
+              _expanded={{ bg: "white" }}
+              _focus={{ bg: "white" }}
+              borderRightRadius="0"
+              iconSpacing="2"
+              fontSize="sm"
+              color="gray.600"
+              paddingLeft="2"
+              paddingRight="2"
+            >
+              {bookingFilterOptions}
+            </MenuButton>
+            <MenuList>
+              <MenuItem onClick={() => setBookingFilterOptions("Today")}>
+                Today
+              </MenuItem>
+              <MenuItem onClick={() => setBookingFilterOptions("Yesterday")}>
+                Yesterday
+              </MenuItem>
+              <MenuItem onClick={() => setBookingFilterOptions("Last 7 days")}>
+                Last 7 days
+              </MenuItem>
+              <MenuItem onClick={() => setBookingFilterOptions("Last 30 days")}>
+                Last 30 days
+              </MenuItem>
+              <MenuItem onClick={() => setBookingFilterOptions("All time")}>
+                All time
+              </MenuItem>
+            </MenuList>
+          </Menu>
+        </HStack>
 
         <Box w="100%">
-          {Object.entries(groupedBookings).map(([date, bookings]) => {
+          {Object.entries(groupedBookings).map(([date]) => {
             return (
               <React.Fragment key={date}>
-                <Box pb="4">
-                  <Text
-                    fontWeight="medium"
-                    fontSize={{ base: "sm", md: "md" }}
-                    pb="1"
-                    color="gray"
-                  >
-                    {new Date(date).toLocaleDateString("en-US", {
-                      weekday: "long",
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </Text>
-                  {bookings.map((booking) => (
+                {filteredBookingDate.map((booking) => (
+                  <Box pb="4" key={booking.id}>
+                    <Text
+                      fontWeight="medium"
+                      fontSize={{ base: "sm", md: "md" }}
+                      pb="1"
+                      color="gray"
+                    >
+                      {new Date(date).toLocaleDateString("en-US", {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </Text>
+
                     <Box
                       key={booking.id}
                       w={{ base: "100%", md: "100%", lg: "70%" }}
@@ -126,7 +205,7 @@ const BookingHistory = () => {
                           fontSize={{ base: "sm", md: "md" }}
                           w={{ base: "20%", md: "30%" }}
                         >
-                          {booking.booking_duration}
+                          {booking.booking_time}
                         </Text>
                         <Box
                           backgroundColor={
@@ -163,15 +242,15 @@ const BookingHistory = () => {
                         </Box>
                       </HStack>
                     </Box>
-                  ))}
-                  {selectedBooking && (
-                    <BookingHistoryModal
-                      isOpen={isModalOpen}
-                      onClose={() => setIsModalOpen(false)}
-                      booking={selectedBooking}
-                    />
-                  )}
-                </Box>
+                    {selectedBooking && (
+                      <BookingHistoryModal
+                        isOpen={isModalOpen}
+                        onClose={() => setIsModalOpen(false)}
+                        booking={selectedBooking}
+                      />
+                    )}
+                  </Box>
+                ))}
               </React.Fragment>
             );
           })}

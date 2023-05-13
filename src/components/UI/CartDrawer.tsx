@@ -38,14 +38,13 @@ import {
   setTotalAmount,
   setTotalQuantity,
 } from "../../store/cartSlice";
-import { addOrder, deleteOrder, setOrders } from "../../store/orderSlice";
-import KhaltiConfig from "../Khalti/KhaltiConfig";
-import KhaltiCheckout from "khalti-checkout-web";
+import { addOrder } from "../../store/orderSlice";
 import useInput from "../../hooks/use-input";
 import Cookies from "js-cookie";
 import ViewBill from "../Card/ViewBill";
-import { m } from "framer-motion";
-import { options } from "pdfkit";
+import KhaltiConfig from "../Khalti/KhaltiConfig";
+import KhaltiCheckout from "khalti-checkout-web";
+import { setPaymentComplete } from "../../store/paymentSlice";
 
 interface RootState {
   cart: {
@@ -68,14 +67,26 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   );
   const dispatch = useDispatch();
   const [paymentMethod, setPaymentMethod] = useState("cash");
+
   const toast = useToast();
-  // const [isOrderPlaced, setIsOrderPlaced] = useState(false);
   const [newOrder, setNewOrder] = useState<IOrderData | null>(null);
   const [showReceipt, setShowReceipt] = useState(false);
   const expirationTime = new Date().getTime() + 6 * 60 * 60 * 1000;
   const options = {
     expires: new Date(expirationTime),
   };
+  const isPaymentSuccess = useSelector(
+    (state: any) => state.payment.isPaymentSuccess
+  );
+  const isPaymentSucessfulCookie = Cookies.get("paymentSuccess") === "true";
+  console.log("isPaymentSuccess", isPaymentSuccess);
+
+  useEffect(() => {
+    const paymentSuccess = Cookies.get("paymentSuccess");
+    if (paymentSuccess === "true") {
+      setPaymentMethod("Khalti");
+    }
+  }, []);
 
   const {
     value: enteredName,
@@ -193,18 +204,11 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
       dispatch(setTotalQuantity(totalQuantity));
       dispatch(setTotalAmount(totalAmount));
     }
-
-    // const orderPlacedCookie = Cookies.get("orderPlaced");
-    // if (orderPlacedCookie) {
-    //   setIsOrderPlaced(true);
-    // }
   }, [dispatch]);
 
   const leastDestructiveRef = useRef<HTMLButtonElement | null>(null);
   const cancelRef = useRef<HTMLButtonElement | null>(null);
   const [alertIsOpen, setAlertIsOpen] = useState(false);
-  const [cancelAlertIsOpen, setCancelAlertIsOpen] = useState(false);
-  const [orderStatus, setOrderStatus] = useState("");
   const [notes, setNotes] = useState("");
   const MAX_NOTES_LENGTH = 350;
 
@@ -213,19 +217,10 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   };
 
   const handlePayment = () => {
-    const config = KhaltiConfig();
+    onClose();
+    const config = KhaltiConfig(dispatch, toast);
     const checkout = new KhaltiCheckout(config);
-    const addKhaltiScript = () => {
-      const script = document.createElement("script");
-      script.type = "text/javascript";
-      script.src = "https://khalti.com/static/khalti-checkout.js";
-      script.async = true;
-      script.onload = () => {
-        checkout.show({ amount: totalAmount * 100 });
-      };
-      document.body.appendChild(script);
-    };
-    addKhaltiScript();
+    checkout.show({ amount: totalAmount * 100 });
   };
 
   const handleChangeNotes = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -301,7 +296,9 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
       resetTableInput();
       setNotes("");
       dispatch(clearCart());
+      dispatch(setPaymentComplete());
       Cookies.remove("cart");
+      Cookies.remove("paymentSuccess");
     } else {
       toast({
         title: "Invalid Input",
@@ -516,7 +513,12 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                 borderRadius="md"
                 _hover={{ bg: "orange.400" }}
                 onClick={() => setAlertIsOpen(true)}
-                disabled={cartItems.length === 0}
+                disabled={
+                  cartItems.length === 0 ||
+                  (paymentMethod === "Khalti" &&
+                    !isPaymentSuccess &&
+                    !isPaymentSucessfulCookie)
+                }
               >
                 Process Transaction
               </Button>
