@@ -19,7 +19,6 @@ const KhaltiConfig = (dispatch?: any, toast?: any) => {
         let data = {
           token: payload.token,
           amount: payload.amount,
-          order_id: payload.order_id,
         };
         console.log(data);
 

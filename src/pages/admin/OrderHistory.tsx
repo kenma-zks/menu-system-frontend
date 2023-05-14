@@ -23,7 +23,7 @@ import { RootState } from "../../store/store";
 const OrderHistory = () => {
   const dispatch = useDispatch();
   const [ordersFilterOptions, setOrdersFilterOptions] =
-    useState<string>("Today");
+    useState<string>("All time");
   const orders = useSelector((state: RootState) => state.orders.orders);
 
   const transformOrderData = async (order: IOrderData): Promise<IOrderData> => {

@@ -103,7 +103,7 @@ const OrderedHistoryItems = ({ orders }: { orders: IOrderData }) => {
               >
                 <AlertDialogContent>
                   <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                    Delete Product
+                    Delete Order
                   </AlertDialogHeader>
 
                   <AlertDialogBody>

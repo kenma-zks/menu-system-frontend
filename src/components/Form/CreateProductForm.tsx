@@ -28,6 +28,7 @@ interface ICreateProductFormProps {
 const CreateProductForm = ({ onReceiveFormData }: ICreateProductFormProps) => {
   const [imagePreview, setImagePreview] = useState<File | null>(null);
 
+  const MAX_DESCRIPTION_LENGTH = 255;
   const dispatch = useAppDispatch();
   const categories = useAppSelector((state) => state.categories.categories);
 
@@ -149,9 +150,9 @@ const CreateProductForm = ({ onReceiveFormData }: ICreateProductFormProps) => {
         encType="multipart/form-data"
       >
         <FormControl isInvalid={enteredProductNameHasError}>
-          <Text pb="2">Product name</Text>
+          <Text pb="2">Food name</Text>
           <Input
-            placeholder="Product name"
+            placeholder="Food name"
             onChange={productNameChangeHandler}
             onBlur={productNameBlurHandler}
             value={enteredProductName}
@@ -193,9 +194,13 @@ const CreateProductForm = ({ onReceiveFormData }: ICreateProductFormProps) => {
           <Textarea
             placeholder="Description"
             onChange={descriptionChangeHandler}
+            maxLength={MAX_DESCRIPTION_LENGTH}
             onBlur={descriptionBlurHandler}
             value={enteredDescription}
           ></Textarea>
+          <Text color="red.500" fontSize="xs" textAlign={"right"}>
+            {enteredDescription.length}/{MAX_DESCRIPTION_LENGTH}
+          </Text>
         </FormControl>
         <FormControl>
           <Text pb="2">Image</Text>

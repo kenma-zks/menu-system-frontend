@@ -29,7 +29,7 @@ const BookingHistory = () => {
   const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [bookingFilterOptions, setBookingFilterOptions] =
-    useState<string>("Today");
+    useState<string>("All time");
 
   const filteredBookings = bookings.filter(
     (booking) =>
