@@ -30,6 +30,12 @@ const orderSlice = createSlice({
       );
       state.orders[orderIndex] = action.payload;
     },
+    // setPaymentSuccess(state, action: PayloadAction<number>) {
+    //   const orderIndex = state.orders.findIndex(
+    //     (order) => order.order_id === action.payload
+    //   );
+    //   state.orders[orderIndex].payment_status = "Paid";
+    // },
   },
 });
 

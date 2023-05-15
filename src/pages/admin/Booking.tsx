@@ -51,7 +51,7 @@ const Booking = () => {
           first_name: item.first_name,
           last_name: item.last_name,
           booking_date: item.booking_date,
-          booking_duration: item.booking_duration,
+          booking_time: item.booking_time,
           table_capacity: item.table_capacity,
           phone_number: item.phone_number,
           email: item.email,
@@ -159,7 +159,7 @@ const Booking = () => {
                             {booking.first_name} {booking.last_name}
                           </Text>
                           <Text color="gray" fontSize={"sm"} w="30%">
-                            {booking.booking_duration}
+                            {booking.booking_time}
                           </Text>
                           <Box
                             backgroundColor={
