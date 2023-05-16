@@ -37,13 +37,57 @@ const BookingHistory = () => {
       booking.last_name.toLowerCase().startsWith(searchQuery.toLowerCase())
   );
 
-  const groupedBookings = filteredBookings.reduce(
+  const groupedBookings = bookings.reduce(
     (acc: Record<string, IBookingData[]>, booking) => {
-      const bookingDate = new Date(booking.booking_date).toLocaleDateString();
-      if (!acc[bookingDate]) {
-        acc[bookingDate] = [];
+      if (
+        !booking.booking_date ||
+        !(
+          booking.first_name
+            .toLowerCase()
+            .startsWith(searchQuery.toLowerCase()) ||
+          booking.last_name.toLowerCase().startsWith(searchQuery.toLowerCase())
+        )
+      ) {
+        return acc; // Skip this booking if it doesn't meet the search criteria
       }
-      acc[bookingDate].push(booking);
+
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const last7days = new Date(today);
+      last7days.setDate(last7days.getDate() - 7);
+      const last30days = new Date(today);
+      last30days.setDate(last30days.getDate() - 30);
+
+      const bookingDate = new Date(booking.booking_date);
+
+      if (
+        bookingFilterOptions === "Today" &&
+        bookingDate.getDate() !== today.getDate()
+      ) {
+        return acc;
+      } else if (
+        bookingFilterOptions === "Yesterday" &&
+        bookingDate.getDate() !== yesterday.getDate()
+      ) {
+        return acc;
+      } else if (
+        bookingFilterOptions === "Last 7 days" &&
+        bookingDate < last7days
+      ) {
+        return acc;
+      } else if (
+        bookingFilterOptions === "Last 30 days" &&
+        bookingDate < last30days
+      ) {
+        return acc;
+      }
+
+      const bookingDateString = bookingDate.toLocaleDateString();
+      if (!acc[bookingDateString]) {
+        acc[bookingDateString] = [];
+      }
+      acc[bookingDateString].push(booking);
       return acc;
     },
     {}
@@ -77,34 +121,6 @@ const BookingHistory = () => {
     setIsModalOpen(true);
     setSelectedBooking(booking);
   };
-
-  const filteredBookingDate = bookings.filter((booking) => {
-    if (!booking.booking_date) {
-      return false; // Skip this order if ordered_date is undefined
-    }
-
-    const today = new Date();
-    const yesterday = new Date(today);
-
-    yesterday.setDate(yesterday.getDate() - 1);
-    const last7days = new Date(today);
-    last7days.setDate(last7days.getDate() - 7);
-    const last30days = new Date(today);
-    last30days.setDate(last30days.getDate() - 30);
-
-    const bookingDate = new Date(booking.booking_date);
-    if (bookingFilterOptions === "Today") {
-      return bookingDate.getDate() === today.getDate();
-    } else if (bookingFilterOptions === "Yesterday") {
-      return bookingDate.getDate() === yesterday.getDate();
-    } else if (bookingFilterOptions === "Last 7 days") {
-      return bookingDate >= last7days;
-    } else if (bookingFilterOptions === "Last 30 days") {
-      return bookingDate >= last30days;
-    } else if (bookingFilterOptions === "All time") {
-      return true;
-    }
-  });
 
   return (
     <Box minH="100vh" backgroundColor="#EBEEF2" p="4">
@@ -159,27 +175,28 @@ const BookingHistory = () => {
         </HStack>
 
         <Box w="100%">
-          {Object.entries(groupedBookings).map(([date]) => {
+          {Object.entries(groupedBookings).map(([date, bookings]) => {
             return (
               <React.Fragment key={date}>
-                {filteredBookingDate.map((booking) => (
-                  <Box pb="4" key={booking.id}>
-                    <Text
-                      fontWeight="medium"
-                      fontSize={{ base: "sm", md: "md" }}
-                      pb="1"
-                      color="gray"
-                    >
-                      {new Date(date).toLocaleDateString("en-US", {
-                        weekday: "long",
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </Text>
+                <Box pb="4">
+                  <Text
+                    fontWeight="medium"
+                    fontSize={{ base: "sm", md: "md" }}
+                    pb="1"
+                    color="gray"
+                  >
+                    {new Date(date).toLocaleDateString("en-US", {
+                      weekday: "long",
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </Text>
+                </Box>
 
+                {bookings.map((booking) => (
+                  <Box pb="4" key={booking.id}>
                     <Box
-                      key={booking.id}
                       w={{ base: "100%", md: "100%", lg: "70%" }}
                       p="4"
                       backgroundColor="white"
@@ -242,6 +259,7 @@ const BookingHistory = () => {
                         </Box>
                       </HStack>
                     </Box>
+
                     {selectedBooking && (
                       <BookingHistoryModal
                         isOpen={isModalOpen}

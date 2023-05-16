@@ -107,7 +107,7 @@ const BookingHistoryModal: React.FC<ViewBookingModalProps> = ({
   return (
     <form>
       <Modal isOpen={isOpen} onClose={onClose} size="2xl">
-        <ModalOverlay />
+        {/* <ModalOverlay /> */}
         <ModalContent key={booking?.id} borderRadius="3xl" as={"form"}>
           <ModalHeader>Booking Details</ModalHeader>
 
